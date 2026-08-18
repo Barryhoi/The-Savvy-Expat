@@ -1,0 +1,619 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background-color: #e9e7f4;
+  color: #041630;
+  font-family: "Satoshi", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background-color: #4934fb;
+  color: #ffffff;
+}
+
+/* Marker-style highlight used in the squeeze subheadline */
+.marker-highlight {
+  background-color: #4934fb;
+  color: #ffffff;
+  padding: 0.1em 0.35em;
+  font-weight: 700;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+/* ---------- Premium gradients ---------- */
+
+/* Soft white sheen at the top of a section, over the lavender page base */
+.bg-hero {
+  background: radial-gradient(
+    900px 480px at 50% 8%,
+    rgba(255, 255, 255, 0.55),
+    rgba(255, 255, 255, 0) 68%
+  );
+}
+
+/* Soft brand-purple glow behind the homepage hero, matching
+   thesavvyexpat.com's look (radial purple fading to transparent, rather
+   than bg-hero's tighter white sheen used on every other page). */
+.bg-hero-glow {
+  background: radial-gradient(
+    1300px 900px at 50% 34%,
+    rgba(73, 52, 251, 0.28),
+    rgba(73, 52, 251, 0) 70%
+  );
+}
+
+.bg-sheen {
+  background: radial-gradient(
+    720px 420px at 50% 40%,
+    rgba(255, 255, 255, 0.35),
+    rgba(255, 255, 255, 0) 70%
+  );
+}
+
+/* Soft purple wash behind a section's center, like the reference story block */
+.bg-glow-purple {
+  background: radial-gradient(
+    900px 620px at 50% 52%,
+    rgba(122, 92, 255, 0.18),
+    rgba(122, 92, 255, 0.06) 55%,
+    rgba(122, 92, 255, 0) 75%
+  );
+}
+
+/* Deep navy full-bleed section with a purple glow bleeding in from the top —
+   the one dark moment on the page, so use it once per page at most. */
+.bg-dark-glow {
+  background:
+    radial-gradient(900px 520px at 50% -5%, rgba(122, 92, 255, 0.28), transparent 65%),
+    radial-gradient(700px 400px at 85% 100%, rgba(73, 52, 251, 0.18), transparent 60%),
+    #041630;
+}
+
+/* Card fill matching the reference's soft lavender panels */
+.card-soft {
+  background: linear-gradient(135deg, #dedaf1 0%, #eae7f7 55%, #efedf9 100%);
+  box-shadow: 0 1px 2px rgba(4, 22, 48, 0.03), 0 10px 28px -18px rgba(4, 22, 48, 0.25);
+}
+
+/* Shine sweep across buttons */
+.btn-shine {
+  position: relative;
+  overflow: hidden;
+}
+.btn-shine::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -80%;
+  width: 45%;
+  height: 100%;
+  background: linear-gradient(
+    105deg,
+    transparent,
+    rgba(255, 255, 255, 0.35),
+    transparent
+  );
+  transform: skewX(-20deg);
+  animation: shine 3.6s ease-in-out infinite;
+}
+@keyframes shine {
+  0% {
+    left: -80%;
+  }
+  55%,
+  100% {
+    left: 160%;
+  }
+}
+
+/* ---------- Scroll reveal ---------- */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal.revealed {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .animate-marquee,
+  .animate-marquee-slow,
+  .animate-float,
+  .btn-shine::after {
+    animation: none !important;
+  }
+}
+
+/* Pause marquees on hover */
+.marquee-row:hover .animate-marquee,
+.marquee-row:hover .animate-marquee-slow {
+  animation-play-state: paused;
+}
+
+/* ---------- Squeeze-page finish ---------- */
+
+/* Fine film grain over the ambient wash. Self-contained SVG turbulence, so
+   there is no asset to load and nothing to go stale. */
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.018;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* One authored entrance: each headline line clips up from its own baseline,
+   a beat apart, so the three-line stack lands like a title card. */
+@keyframes line-rise {
+  from {
+    opacity: 0;
+    transform: translateY(0.32em);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.line-rise > * {
+  animation: line-rise 1s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.line-rise > *:nth-child(2) {
+  animation-delay: 0.09s;
+}
+.line-rise > *:nth-child(3) {
+  animation-delay: 0.18s;
+}
+
+/* Light sweeps across the control once on hover, rather than looping forever
+   the way .btn-shine does — restraint reads more expensive here. */
+.sheen {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.sheen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  transform: translateX(-120%) skewX(-18deg);
+  background: linear-gradient(
+    100deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.2) 50%,
+    transparent 80%
+  );
+  transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.sheen:hover::after {
+  transform: translateX(120%) skewX(-18deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .line-rise > * {
+    animation: none;
+  }
+  .sheen::after {
+    transition: none;
+  }
+}
+
+/* Hides the scrollbar on horizontally-scrolling newsletter shelves while
+   keeping native touch/trackpad/arrow-button scrolling fully functional. */
+.hide-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* ---------- Reading styles for beehiiv post HTML content ---------- */
+
+.post-content {
+  line-height: 1.75;
+}
+.post-content h1,
+.post-content h2,
+.post-content h3,
+.post-content h4 {
+  font-family: "Satoshi", system-ui, sans-serif;
+  font-weight: 700;
+  color: #041630;
+  margin-top: 2em;
+  margin-bottom: 0.75em;
+  line-height: 1.25;
+}
+.post-content h1 {
+  font-size: 1.875rem;
+}
+.post-content h2 {
+  font-size: 1.5rem;
+}
+.post-content h3 {
+  font-size: 1.25rem;
+}
+.post-content p {
+  margin-bottom: 1.25em;
+}
+.post-content a {
+  color: #4934fb;
+  text-decoration: underline;
+}
+.post-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.75rem;
+  margin: 1.5em 0;
+}
+.post-content ul,
+.post-content ol {
+  margin: 1.25em 0;
+  padding-left: 1.5em;
+}
+.post-content ul {
+  list-style: disc;
+}
+.post-content ol {
+  list-style: decimal;
+}
+.post-content li {
+  margin-bottom: 0.5em;
+}
+.post-content blockquote {
+  border-left: 3px solid #4934fb;
+  padding-left: 1.25em;
+  margin: 1.5em 0;
+  font-style: italic;
+  color: rgba(4, 22, 48, 0.7);
+}
+.post-content hr {
+  border: none;
+  border-top: 1px solid #e3e3e3;
+  margin: 2em 0;
+}
+
+/* beehiiv wraps every content block in a bordered "section" div with
+   hardcoded inline styles (light background + purple border) by default —
+   neutralize it so the newsletter reads as one continuous column instead of
+   boxes-within-boxes stacked on our own card background. */
+.post-content .section {
+  background-color: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Every heading inside a newsletter becomes the same small pill badge.
+   Evan writes two kinds of heading and marks them up inconsistently: the
+   "3 MIN READ" label at the top of an issue, and section headings like
+   "What It Actually Gets You". Across the archive those land on h1, h2 and
+   h3 more or less interchangeably, so styling by level would make identical
+   headings look different from issue to issue. One treatment for all three
+   keeps the reading experience consistent whatever tag the issue happens to
+   use, and stops a mid-article heading rendering as a giant display line.
+
+   The exception is beehiiv's own recommendation card, which puts the
+   attached file's name in an h3 — that is a filename inside a download
+   block, not a section heading, so it keeps normal title styling. */
+.post-content h1,
+.post-content h2,
+.post-content h3:not(.recommendation__title) {
+  display: inline-flex;
+  align-items: center;
+  margin: 0 0 1.5em;
+  border-radius: 999px;
+  background-color: rgba(73, 52, 251, 0.1);
+  padding: 0.4em 0.95em;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  line-height: 1.35;
+  text-transform: uppercase;
+  color: #4934fb;
+}
+
+/* ---------- /king motion ----------
+   Additive polish on the existing brand system. Everything here is opt-in by
+   class, so no other route changes, and every effect is disabled under
+   prefers-reduced-motion at the bottom of this block. */
+
+/* A soft violet aura that breathes behind the hero video. */
+@keyframes aura {
+  0%, 100% { opacity: 0.28; transform: scale(1); }
+  50%      { opacity: 0.45; transform: scale(1.035); }
+}
+.aura {
+  animation: aura 7s ease-in-out infinite;
+  will-change: opacity, transform;
+}
+
+/* Section headings get a rule that draws itself once the heading arrives. */
+@keyframes sweep {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+.reveal .sweep { transform: scaleX(0); transform-origin: left center; }
+.reveal.revealed .sweep {
+  animation: sweep 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
+}
+
+/* Cards rise slightly and deepen their shadow rather than just scaling. */
+.lift {
+  transition:
+    transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 2px 4px rgba(4, 22, 48, 0.05), 0 22px 50px -22px rgba(73, 52, 251, 0.38);
+}
+
+/* Table and list rows tint toward the brand violet on hover. */
+.row-hover {
+  transition: background-color 0.3s ease;
+}
+.row-hover:hover {
+  background-color: rgba(73, 52, 251, 0.045);
+}
+
+/* Accordion bodies slide and fade instead of snapping open. */
+@keyframes accordion-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: none; }
+}
+details[open] .accordion-body {
+  animation: accordion-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Figures count up visually by wiping in from their own baseline. */
+@keyframes figure-rise {
+  from { opacity: 0; transform: translateY(0.28em); }
+  to   { opacity: 1; transform: none; }
+}
+.reveal.revealed .figure-rise {
+  animation: figure-rise 0.75s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aura { animation: none; }
+  .reveal.revealed .sweep,
+  .reveal.revealed .figure-rise,
+  details[open] .accordion-body { animation: none; }
+  .reveal .sweep { transform: none; }
+  .lift { transition: none; }
+  .lift:hover { transform: none; }
+}
+
+/* ---------- /king premium motion, second pass ----------
+   Richer entrances than a plain fade. Everything is opt-in by class and every
+   effect is switched off under prefers-reduced-motion at the end of the block. */
+
+/* Headline wipes up behind its own baseline instead of fading in. */
+@keyframes headline-wipe {
+  from {
+    opacity: 0;
+    transform: translateY(0.42em);
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    clip-path: inset(0 0 -12% 0);
+  }
+}
+.headline-wipe {
+  animation: headline-wipe 1.15s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both;
+}
+
+/* Reveals that also resolve out of a blur read as depth of field rather than
+   as a plain opacity ramp. Applied to the heavier blocks only.
+   Written as an entrance animation from a visible default rather than as a
+   transition out of a hidden one: if the reveal never fires, the content is
+   simply there. A blurred default would leave text unreadable on failure. */
+@keyframes rich-in {
+  from {
+    opacity: 0;
+    filter: blur(10px);
+    transform: translateY(18px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: none;
+  }
+}
+.reveal.revealed .rich {
+  animation: rich-in 1.1s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* A single light sweep crosses a card the first time it arrives. One shot,
+   never a loop, so it reads as a finish rather than a shimmer. */
+@keyframes card-sweep {
+  from { transform: translateX(-120%) skewX(-18deg); }
+  to   { transform: translateX(220%) skewX(-18deg); }
+}
+.sweep-once {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.sweep-once::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  transform: translateX(-120%) skewX(-18deg);
+  background: linear-gradient(
+    100deg,
+    transparent 24%,
+    rgba(255, 255, 255, 0.42) 50%,
+    transparent 76%
+  );
+}
+.reveal.revealed .sweep-once::after {
+  animation: card-sweep 1.5s cubic-bezier(0.22, 1, 0.36, 1) 0.35s both;
+}
+
+/* List items arrive in sequence rather than as one block. */
+.reveal.revealed .cascade > * {
+  animation: cascade-in 0.75s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes cascade-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
+.reveal.revealed .cascade > *:nth-child(1) { animation-delay: 0.04s; }
+.reveal.revealed .cascade > *:nth-child(2) { animation-delay: 0.11s; }
+.reveal.revealed .cascade > *:nth-child(3) { animation-delay: 0.18s; }
+.reveal.revealed .cascade > *:nth-child(4) { animation-delay: 0.25s; }
+.reveal.revealed .cascade > *:nth-child(5) { animation-delay: 0.32s; }
+.reveal.revealed .cascade > *:nth-child(6) { animation-delay: 0.39s; }
+.reveal.revealed .cascade > *:nth-child(7) { animation-delay: 0.46s; }
+.reveal.revealed .cascade > *:nth-child(8) { animation-delay: 0.53s; }
+
+/* The hero aura gains a second, slower layer so the glow drifts rather than
+   simply pulsing on one timer. */
+@keyframes aura-drift {
+  0%, 100% { opacity: 0.2; transform: translate3d(-2%, 1%, 0) scale(1.04); }
+  50%      { opacity: 0.34; transform: translate3d(2%, -1%, 0) scale(1.1); }
+}
+.aura-2 {
+  animation: aura-drift 11s ease-in-out infinite;
+  will-change: opacity, transform;
+}
+
+/* A ring that breathes out of the final call to action, once every few
+   seconds, so the last thing on the page is quietly alive. */
+@keyframes cta-ring {
+  0%   { opacity: 0.5; transform: scale(1); }
+  70%  { opacity: 0; transform: scale(1.16); }
+  100% { opacity: 0; transform: scale(1.16); }
+}
+.cta-ring::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1px solid rgba(73, 52, 251, 0.55);
+  animation: cta-ring 3.4s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+  pointer-events: none;
+}
+
+/* Poster images drift almost imperceptibly while idle, which makes a static
+   thumbnail feel like held footage. */
+@keyframes poster-drift {
+  0%, 100% { transform: scale(1.015) translate3d(0, 0, 0); }
+  50%      { transform: scale(1.045) translate3d(0, -0.8%, 0); }
+}
+.poster-drift img {
+  animation: poster-drift 16s ease-in-out infinite;
+}
+.poster-drift:hover img {
+  animation-play-state: paused;
+}
+
+/* ---------- Subscribe → /king hand-off ----------
+   A brief, deliberately choreographed beat between the survey and the
+   redirect, rather than static text sitting on screen while the timer
+   counts down. Runs on mount rather than through Reveal/IntersectionObserver,
+   since the block is already in view the instant this step renders and the
+   timing needs to be immediate, not asynchronous. */
+@keyframes handoff-headline {
+  from {
+    opacity: 0;
+    transform: translateY(0.4em) scale(0.98);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
+.handoff-headline {
+  animation: handoff-headline 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes handoff-pop {
+  0%   { opacity: 0; transform: scale(0.5); }
+  60%  { opacity: 1; transform: scale(1.08); }
+  100% { opacity: 1; transform: scale(1); }
+}
+.handoff-pop {
+  animation: handoff-pop 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both;
+}
+
+/* The checkmark draws itself in as the badge settles, rather than just
+   appearing — pathLength="1" normalizes the stroke so the dash values below
+   work regardless of the path's actual geometry. */
+@keyframes handoff-check {
+  to { stroke-dashoffset: 0; }
+}
+.handoff-check {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: handoff-check 0.35s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards;
+}
+
+@keyframes handoff-subtext {
+  from { opacity: 0; transform: translateY(0.5em); }
+  to   { opacity: 1; transform: none; }
+}
+.handoff-subtext {
+  animation: handoff-subtext 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
+}
+
+/* Fills over the redirect delay so the wait reads as active progress
+   instead of a stall. Duration is set inline from the same constant that
+   drives the actual redirect timer, so the two can never drift apart. */
+@keyframes handoff-progress {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+.handoff-progress {
+  transform-origin: left center;
+  animation: handoff-progress linear 1.1s both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .headline-wipe,
+  .aura-2,
+  .cta-ring::before,
+  .poster-drift img,
+  .handoff-headline,
+  .handoff-pop,
+  .handoff-subtext,
+  .handoff-progress,
+  .reveal.revealed .cascade > *,
+  .reveal.revealed .sweep-once::after {
+    animation: none !important;
+  }
+  .handoff-check {
+    animation: none !important;
+    stroke-dashoffset: 0;
+  }
+  .reveal.revealed .rich {
+    animation: none;
+  }
+  .sweep-once::after { display: none; }
+}
