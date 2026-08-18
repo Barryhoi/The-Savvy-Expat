@@ -147,7 +147,7 @@ export default function NewsletterList({ posts }: { posts: NewsletterPost[] }) {
             type="search"
             value={query}
             onChange={(event) => handleSearch(event.target.value)}
-            placeholder="Search issues"
+            placeholder="Search newsletters"
             className="w-full rounded-xl border border-ink/10 bg-white/80 py-2.5 pl-11 pr-4 text-sm outline-none transition-all placeholder:text-ink/35 focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/10"
           />
         </div>
