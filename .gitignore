@@ -28,3 +28,5 @@ next-env.d.ts
 # local tool state, not project source
 .claude/
 .impeccable/
+.vercel
+.env*
