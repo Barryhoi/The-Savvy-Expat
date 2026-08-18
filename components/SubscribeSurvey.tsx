@@ -73,7 +73,7 @@ export default function SubscribeSurvey({
 
   return (
     <form onSubmit={handleSubmit} className="w-full">
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+      <div className="grid grid-cols-2 gap-3 sm:gap-5">
         <Field label="First name">
           <input
             type="text"
@@ -97,7 +97,7 @@ export default function SubscribeSurvey({
         </Field>
       </div>
 
-      <div className="mt-5">
+      <div className="mt-4">
         <Field label="Phone number">
           <input
             type="tel"
@@ -110,9 +110,9 @@ export default function SubscribeSurvey({
         </Field>
       </div>
 
-      <div className="mt-8">
+      <div className="mt-6">
         <Field label="Are you planning to move to the Philippines? If so, when?">
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="flex flex-col gap-2.5">
             {TIMELINE_OPTIONS.map((option) => (
               <ChoiceTile
                 key={option}
@@ -128,9 +128,9 @@ export default function SubscribeSurvey({
         </Field>
       </div>
 
-      <div className="mt-8">
+      <div className="mt-6">
         <Field label="Are you considering getting help with your move to the Philippines?">
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-2.5">
             {HELP_OPTIONS.map((option) => (
               <ChoiceTile
                 key={option}
@@ -149,7 +149,7 @@ export default function SubscribeSurvey({
       <button
         type="submit"
         disabled={status === "loading"}
-        className="sheen mt-9 h-[56px] w-full rounded-[10px] bg-primary px-4 text-[16px] font-bold leading-[24px] text-white shadow-[0_6px_16px_-8px_rgba(73,52,251,0.5)] transition-colors duration-200 hover:bg-[#3d2ae8] disabled:opacity-60 sm:w-auto sm:px-10"
+        className="sheen mt-7 h-[56px] w-full rounded-[10px] bg-primary px-4 text-[16px] font-bold leading-[24px] text-white shadow-[0_6px_16px_-8px_rgba(73,52,251,0.5)] transition-colors duration-200 hover:bg-[#3d2ae8] disabled:opacity-60 sm:w-auto sm:px-10"
       >
         {status === "loading" ? "Submitting…" : "Complete My Profile"}
       </button>
@@ -187,7 +187,7 @@ function ChoiceTile({
 }) {
   return (
     <label
-      className={`group flex cursor-pointer items-start gap-3 rounded-2xl border-[1.5px] px-5 py-4 transition-all duration-150 ${
+      className={`group flex cursor-pointer items-start gap-2.5 rounded-2xl border-[1.5px] px-4 py-3 transition-all duration-150 ${
         checked
           ? "border-primary bg-primary/[0.04] shadow-[0_4px_16px_-8px_rgba(73,52,251,0.35)]"
           : "border-[#E2E4EA] bg-white hover:border-[#B9BFC9]"
