@@ -31,7 +31,7 @@ export default function SubscribeFlow() {
     return (
       <div className="relative z-10 mx-auto w-full max-w-[640px] flex-1 px-6 pb-16 pt-14 md:pb-[60px] md:pt-20">
         <Reveal>
-          <h1 className="text-[40px] font-extrabold leading-[40px] tracking-[-3px] text-[#000101] md:text-[64px] md:leading-[62px]">
+          <h1 className="whitespace-nowrap text-[20px] font-extrabold leading-[26px] tracking-[-1px] text-[#000101] md:text-[36px] md:leading-[44px] md:tracking-[-2px]">
             Savvy Expat Subscriber Survey
           </h1>
 
