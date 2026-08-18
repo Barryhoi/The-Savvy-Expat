@@ -32,12 +32,8 @@ export default function SubscribeFlow() {
       <div className="relative z-10 mx-auto w-full max-w-[640px] flex-1 px-6 pb-16 pt-14 md:pb-[60px] md:pt-20">
         <Reveal>
           <h1 className="text-[40px] font-extrabold leading-[40px] tracking-[-3px] text-[#000101] md:text-[64px] md:leading-[62px]">
-            One Last Thing.
+            Savvy Expat Subscriber Survey
           </h1>
-          <p className="mt-5 text-[17px] leading-[27.2px] text-[#374151]">
-            Two quick questions so we know how to help &mdash; then
-            you&apos;re in.
-          </p>
 
           <div className="mt-10">
             <SubscribeSurvey
