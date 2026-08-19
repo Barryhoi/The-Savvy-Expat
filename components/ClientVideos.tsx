@@ -8,7 +8,7 @@ import { TESTIMONIAL_VIDEOS } from "@/lib/testimonials";
  * same proof follows a visitor from the VSL all the way to the confirmation.
  */
 export default function ClientVideos({
-  heading = "Hear From Those Who've Made The Move…",
+  heading = "Hear From Those Who've Made The Move With Us…",
   subheading,
 }: {
   heading?: string;
