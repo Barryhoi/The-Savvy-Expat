@@ -59,6 +59,9 @@ export default function SubscribeSurvey({
       });
 
       if (res.ok) {
+        // Same keyboard dismissal as the email step: if the visitor tapped
+        // submit straight from the phone field, the keyboard is still up.
+        (document.activeElement as HTMLElement | null)?.blur?.();
         onComplete();
       } else {
         const json = await res.json().catch(() => ({}));

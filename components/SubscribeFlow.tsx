@@ -29,9 +29,17 @@ export default function SubscribeFlow() {
 
   // Each step is a fresh full-page moment. Without this, whatever scroll
   // position the visitor was at when they submitted carries over to the
-  // next step, which lands them mid-page instead of at the top.
+  // next step, which lands them mid-page instead of at the top. A single
+  // immediate scroll is not enough on iOS: the on-screen keyboard is still
+  // collapsing when the step swaps, and Safari restores its viewport after
+  // that finishes, undoing the scroll — so re-assert it across the settle
+  // window until the keyboard is fully gone.
   useEffect(() => {
     window.scrollTo(0, 0);
+    const timers = [150, 350, 650].map((ms) =>
+      window.setTimeout(() => window.scrollTo(0, 0), ms)
+    );
+    return () => timers.forEach((t) => window.clearTimeout(t));
   }, [step]);
 
   if (step === "survey") {
@@ -92,7 +100,7 @@ export default function SubscribeFlow() {
 
   return (
     <div className="relative z-10 flex-1 px-6 pb-10 pt-5 md:pb-[45px] md:pl-[180px] md:pr-20 md:pt-[30px]">
-      <h1 className="line-rise max-w-[700px] text-[34px] font-extrabold leading-[34px] tracking-[-2px] text-[#000101] md:text-[88px] md:leading-[85.36px] md:tracking-[-3px]">
+      <h1 className="line-rise max-w-[700px] text-[37px] font-extrabold leading-[37px] tracking-[-2px] text-[#000101] md:text-[88px] md:leading-[85.36px] md:tracking-[-3px]">
         <span className="block">Real Talk.</span>
         <span className="block">Real Philippines.</span>
         <span className="block">Every Week.</span>

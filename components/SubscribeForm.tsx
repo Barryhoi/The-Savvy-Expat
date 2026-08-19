@@ -47,6 +47,9 @@ export default function SubscribeForm({
         const subscribedEmail = email.trim();
         setEmail("");
         if (onSuccess) {
+          // Dismiss the mobile keyboard before the step swap, so the next
+          // step mounts on a settled viewport instead of mid-collapse.
+          (document.activeElement as HTMLElement | null)?.blur?.();
           onSuccess(subscribedEmail);
         } else {
           setStatus("success");
