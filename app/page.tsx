@@ -483,7 +483,7 @@ export default function VslPage() {
               <h2 className="mx-auto max-w-3xl text-3xl font-black leading-tight tracking-tight sm:text-5xl">
                 Make The Move To The Philippines Seamlessly
               </h2>
-              <p className="mt-5 text-lg text-ink/60">
+              <p className="mt-5 text-lg leading-relaxed text-ink/60 sm:text-xl">
                 Ready To Turn Your Philippines Dreams Into Reality?
               </p>
               <div className="mt-9">

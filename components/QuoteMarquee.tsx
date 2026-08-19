@@ -74,7 +74,9 @@ export default function QuoteMarquee({
           <h2 className="mx-auto max-w-3xl text-3xl font-black leading-tight tracking-tight sm:text-4xl">
             {heading}
           </h2>
-          <p className="mt-4 text-base text-ink/60">{subheading}</p>
+          <p className="mt-4 text-lg leading-relaxed text-ink/60 sm:text-xl">
+            {subheading}
+          </p>
         </Reveal>
       </div>
 
