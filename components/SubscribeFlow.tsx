@@ -27,15 +27,22 @@ export default function SubscribeFlow() {
     return () => clearTimeout(timer);
   }, [step, router]);
 
+  // Each step is a fresh full-page moment. Without this, whatever scroll
+  // position the visitor was at when they submitted carries over to the
+  // next step, which lands them mid-page instead of at the top.
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [step]);
+
   if (step === "survey") {
     return (
-      <div className="relative z-10 mx-auto w-full max-w-[640px] flex-1 px-6 pb-16 pt-14 md:pb-[60px] md:pt-20">
+      <div className="relative z-10 mx-auto w-full max-w-[640px] flex-1 px-6 pb-16 pt-4 md:pb-[60px] md:pt-20">
         <Reveal>
           <h1 className="whitespace-nowrap text-[20px] font-extrabold leading-[26px] tracking-[-1px] text-[#000101] md:text-[36px] md:leading-[44px] md:tracking-[-2px]">
             Savvy Expat Subscriber Survey
           </h1>
 
-          <div className="mt-10">
+          <div className="mt-4 md:mt-10">
             <SubscribeSurvey
               email={email}
               onComplete={() => setStep("redirecting")}
@@ -84,31 +91,31 @@ export default function SubscribeFlow() {
   }
 
   return (
-    <div className="relative z-10 flex-1 px-6 pb-10 pt-10 md:pb-[45px] md:pl-[180px] md:pr-20 md:pt-[30px]">
-      <h1 className="line-rise max-w-[700px] text-[40px] font-extrabold leading-[40px] tracking-[-3px] text-[#000101] md:text-[88px] md:leading-[85.36px]">
+    <div className="relative z-10 flex-1 px-6 pb-10 pt-5 md:pb-[45px] md:pl-[180px] md:pr-20 md:pt-[30px]">
+      <h1 className="line-rise max-w-[700px] text-[34px] font-extrabold leading-[34px] tracking-[-2px] text-[#000101] md:text-[88px] md:leading-[85.36px] md:tracking-[-3px]">
         <span className="block">Real Talk.</span>
         <span className="block">Real Philippines.</span>
         <span className="block">Every Week.</span>
       </h1>
 
       <Reveal delay={80}>
-        <figure className="mt-4">
+        <figure className="mt-3 md:mt-4">
           <Image
             src="/evan-portrait.jpg"
             alt="Evan Lorezca, founder of Savvy Expat"
             width={400}
             height={400}
             priority
-            className="h-[90px] w-[90px] rounded-full object-cover shadow-[0_0_0_3px_#fff,0_8px_20px_-8px_rgba(4,22,48,0.28)]"
+            className="h-[72px] w-[72px] rounded-full object-cover shadow-[0_0_0_3px_#fff,0_8px_20px_-8px_rgba(4,22,48,0.28)] md:h-[90px] md:w-[90px]"
           />
-          <figcaption className="mt-3 text-[12px] leading-[16.8px] text-[#9CA3AF]">
+          <figcaption className="mt-2 text-[12px] leading-[16.8px] text-[#9CA3AF] md:mt-3">
             Evan Lorezca &mdash; Founder of Savvy Expat
           </figcaption>
         </figure>
       </Reveal>
 
       <Reveal delay={140}>
-        <p className="mt-8 max-w-[580px] text-[16px] leading-[26.4px] text-black">
+        <p className="mt-5 max-w-[580px] text-[16px] leading-[26.4px] text-black md:mt-8">
           Join 5,000+ expats and retirees getting the real inside scoop on
           retiring in the Philippines &mdash;{" "}
           <span className="marker-highlight">
@@ -116,7 +123,7 @@ export default function SubscribeFlow() {
           </span>
         </p>
 
-        <p className="mt-[26px] max-w-[580px] text-[17px] leading-[27.2px] text-[#374151]">
+        <p className="mt-4 max-w-[580px] text-[17px] leading-[27.2px] text-[#374151] md:mt-[26px]">
           👑 Subscribe and we&apos;ll send our free{" "}
           <strong className="font-bold">
             How to Live Like a King in the Philippines
@@ -126,7 +133,7 @@ export default function SubscribeFlow() {
       </Reveal>
 
       <Reveal delay={200}>
-        <p className="mt-6 flex items-center gap-[22px]">
+        <p className="mt-4 flex items-center gap-[22px] md:mt-6">
           <span className="rounded-[5px] bg-primary px-3 py-1 text-[22px] font-extrabold leading-[26.4px] text-white">
             5,000+
           </span>
@@ -135,7 +142,7 @@ export default function SubscribeFlow() {
           </span>
         </p>
 
-        <div className="mt-6 max-w-[480px]">
+        <div className="mt-4 max-w-[480px] md:mt-6">
           <SubscribeForm
             onSuccess={(subscribedEmail) => {
               setEmail(subscribedEmail);
