@@ -222,7 +222,7 @@ export default function VslPage() {
             </h2>
           </Reveal>
           <Reveal delay={100}>
-            <div className="mx-auto mt-8 max-w-2xl space-y-5 text-base leading-relaxed text-ink/70 sm:text-lg">
+            <div className="mx-auto mt-8 max-w-2xl space-y-5 text-lg leading-relaxed text-ink/70 sm:text-xl">
               <p>
                 Planning on moving to the Philippines, but don&apos;t know where
                 to start? Finding a rental, securing a visa, setting up health
@@ -297,7 +297,7 @@ export default function VslPage() {
               Sit Back And We&apos;ll Curate Your Dream Life In The Philippines
               For You
             </h2>
-            <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-ink/70 sm:text-lg">
+            <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-ink/70 sm:text-xl">
               We hold your hand through the entire process of moving to the
               Philippines with boots on the ground experience and connections.
               Tap into us, tap into our network.
