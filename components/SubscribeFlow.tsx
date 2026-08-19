@@ -29,17 +29,30 @@ export default function SubscribeFlow() {
 
   // Each step is a fresh full-page moment. Without this, whatever scroll
   // position the visitor was at when they submitted carries over to the
-  // next step, which lands them mid-page instead of at the top. A single
-  // immediate scroll is not enough on iOS: the on-screen keyboard is still
-  // collapsing when the step swaps, and Safari restores its viewport after
-  // that finishes, undoing the scroll — so re-assert it across the settle
-  // window until the keyboard is fully gone.
+  // next step, which lands them mid-page instead of at the top. On iOS the
+  // on-screen keyboard may still be collapsing when the step swaps, and
+  // Safari re-adjusts its viewport when that finishes — at timings that
+  // outlast any fixed delay on slower devices. So besides a few timed
+  // re-asserts, listen to the visualViewport resize events that collapse
+  // actually fires and pin the page to the top on each one, for a short
+  // window after the swap.
   useEffect(() => {
-    window.scrollTo(0, 0);
-    const timers = [150, 350, 650].map((ms) =>
-      window.setTimeout(() => window.scrollTo(0, 0), ms)
+    const toTop = () => window.scrollTo(0, 0);
+    toTop();
+    const timers = [150, 400, 800, 1200].map((ms) =>
+      window.setTimeout(toTop, ms)
     );
-    return () => timers.forEach((t) => window.clearTimeout(t));
+    const viewport = window.visualViewport;
+    viewport?.addEventListener("resize", toTop);
+    const stopListening = window.setTimeout(
+      () => viewport?.removeEventListener("resize", toTop),
+      1800
+    );
+    return () => {
+      timers.forEach((t) => window.clearTimeout(t));
+      window.clearTimeout(stopListening);
+      viewport?.removeEventListener("resize", toTop);
+    };
   }, [step]);
 
   if (step === "survey") {

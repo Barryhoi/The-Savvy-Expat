@@ -31,6 +31,11 @@ export default function SubscribeForm({
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    // Dismiss the mobile keyboard immediately, so it finishes collapsing
+    // while the request is in flight — by the time the next step mounts,
+    // the viewport has already settled. Blurring only on success proved too
+    // late: iOS was still restoring its viewport after the step swap.
+    (document.activeElement as HTMLElement | null)?.blur?.();
     setStatus("loading");
     setMessage("");
 
@@ -47,9 +52,6 @@ export default function SubscribeForm({
         const subscribedEmail = email.trim();
         setEmail("");
         if (onSuccess) {
-          // Dismiss the mobile keyboard before the step swap, so the next
-          // step mounts on a settled viewport instead of mid-collapse.
-          (document.activeElement as HTMLElement | null)?.blur?.();
           onSuccess(subscribedEmail);
         } else {
           setStatus("success");

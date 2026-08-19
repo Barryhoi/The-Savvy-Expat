@@ -41,6 +41,9 @@ export default function SubscribeSurvey({
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    // Close the keyboard now (e.g. submitting straight from the phone
+    // field) so it collapses during the request, not after the step swap.
+    (document.activeElement as HTMLElement | null)?.blur?.();
     setStatus("loading");
     setMessage("");
 
@@ -59,9 +62,6 @@ export default function SubscribeSurvey({
       });
 
       if (res.ok) {
-        // Same keyboard dismissal as the email step: if the visitor tapped
-        // submit straight from the phone field, the keyboard is still up.
-        (document.activeElement as HTMLElement | null)?.blur?.();
         onComplete();
       } else {
         const json = await res.json().catch(() => ({}));
