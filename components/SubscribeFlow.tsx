@@ -37,7 +37,15 @@ export default function SubscribeFlow() {
   // actually fires and pin the page to the top on each one, for a short
   // window after the swap.
   useEffect(() => {
-    const toTop = () => window.scrollTo(0, 0);
+    const toTop = () => {
+      // iOS pans its visual viewport while the keyboard is up, and that pan
+      // is NOT reflected in window.scrollY — so a plain scrollTo(0, 0) with
+      // scrollY already 0 is treated as a no-op and leaves the page visibly
+      // shifted under the status bar. Nudging 1px first makes the reset a
+      // real scroll, which forces Safari to collapse the pan too.
+      window.scrollTo(0, 1);
+      window.scrollTo(0, 0);
+    };
     toTop();
     const timers = [150, 400, 800, 1200].map((ms) =>
       window.setTimeout(toTop, ms)
