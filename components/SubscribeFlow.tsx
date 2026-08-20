@@ -1,124 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Reveal from "@/components/Reveal";
 import SubscribeForm from "@/components/SubscribeForm";
-import SubscribeSurvey from "@/components/SubscribeSurvey";
+import { SUBSCRIBE_EMAIL_KEY } from "@/components/SurveyFlow";
 
-type Step = "email" | "survey" | "redirecting";
-
-const REDIRECT_DELAY_MS = 2800;
-
-/** Owns the full /subscribe page body across all three steps — email
- * capture, the qualifying survey, then a hand-off into /king — so each step
- * gets a real full-page moment instead of a form squeezed into a corner.
- * The page shell (gradient, grain, decorative bloom, footer) stays in
- * app/subscribe/page.tsx and wraps this regardless of step. */
+/** The /subscribe squeeze page body: email capture only. On success the
+ * visitor is handed to /survey by a FULL browser navigation, deliberately
+ * not a client-side route swap — swapping content into the document the
+ * iOS keyboard was just open on left Safari's viewport stuck panned, and
+ * a fresh page load is the one reliable reset. The email crosses over in
+ * sessionStorage so it never appears in a URL. */
 export default function SubscribeFlow() {
-  const [step, setStep] = useState<Step>("email");
-  const [email, setEmail] = useState("");
-  const router = useRouter();
-
-  useEffect(() => {
-    if (step !== "redirecting") return;
-    const timer = setTimeout(() => router.push("/king"), REDIRECT_DELAY_MS);
-    return () => clearTimeout(timer);
-  }, [step, router]);
-
-  // Each step is a fresh full-page moment. Without this, whatever scroll
-  // position the visitor was at when they submitted carries over to the
-  // next step, which lands them mid-page instead of at the top. On iOS the
-  // on-screen keyboard may still be collapsing when the step swaps, and
-  // Safari re-adjusts its viewport when that finishes — at timings that
-  // outlast any fixed delay on slower devices. So besides a few timed
-  // re-asserts, listen to the visualViewport resize events that collapse
-  // actually fires and pin the page to the top on each one, for a short
-  // window after the swap.
-  useEffect(() => {
-    const toTop = () => {
-      // iOS pans its visual viewport while the keyboard is up, and that pan
-      // is NOT reflected in window.scrollY — so a plain scrollTo(0, 0) with
-      // scrollY already 0 is treated as a no-op and leaves the page visibly
-      // shifted under the status bar. Nudging 1px first makes the reset a
-      // real scroll, which forces Safari to collapse the pan too.
-      window.scrollTo(0, 1);
-      window.scrollTo(0, 0);
-    };
-    toTop();
-    const timers = [150, 400, 800, 1200].map((ms) =>
-      window.setTimeout(toTop, ms)
-    );
-    const viewport = window.visualViewport;
-    viewport?.addEventListener("resize", toTop);
-    const stopListening = window.setTimeout(
-      () => viewport?.removeEventListener("resize", toTop),
-      1800
-    );
-    return () => {
-      timers.forEach((t) => window.clearTimeout(t));
-      window.clearTimeout(stopListening);
-      viewport?.removeEventListener("resize", toTop);
-    };
-  }, [step]);
-
-  if (step === "survey") {
-    return (
-      <div className="relative z-10 mx-auto w-full max-w-[640px] flex-1 px-6 pb-16 pt-4 md:pb-[60px] md:pt-20">
-        <Reveal>
-          <h1 className="whitespace-nowrap text-[20px] font-extrabold leading-[26px] tracking-[-1px] text-[#000101] md:text-[36px] md:leading-[44px] md:tracking-[-2px]">
-            Savvy Expat Subscriber Survey
-          </h1>
-
-          <div className="mt-4 md:mt-10">
-            <SubscribeSurvey
-              email={email}
-              onComplete={() => setStep("redirecting")}
-            />
-          </div>
-        </Reveal>
-      </div>
-    );
-  }
-
-  if (step === "redirecting") {
-    return (
-      <div className="relative z-10 mx-auto flex w-full max-w-[640px] flex-1 flex-col items-center justify-center px-6 text-center">
-        <span className="handoff-pop flex h-12 w-12 items-center justify-center rounded-full bg-primary md:h-16 md:w-16">
-          <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6 md:h-7 md:w-7">
-            <path
-              d="M5 13l4 4L19 7"
-              stroke="white"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              pathLength="1"
-              className="handoff-check"
-            />
-          </svg>
-        </span>
-
-        <h1 className="handoff-headline mt-6 text-[40px] font-extrabold leading-[40px] tracking-[-3px] text-[#000101] md:text-[64px] md:leading-[62px]">
-          You&apos;re All Set.
-        </h1>
-        <p className="handoff-subtext mt-5 max-w-[440px] text-[17px] leading-[27.2px] text-[#374151]">
-          You are now being taken to our{" "}
-          <strong className="font-bold">
-            How to Live Like a King in the Philippines
-          </strong>{" "}
-          guide. Enjoy!
-        </p>
-        <div className="mt-8 h-[3px] w-[160px] overflow-hidden rounded-full bg-primary/15">
-          <div
-            className="handoff-progress h-full w-full rounded-full bg-primary"
-            style={{ animationDuration: `${REDIRECT_DELAY_MS}ms` }}
-          />
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="relative z-10 flex-1 px-6 pb-10 pt-5 md:pb-[45px] md:pl-[180px] md:pr-20 md:pt-[30px]">
       <h1 className="line-rise max-w-[700px] text-[37px] font-extrabold leading-[37px] tracking-[-2px] text-[#000101] md:text-[88px] md:leading-[85.36px] md:tracking-[-3px]">
@@ -174,8 +67,13 @@ export default function SubscribeFlow() {
         <div className="mt-4 max-w-[480px] md:mt-6">
           <SubscribeForm
             onSuccess={(subscribedEmail) => {
-              setEmail(subscribedEmail);
-              setStep("survey");
+              try {
+                sessionStorage.setItem(SUBSCRIBE_EMAIL_KEY, subscribedEmail);
+              } catch {
+                // Storage unavailable: /survey will bounce back here rather
+                // than submit a survey with no email attached.
+              }
+              window.location.assign("/survey");
             }}
           />
           <p className="mt-4 text-[13px] leading-[18.2px] text-[#9CA3AF]">
