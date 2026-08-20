@@ -188,6 +188,10 @@ export default function TypeformEmbed({
         ref={containerRef}
         data-tf-live={liveId}
         data-tf-opacity="50"
+        // Same Lenis-vs-nested-scroll conflict fixed on the YouTube and Cal
+        // embeds — this container always ends up with an iframe once loaded,
+        // and Typeform's own question flow scrolls internally.
+        data-lenis-prevent
         className="h-full min-h-[560px] w-full"
       />
     </div>

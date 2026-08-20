@@ -30,7 +30,12 @@ export default function LottieIcon({ src, size = 112 }: LottieIconProps) {
 
   return (
     <div style={{ width: size, height: size }} aria-hidden="true">
-      {data && <Lottie animationData={data} loop autoplay />}
+      {/* Plays its intro once and settles on the last frame. Six of these
+          render at once in the services grid; looping all of them forever
+          keeps six requestAnimationFrame loops competing with Lenis's own
+          for the rest of the visit, which is a real source of scroll jank
+          for something that's purely decorative after the first look. */}
+      {data && <Lottie animationData={data} loop={false} autoplay />}
     </div>
   );
 }

@@ -205,6 +205,11 @@ export default function CalEmbed({
       )}
       <div
         id={elementId.current}
+        // Same Lenis-vs-nested-scroll conflict as the YouTube embed, except
+        // this container is *always* scrollable on its own (overflow-y-auto,
+        // then Cal's iframe mounts a scrollable time-slot list inside that) —
+        // there's no idle state to spare it in, unlike the video thumbnails.
+        data-lenis-prevent
         className="min-h-[620px] w-full overflow-y-auto"
       />
     </div>
