@@ -187,6 +187,7 @@ export default function TypeformEmbed({
       <div
         ref={containerRef}
         data-tf-live={liveId}
+        data-tf-opacity="50"
         className="h-full min-h-[560px] w-full"
       />
     </div>
