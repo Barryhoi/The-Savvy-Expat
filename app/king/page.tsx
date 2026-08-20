@@ -624,6 +624,13 @@ export default function KingPage() {
         <section className="bg-hero">
           <div className="mx-auto max-w-4xl px-6 pb-16 pt-10 text-center sm:pt-14">
             <Reveal>
+              {/* The guide's own title, worn as a masthead: readers arrive
+                  here from the subscribe funnel having been promised the
+                  "How to Live Like a King" guide, and this is what tells
+                  them they are holding it. */}
+              <p className="mb-7 inline-block max-w-full rounded-full bg-white/90 px-4 py-2.5 text-xs font-black text-ink shadow-card ring-1 ring-ink/5 sm:px-5 sm:text-sm sm:tracking-wide">
+                👑 How to Live Like a King in the Philippines
+              </p>
               <h1 className="headline-wipe text-[2.1rem] font-black leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl">
                 You Didn&apos;t Build This Life to Compromise on It.
               </h1>
