@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, type FormEvent, type ReactNode } from "react";
-import { waitForViewportSettle } from "@/components/SubscribeForm";
 
 const TIMELINE_OPTIONS = [
   "Within the next 6 months",
@@ -63,9 +62,6 @@ export default function SubscribeSurvey({
       });
 
       if (res.ok) {
-        // Same guard as the email step: don't unmount these inputs while
-        // the keyboard is still collapsing.
-        await waitForViewportSettle();
         onComplete();
       } else {
         const json = await res.json().catch(() => ({}));

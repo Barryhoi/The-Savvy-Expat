@@ -5,40 +5,6 @@ import { useState, type FormEvent } from "react";
 type Status = "idle" | "loading" | "success" | "error";
 
 /**
- * Resolves once the visual viewport has held still for a beat — i.e. the
- * mobile keyboard has finished collapsing. Unmounting a focused input while
- * the iOS keyboard is still animating away is what leaves Safari's viewport
- * stuck panned under the status bar, so the step swap waits this out.
- * Resolves quickly when no keyboard was up, and never later than maxWaitMs.
- */
-export function waitForViewportSettle(maxWaitMs = 900): Promise<void> {
-  return new Promise((resolve) => {
-    const viewport = window.visualViewport;
-    if (!viewport) {
-      resolve();
-      return;
-    }
-    let last = viewport.height;
-    let stableFor = 0;
-    const interval = window.setInterval(() => {
-      if (Math.abs(viewport.height - last) < 1) {
-        stableFor += 50;
-        if (stableFor >= 250) cleanup();
-      } else {
-        stableFor = 0;
-        last = viewport.height;
-      }
-    }, 50);
-    const deadline = window.setTimeout(cleanup, maxWaitMs);
-    function cleanup() {
-      window.clearInterval(interval);
-      window.clearTimeout(deadline);
-      resolve();
-    }
-  });
-}
-
-/**
  * Three layouts for the same form:
  * - `stacked` (default) — the squeeze page, where the form is the whole screen.
  * - `inline` — a single pill for mastheads, where signing up is a side offer.
@@ -86,9 +52,6 @@ export default function SubscribeForm({
         const subscribedEmail = email.trim();
         setEmail("");
         if (onSuccess) {
-          // Never unmount this form while the keyboard is mid-collapse —
-          // that is what leaves iOS Safari's viewport stuck panned.
-          await waitForViewportSettle();
           onSuccess(subscribedEmail);
         } else {
           setStatus("success");
