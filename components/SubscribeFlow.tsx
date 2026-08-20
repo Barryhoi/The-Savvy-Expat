@@ -19,7 +19,14 @@ const REDIRECT_DELAY_MS = 2800;
 export default function SubscribeFlow() {
   const [step, setStep] = useState<Step>("email");
   const [email, setEmail] = useState("");
+  // Diagnostic readout for device-only viewport bugs, opt-in via ?debug=1.
+  // Set from an effect (not at render) so server and client HTML match.
+  const [debug, setDebug] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    setDebug(new URLSearchParams(window.location.search).has("debug"));
+  }, []);
 
   useEffect(() => {
     if (step !== "redirecting") return;
@@ -39,27 +46,39 @@ export default function SubscribeFlow() {
   useEffect(() => {
     const toTop = () => {
       // iOS pans its visual viewport while the keyboard is up, and that pan
-      // is NOT reflected in window.scrollY — so a plain scrollTo(0, 0) with
-      // scrollY already 0 is treated as a no-op and leaves the page visibly
-      // shifted under the status bar. Nudging 1px first makes the reset a
-      // real scroll, which forces Safari to collapse the pan too.
-      window.scrollTo(0, 1);
+      // (visualViewport.offsetTop) is NOT reflected in window.scrollY — so a
+      // plain scrollTo(0, 0) with scrollY already 0 is treated as a no-op
+      // and leaves the page visibly shifted under the status bar. Scroll
+      // down by at least the pan first, so the reset is a real scroll large
+      // enough to drag the visual viewport back with it.
+      const pan = window.visualViewport?.offsetTop ?? 0;
+      window.scrollTo(0, Math.max(1, Math.ceil(pan)));
       window.scrollTo(0, 0);
     };
     toTop();
     const timers = [150, 400, 800, 1200].map((ms) =>
       window.setTimeout(toTop, ms)
     );
+    // The keyboard collapse reports through the visual viewport's resize
+    // and scroll events. Only intervene when its offsetTop shows a real
+    // pan: normal user scrolling keeps offsetTop at 0, so this never
+    // fights a visitor who starts scrolling right away, and our own
+    // corrective scrolls can't re-trigger it.
+    const onViewportChange = () => {
+      if ((window.visualViewport?.offsetTop ?? 0) > 2) toTop();
+    };
     const viewport = window.visualViewport;
-    viewport?.addEventListener("resize", toTop);
-    const stopListening = window.setTimeout(
-      () => viewport?.removeEventListener("resize", toTop),
-      1800
-    );
+    viewport?.addEventListener("resize", onViewportChange);
+    viewport?.addEventListener("scroll", onViewportChange);
+    const stop = () => {
+      viewport?.removeEventListener("resize", onViewportChange);
+      viewport?.removeEventListener("scroll", onViewportChange);
+    };
+    const stopListening = window.setTimeout(stop, 2500);
     return () => {
       timers.forEach((t) => window.clearTimeout(t));
       window.clearTimeout(stopListening);
-      viewport?.removeEventListener("resize", toTop);
+      stop();
     };
   }, [step]);
 
@@ -78,6 +97,7 @@ export default function SubscribeFlow() {
             />
           </div>
         </Reveal>
+        {debug && <ViewportDebug />}
       </div>
     );
   }
@@ -115,6 +135,7 @@ export default function SubscribeFlow() {
             style={{ animationDuration: `${REDIRECT_DELAY_MS}ms` }}
           />
         </div>
+        {debug && <ViewportDebug />}
       </div>
     );
   }
@@ -183,6 +204,39 @@ export default function SubscribeFlow() {
           </p>
         </div>
       </Reveal>
+      {debug && <ViewportDebug />}
+    </div>
+  );
+}
+
+/** Tiny live readout of the scroll and viewport numbers, rendered only
+ * when the URL carries ?debug=1 — lets a phone screenshot show exactly
+ * which viewport layer is shifted when a device-only bug won't reproduce
+ * anywhere else. */
+function ViewportDebug() {
+  const [text, setText] = useState("");
+
+  useEffect(() => {
+    const update = () => {
+      const viewport = window.visualViewport;
+      setText(
+        [
+          `scrollY ${Math.round(window.scrollY)}`,
+          `vvOffset ${viewport ? viewport.offsetTop.toFixed(1) : "n/a"}`,
+          `vvPageTop ${viewport ? viewport.pageTop.toFixed(1) : "n/a"}`,
+          `vvH ${viewport ? Math.round(viewport.height) : "n/a"}`,
+          `winH ${window.innerHeight}`,
+        ].join(" · ")
+      );
+    };
+    update();
+    const interval = window.setInterval(update, 150);
+    return () => window.clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="pointer-events-none fixed bottom-24 left-2 z-[999] rounded-md bg-black/80 px-2 py-1 font-mono text-[11px] leading-relaxed text-white">
+      {text}
     </div>
   );
 }
