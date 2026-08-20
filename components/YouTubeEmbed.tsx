@@ -48,6 +48,11 @@ export default function YouTubeEmbed({
 
   return (
     <div
+      // Lenis (site-wide smooth scroll) fights the iframe's own scroll
+      // capture once it's playing — this opts the embed out so scrolling
+      // over/through it doesn't glitch against the eased scroll everywhere
+      // else on the page.
+      data-lenis-prevent
       className={`relative aspect-video w-full overflow-hidden bg-ink ${
         featured
           ? "rounded-xl"
