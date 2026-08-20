@@ -51,8 +51,11 @@ export default function YouTubeEmbed({
       // Lenis (site-wide smooth scroll) fights the iframe's own scroll
       // capture once it's playing — this opts the embed out so scrolling
       // over/through it doesn't glitch against the eased scroll everywhere
-      // else on the page.
-      data-lenis-prevent
+      // else on the page. Only set once the iframe actually exists: applying
+      // it to the idle thumbnail button too (which captures no scroll input
+      // of its own) made Lenis hand off between native and smoothed scroll
+      // at every thumbnail on a video-grid page, which is its own glitch.
+      {...(playing ? { "data-lenis-prevent": true } : {})}
       className={`relative aspect-video w-full overflow-hidden bg-ink ${
         featured
           ? "rounded-xl"
