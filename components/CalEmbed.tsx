@@ -121,11 +121,15 @@ export default function CalEmbed({
     // Cal paints its own white surface. Hand it the page's lavender instead so
     // the calendar reads as part of the page rather than a card dropped on it.
     //
-    // cal-bg-emphasis/subtle/muted aren't just the card's fill — Cal reuses
-    // them for anything elevated above the card too, including dropdown
-    // menus (e.g. the phone country picker) that get portaled onto the page
-    // itself. A near-transparent value here made those menus unreadable, so
-    // only the card background goes transparent; elevated surfaces stay solid.
+    // cssVarsPerTheme writes a `.light { --name: value !important }` block
+    // straight into the embed iframe's own <head> (see Cal's embed-iframe-init
+    // applyCssVars) — it isn't limited to the documented cal-* names, it sets
+    // whatever key you give it. The phone-country dropdown doesn't read any
+    // cal-* token at all: its panel is styled by Tailwind's `bg-popover`
+    // class, which resolves through --popover (itself defined as
+    // `var(--color-white)` in Cal's base theme). Something about the embedded
+    // context left that chain unresolved, rendering the panel transparent, so
+    // pin both links directly rather than relying on Cal's own default.
     ns("ui", {
       theme: "light",
       cssVarsPerTheme: {
@@ -138,6 +142,8 @@ export default function CalEmbed({
           "cal-border": "rgba(4,22,48,0.10)",
           "cal-border-subtle": "rgba(4,22,48,0.08)",
           "cal-border-emphasis": "rgba(4,22,48,0.18)",
+          "color-white": "#ffffff",
+          popover: "#ffffff",
         },
         dark: { "cal-brand": "#fafafa" },
       },

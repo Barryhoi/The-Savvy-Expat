@@ -225,31 +225,6 @@ body {
   display: none;
 }
 
-/* ---------- Cal.com booking embed: portaled dropdown backdrop ----------
-   Cal's booking widget can't render floating UI (the phone country picker,
-   any similar dropdown) inside its own iframe box, since a dropdown needs
-   to escape that box to overlay the rest of the page. So Cal's embed script
-   portals that floating UI out of the iframe and onto this page directly,
-   under [data-base-ui-portal]. Once relocated here, its background reads
-   Cal's own internal theme tokens, which don't reliably resolve in our DOM —
-   the panel can end up with no background at all, letting our page content
-   show through it. Force a solid, legible surface regardless of which
-   token or class Cal's build happens to apply. */
-[data-base-ui-portal] {
-  --popover: #ffffff;
-  --color-white: #ffffff;
-  --cal-bg-emphasis: #e8e9f1;
-  --cal-bg: #ffffff;
-  --cal-bg-subtle: #f2f2f8;
-  --cal-bg-muted: #f6f6fb;
-}
-[data-base-ui-portal] [class*="bg-popover"],
-[data-base-ui-portal] [role="listbox"],
-[data-base-ui-portal] [role="dialog"],
-[data-base-ui-portal] [role="menu"] {
-  background-color: #ffffff;
-}
-
 /* ---------- Reading styles for beehiiv post HTML content ---------- */
 
 .post-content {
