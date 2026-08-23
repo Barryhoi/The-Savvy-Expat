@@ -120,15 +120,21 @@ export default function CalEmbed({
 
     // Cal paints its own white surface. Hand it the page's lavender instead so
     // the calendar reads as part of the page rather than a card dropped on it.
+    //
+    // cal-bg-emphasis/subtle/muted aren't just the card's fill — Cal reuses
+    // them for anything elevated above the card too, including dropdown
+    // menus (e.g. the phone country picker) that get portaled onto the page
+    // itself. A near-transparent value here made those menus unreadable, so
+    // only the card background goes transparent; elevated surfaces stay solid.
     ns("ui", {
       theme: "light",
       cssVarsPerTheme: {
         light: {
           "cal-brand": "#4934FB",
           "cal-bg": "transparent",
-          "cal-bg-emphasis": "rgba(4,22,48,0.06)",
-          "cal-bg-subtle": "rgba(4,22,48,0.04)",
-          "cal-bg-muted": "transparent",
+          "cal-bg-emphasis": "#e8e9f1",
+          "cal-bg-subtle": "#f2f2f8",
+          "cal-bg-muted": "#f6f6fb",
           "cal-border": "rgba(4,22,48,0.10)",
           "cal-border-subtle": "rgba(4,22,48,0.08)",
           "cal-border-emphasis": "rgba(4,22,48,0.18)",
