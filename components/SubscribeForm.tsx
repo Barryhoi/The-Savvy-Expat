@@ -40,10 +40,19 @@ export default function SubscribeForm({
     setMessage("");
 
     try {
+      // Attribution: ManyChat links the squeeze page with ?video=<post id>
+      // (&platform=) so the subscription records which reel sent
+      // this person. Read at submit time — works in every form variant, and
+      // organic visitors simply send nothing.
+      const params = new URLSearchParams(window.location.search);
       const res = await fetch("/api/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({
+          email,
+          video: params.get("video") ?? undefined,
+          platform: params.get("platform") ?? undefined,
+        }),
       });
 
       const json = await res.json();

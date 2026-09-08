@@ -6,11 +6,22 @@ import type {
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+/** Attribution tags are ids and slugs, never free text — cap and strip. */
+function cleanTag(value: unknown): string | undefined {
+  if (typeof value !== "string") return undefined;
+  const cleaned = value.trim().replace(/[^\w.-]/g, "").slice(0, 64);
+  return cleaned || undefined;
+}
+
 export async function POST(request: Request) {
   let email: unknown;
+  let video: string | undefined;
+  let platform: string | undefined;
   try {
     const body = await request.json();
     email = body?.email;
+    video = cleanTag(body?.video);
+    platform = cleanTag(body?.platform);
   } catch {
     return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
   }
@@ -45,7 +56,12 @@ export async function POST(request: Request) {
           email: email.trim(),
           reactivate_existing: true,
           send_welcome_email: true,
+          // utm_campaign carries the video id that produced this subscriber —
+          // the key the content CRM joins revenue back to. utm_medium is the
+          // platform. Organic signups keep the plain squeeze_page source.
           utm_source: "squeeze_page",
+          ...(platform ? { utm_medium: platform } : {}),
+          ...(video ? { utm_campaign: video } : {}),
         }),
       }
     );
