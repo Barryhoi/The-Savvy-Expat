@@ -439,20 +439,21 @@ details[open] .accordion-body {
   animation: headline-wipe 1.15s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both;
 }
 
-/* Reveals that also resolve out of a blur read as depth of field rather than
-   as a plain opacity ramp. Applied to the heavier blocks only.
-   Written as an entrance animation from a visible default rather than as a
-   transition out of a hidden one: if the reveal never fires, the content is
-   simply there. A blurred default would leave text unreadable on failure. */
+/* Heavier blocks rise and scale into place as they arrive. This used to also
+   animate filter: blur() for a depth-of-field feel, but animating blur forces
+   an expensive per-frame GPU re-render on large cards, and profiling showed it
+   was the single cause of scroll jank on this page — it dropped desktop
+   scrolling from ~60fps to ~40fps with visible hitches (a 166ms stall in the
+   trace). Opacity + transform give nearly the same entrance at a locked 60fps.
+   Written as an entrance from a visible default rather than a transition out
+   of a hidden one: if the reveal never fires, the content is simply there. */
 @keyframes rich-in {
   from {
     opacity: 0;
-    filter: blur(10px);
     transform: translateY(18px) scale(0.985);
   }
   to {
     opacity: 1;
-    filter: blur(0);
     transform: none;
   }
 }
