@@ -6,7 +6,12 @@ const BOOK_CALL_URL = "/form";
 
 export default function Header() {
   return (
-    <header className="sticky top-0 z-50 bg-[#E9E7F4]/80 backdrop-blur-xl">
+    {/* Solid background, not backdrop-blur. A sticky header with backdrop-blur
+        forces the browser to re-blur everything scrolling behind it every
+        frame, which was the primary cause of scroll stutter on the pages that
+        carry this nav (home, /newsletter, /reviews). The page base is this
+        exact colour, so a solid fill looks the same without the per-frame cost. */}
+    <header className="sticky top-0 z-50 bg-[#E9E7F4]">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
         <Link href="/" className="flex items-center">
           <Image
