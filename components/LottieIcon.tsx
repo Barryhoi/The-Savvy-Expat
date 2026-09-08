@@ -32,9 +32,9 @@ export default function LottieIcon({ src, size = 112 }: LottieIconProps) {
 
   // Loops continuously, but only while actually on screen. Six of these
   // render at once in the services grid; looping all of them forever
-  // regardless of scroll position keeps six requestAnimationFrame loops
-  // competing with Lenis's own for the rest of the visit. Pausing off-screen
-  // instances keeps the loop everyone expects without that cost.
+  // regardless of scroll position would keep six requestAnimationFrame
+  // loops running for the whole visit. Pausing the off-screen instances
+  // keeps the loop everyone expects without that cost.
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;

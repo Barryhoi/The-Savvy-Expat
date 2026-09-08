@@ -99,8 +99,10 @@ export default function SurveyFlow() {
               try {
                 sessionStorage.removeItem(SUBSCRIBE_EMAIL_KEY);
               } catch {}
-              window.scrollTo(0, 1);
-              window.scrollTo(0, 0);
+              // Instant, never smooth: this nudge defeats the iOS keyboard
+              // viewport pan, and animating it would reintroduce that bug.
+              window.scrollTo({ top: 1, left: 0, behavior: "instant" });
+              window.scrollTo({ top: 0, left: 0, behavior: "instant" });
               setStep("redirecting");
             }}
           />

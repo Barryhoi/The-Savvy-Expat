@@ -2,6 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Native browser scrolling. The Lenis smooth-scroll library was removed — it
+   hijacked every wheel/touch input to fake an eased "glide," which felt laggy
+   and fought the embedded iframes (Cal.com, Typeform, YouTube) for control of
+   the scroll. Native scrolling is smooth and reliable on its own. We keep only
+   a gentle glide for in-page anchor jumps, and disable even that for anyone
+   who prefers reduced motion. */
+html {
+  scroll-behavior: smooth;
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
 body {
   background-color: #e9e7f4;
   color: #041630;
