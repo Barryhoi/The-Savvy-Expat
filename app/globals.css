@@ -94,7 +94,17 @@ body {
   box-shadow: 0 1px 2px rgba(4, 22, 48, 0.03), 0 10px 28px -18px rgba(4, 22, 48, 0.25);
 }
 
-/* Shine sweep across buttons */
+/* Shine sweep across buttons.
+   The sweep animates transform (compositor-only), NOT `left`. Animating `left`
+   here was the single confirmed source of site-wide scroll jank: it was the
+   only layout-animating keyframe in the codebase, ran infinitely on ~13
+   buttons per page, and dirtied the global layout tree every frame — profiled
+   at DSF2, pausing it took /king's per-frame Layout events from 107 to 0 and
+   removed a 216ms scroll hitch; homepage layout time -75%, paint -40%.
+   Geometry is identical to the old version: the 45%-wide strip starts at
+   left:-80% and ends at the old left:160% (240% of the parent = 533.34% of the
+   strip's own width). skewX is repeated in the keyframes because `transform`
+   in a keyframe replaces the element's static transform. */
 .btn-shine {
   position: relative;
   overflow: hidden;
@@ -117,11 +127,11 @@ body {
 }
 @keyframes shine {
   0% {
-    left: -80%;
+    transform: translateX(0) skewX(-20deg);
   }
   55%,
   100% {
-    left: 160%;
+    transform: translateX(533.34%) skewX(-20deg);
   }
 }
 
