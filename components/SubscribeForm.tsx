@@ -2,6 +2,8 @@
 
 import { useState, type FormEvent } from "react";
 
+import { saveAttribution } from "@/lib/attribution";
+
 type Status = "idle" | "loading" | "success" | "error";
 
 /**
@@ -58,6 +60,10 @@ export default function SubscribeForm({
       const json = await res.json();
 
       if (res.ok) {
+        // Bank the tags for the rest of the funnel: /form replays them into
+        // the Typeform as hidden fields, since the full-page hops between
+        // here and there drop URL params.
+        saveAttribution(params.get("video"), params.get("platform"));
         const subscribedEmail = email.trim();
         setEmail("");
         if (onSuccess) {

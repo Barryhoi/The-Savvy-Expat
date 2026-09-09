@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { readAttribution } from "@/lib/attribution";
+
 const EMBED_SCRIPT = "https://embed.typeform.com/next/embed.js";
 /** How long to wait before deciding the embed is never going to appear. */
 const LOAD_TIMEOUT_MS = 8000;
@@ -88,12 +90,30 @@ export default function TypeformEmbed({
   const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const [status, setStatus] = useState<"loading" | "ready" | "failed">("loading");
+  // The direct link mirrors whatever hidden fields the embed carries, so a
+  // blocked embed doesn't also mean lost attribution.
+  const [directUrl, setDirectUrl] = useState(fallbackUrl);
 
   useEffect(() => {
     let cancelled = false;
 
     // Warm the next page so the post-submit hop is instant.
     router.prefetch(nextHref);
+
+    // Attribution: replay the tags the subscribe step banked (or the current
+    // URL's ?video/?platform) into the form as hidden fields. Set on the DOM
+    // node before tf.load() scans it — values are sanitized to [\w.-] so the
+    // key=value,key=value format can't be broken. Forms without these hidden
+    // fields declared simply ignore them.
+    const attr = readAttribution();
+    const hiddenPairs = [
+      attr.video ? `video=${attr.video}` : null,
+      attr.platform ? `platform=${attr.platform}` : null,
+    ].filter(Boolean);
+    if (hiddenPairs.length > 0) {
+      containerRef.current?.setAttribute("data-tf-hidden", hiddenPairs.join(","));
+      setDirectUrl(`${fallbackUrl}#${hiddenPairs.join("&")}`);
+    }
 
     const onMessage = (event: MessageEvent) => {
       if (!event.origin.includes("typeform.com")) return;
@@ -147,7 +167,7 @@ export default function TypeformEmbed({
       bodyObserver.disconnect();
       body.style.overflow = originalOverflow;
     };
-  }, [liveId, nextHref, router]);
+  }, [liveId, nextHref, fallbackUrl, router]);
 
   if (status === "failed") {
     return (
@@ -159,7 +179,7 @@ export default function TypeformEmbed({
             directly instead — it&apos;s the same form.
           </p>
           <a
-            href={fallbackUrl}
+            href={directUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="btn-shine mt-6 inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-bold text-on-primary shadow-glow transition-all duration-300 hover:-translate-y-0.5"
