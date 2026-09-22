@@ -130,26 +130,40 @@ export default function CalEmbed({
     // `var(--color-white)` in Cal's base theme). Something about the embedded
     // context left that chain unresolved, rendering the panel transparent, so
     // pin both links directly rather than relying on Cal's own default.
-    ns("ui", {
-      theme: "light",
-      cssVarsPerTheme: {
-        light: {
-          "cal-brand": "#4934FB",
-          "cal-bg": "transparent",
-          "cal-bg-emphasis": "#e8e9f1",
-          "cal-bg-subtle": "#f2f2f8",
-          "cal-bg-muted": "#f6f6fb",
-          "cal-border": "rgba(4,22,48,0.10)",
-          "cal-border-subtle": "rgba(4,22,48,0.08)",
-          "cal-border-emphasis": "rgba(4,22,48,0.18)",
-          "color-white": "#ffffff",
-          popover: "#ffffff",
+    //
+    // cal-bg is transparent ONLY on wide screens, where the month grid and the
+    // slot list render side by side and the page's lavender shows through as
+    // intended. On small screens Cal stacks the slots view ON TOP of the event
+    // details (useSlotsViewOnSmallScreen), and a transparent background lets
+    // the layer underneath bleed through — the slot times render over the
+    // event description and the picker is unreadable/untappable. So below the
+    // desktop breakpoint the embed gets the page base color as a solid fill:
+    // visually identical to the blend, but opaque where layers overlap.
+    const wideScreen = window.matchMedia("(min-width: 1024px)");
+    const applyUi = () => {
+      ns("ui", {
+        theme: "light",
+        cssVarsPerTheme: {
+          light: {
+            "cal-brand": "#4934FB",
+            "cal-bg": wideScreen.matches ? "transparent" : "#e9e7f4",
+            "cal-bg-emphasis": "#e8e9f1",
+            "cal-bg-subtle": "#f2f2f8",
+            "cal-bg-muted": "#f6f6fb",
+            "cal-border": "rgba(4,22,48,0.10)",
+            "cal-border-subtle": "rgba(4,22,48,0.08)",
+            "cal-border-emphasis": "rgba(4,22,48,0.18)",
+            "color-white": "#ffffff",
+            popover: "#ffffff",
+          },
+          dark: { "cal-brand": "#fafafa" },
         },
-        dark: { "cal-brand": "#fafafa" },
-      },
-      hideEventTypeDetails: false,
-      layout: "month_view",
-    });
+        hideEventTypeDetails: false,
+        layout: "month_view",
+      });
+    };
+    applyUi();
+    wideScreen.addEventListener("change", applyUi);
 
     const markReady = () => {
       window.clearTimeout(timer);
@@ -181,6 +195,7 @@ export default function CalEmbed({
     return () => {
       window.clearTimeout(timer);
       observer.disconnect();
+      wideScreen.removeEventListener("change", applyUi);
     };
   }, [calLink, namespace, nextHref, router]);
 
