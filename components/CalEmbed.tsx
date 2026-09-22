@@ -108,11 +108,18 @@ export default function CalEmbed({
       return;
     }
 
+    // No useSlotsViewOnSmallScreen here, deliberately. That flag swaps the
+    // whole booker for a separate slots-only view when a date is tapped on a
+    // phone — but the swapped-in view keeps the month view's reported height,
+    // so the visitor got four slot buttons followed by ~500px of dead page
+    // before the next section, and (before cal-bg was solid) the old view
+    // bleeding through the new one. Without the flag, Cal's natural stacked
+    // mobile layout lists the day's slots directly under the calendar and the
+    // iframe height tracks the real content. Desktop is unaffected either way.
     ns("inline", {
       elementOrSelector: `#${elementId.current}`,
       config: {
         layout: "month_view",
-        useSlotsViewOnSmallScreen: "true",
         theme: "light",
       },
       calLink,
@@ -133,12 +140,11 @@ export default function CalEmbed({
     //
     // cal-bg is transparent ONLY on wide screens, where the month grid and the
     // slot list render side by side and the page's lavender shows through as
-    // intended. On small screens Cal stacks the slots view ON TOP of the event
-    // details (useSlotsViewOnSmallScreen), and a transparent background lets
-    // the layer underneath bleed through — the slot times render over the
-    // event description and the picker is unreadable/untappable. So below the
+    // intended. On narrow screens the booker stacks its surfaces, and
+    // transparency has bitten twice there (the slots overlay ghosting through
+    // the event details; the see-through phone-country dropdown), so below the
     // desktop breakpoint the embed gets the page base color as a solid fill:
-    // visually identical to the blend, but opaque where layers overlap.
+    // visually identical to the blend, but opaque wherever surfaces overlap.
     const wideScreen = window.matchMedia("(min-width: 1024px)");
     const applyUi = () => {
       ns("ui", {
