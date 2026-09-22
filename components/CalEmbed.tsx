@@ -3,68 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
-const CAL_ORIGIN = "https://app.cal.com";
-const CAL_SCRIPT = `${CAL_ORIGIN}/embed/embed.js`;
+import { CAL_ORIGIN, ensureCalLoader } from "@/lib/booking";
+
 /** How long to wait before deciding the calendar is never going to appear. */
 const LOAD_TIMEOUT_MS = 8000;
-
-type CalFn = ((...args: unknown[]) => void) & {
-  ns?: Record<string, (...args: unknown[]) => void>;
-  loaded?: boolean;
-  q?: unknown[];
-};
-
-declare global {
-  interface Window {
-    Cal?: CalFn;
-  }
-}
-
-/**
- * The upstream Cal loader snippet, transcribed so it can run inside an effect.
- * It queues calls made before embed.js finishes downloading, so the namespace
- * is safe to use immediately after this returns.
- */
-function ensureCalLoader(): CalFn {
-  const w = window;
-  if (w.Cal) return w.Cal;
-
-  const push = (target: { q?: unknown[] }, args: unknown) => {
-    target.q = target.q || [];
-    target.q.push(args);
-  };
-
-  const cal = function (...args: unknown[]) {
-    const c = w.Cal as CalFn;
-    if (!c.loaded) {
-      c.ns = {};
-      c.q = c.q || [];
-      const script = document.createElement("script");
-      script.src = CAL_SCRIPT;
-      document.head.appendChild(script);
-      c.loaded = true;
-    }
-    if (args[0] === "init") {
-      const namespace = args[1];
-      if (typeof namespace === "string") {
-        const api = function (...inner: unknown[]) {
-          push(api, inner);
-        } as CalFn;
-        api.q = api.q || [];
-        c.ns![namespace] = c.ns![namespace] || api;
-        push(c.ns![namespace] as unknown as { q?: unknown[] }, args);
-        push(c, ["initNamespace", namespace]);
-      } else {
-        push(c, args);
-      }
-      return;
-    }
-    push(c, args);
-  } as CalFn;
-
-  w.Cal = cal;
-  return cal;
-}
 
 /**
  * The booking calendar, wired to hand the visitor to the confirmation page.

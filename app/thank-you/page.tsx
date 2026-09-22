@@ -1,4 +1,3 @@
-import Footer from "@/components/Footer";
 import Reveal from "@/components/Reveal";
 import FunnelHeader from "@/components/FunnelHeader";
 import YouTubeEmbed from "@/components/YouTubeEmbed";
@@ -67,14 +66,14 @@ export default function ThankYouPage() {
         </section>
       </div>
 
-      <main className="flex-1">
+      {/* No site footer on the funnel pages: the visitor has just booked;
+          a newsletter box and social links here only dilute the ending. */}
+      <main className="flex-1 pb-16">
         <ClientVideos
           heading="While You Wait, Meet A Few Clients"
           subheading="They all started with the same call you just booked."
         />
       </main>
-
-      <Footer />
     </div>
   );
 }

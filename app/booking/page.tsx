@@ -1,12 +1,9 @@
-import Footer from "@/components/Footer";
 import Reveal from "@/components/Reveal";
 import FunnelHeader from "@/components/FunnelHeader";
 import CalEmbed from "@/components/CalEmbed";
 import ClientVideos from "@/components/ClientVideos";
 import QuoteMarquee from "@/components/QuoteMarquee";
-
-const CAL_LINK = "team/the-savvy-expat/expat-relocation-discovery-call";
-const CAL_NAMESPACE = "expat-relocation-discovery-call";
+import { CAL_LINK, CAL_NAMESPACE, CAL_ORIGIN, CAL_SCRIPT } from "@/lib/booking";
 
 export const metadata = {
   title: "Book Your Call — Step 2 — The Savvy Expat",
@@ -15,9 +12,17 @@ export const metadata = {
   robots: { index: false, follow: false },
 };
 
+// No site footer on the funnel pages: a newsletter box and social links under
+// the calendar are exits from a flow that should end in a booked call.
 export default function BookingPage() {
   return (
     <div className="flex min-h-screen flex-col overflow-x-clip">
+      {/* Start Cal's embed script at parse time, not after hydration. If the
+          visitor came through /form the assets are already warm (CalPreload)
+          and these resolve from cache. */}
+      <link rel="preload" as="script" href={CAL_SCRIPT} />
+      <link rel="preconnect" href={CAL_ORIGIN} />
+
       <div className="bg-hero">
         <FunnelHeader current={2} />
 
@@ -43,15 +48,13 @@ export default function BookingPage() {
         </section>
       </div>
 
-      <main className="flex-1">
+      <main className="flex-1 pb-16">
         <ClientVideos />
         <QuoteMarquee
           heading="It All Starts With A Call"
           subheading="Every client below started exactly where you are now — on this page, picking a time."
         />
       </main>
-
-      <Footer />
     </div>
   );
 }

@@ -63,33 +63,32 @@ function loadTypeform(): Promise<TypeformApi> {
 /**
  * The intake form, wired to hand the visitor straight to the booking calendar.
  *
- * Mounted through `data-tf-live` + `tf.load()` — the snippet Typeform gives you
- * — rather than `createWidget`, because a live id is not a classic form id:
- * passing one to `createWidget` requests a form URL that doesn't exist and
- * Typeform answers with a generic marketing page instead of the form.
+ * Mounted by the form's own id (`data-tf-widget`) rather than the "live embed"
+ * id from Typeform's share panel. A live id costs an extra round trip to
+ * api.typeform.com before the form can even start loading — measured at
+ * ~0.85s on a phone, on top of the ~3.7s Typeform takes to serve the form
+ * itself — and its only benefit was re-pointing the form without a deploy,
+ * which the direct-link fallback below never followed anyway. To move the
+ * funnel to a different form, change FORM_ID on the page.
  *
- * The live id resolves to whichever form it currently points at, so the submit
- * handoff listens for the embed's own `form-submit` message rather than
- * hard-coding the resolved id. Re-point the form in Typeform and this keeps
- * working.
+ * The submit handoff listens for the embed's `form-submit` message and
+ * navigates client-side, so the hop to the calendar is instant.
  */
 export default function TypeformEmbed({
-  liveId,
+  formId,
   nextHref,
-  fallbackUrl,
   className = "",
 }: {
-  /** The `data-tf-live` id from Typeform's embed snippet. */
-  liveId: string;
+  /** The Typeform form id, e.g. `my8rCVz6`. */
+  formId: string;
   /** Where a completed form sends the visitor. */
   nextHref: string;
-  /** Direct form link, shown if the embed script never loads. */
-  fallbackUrl: string;
   className?: string;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const [status, setStatus] = useState<"loading" | "ready" | "failed">("loading");
+  const fallbackUrl = `https://form.typeform.com/to/${formId}`;
   // The direct link mirrors whatever hidden fields the embed carries, so a
   // blocked embed doesn't also mean lost attribution.
   const [directUrl, setDirectUrl] = useState(fallbackUrl);
@@ -167,7 +166,7 @@ export default function TypeformEmbed({
       bodyObserver.disconnect();
       body.style.overflow = originalOverflow;
     };
-  }, [liveId, nextHref, fallbackUrl, router]);
+  }, [formId, nextHref, fallbackUrl, router]);
 
   if (status === "failed") {
     return (
@@ -191,8 +190,13 @@ export default function TypeformEmbed({
     );
   }
 
+  // The height floor only holds space for the spinner. Once the form is up,
+  // `data-tf-auto-resize` sizes the iframe to the question on screen (within
+  // the min,max bounds below), so a two-line question no longer sits in a
+  // 560px box with a dead void underneath. `data-tf-inline-on-mobile` keeps
+  // the form in the page on phones instead of Typeform's full-screen takeover.
   return (
-    <div className={`relative min-h-[560px] w-full ${className}`}>
+    <div className={`relative w-full ${status === "ready" ? "" : "min-h-[420px]"} ${className}`}>
       {status === "loading" && (
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
           <p className="flex items-center gap-3 text-sm font-medium text-ink/50">
@@ -206,9 +210,11 @@ export default function TypeformEmbed({
       )}
       <div
         ref={containerRef}
-        data-tf-live={liveId}
+        data-tf-widget={formId}
         data-tf-opacity="50"
-        className="h-full min-h-[560px] w-full"
+        data-tf-auto-resize="320,900"
+        data-tf-inline-on-mobile
+        className="w-full"
       />
     </div>
   );
