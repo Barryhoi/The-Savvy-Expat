@@ -121,6 +121,18 @@ export default function CalEmbed({
       config: {
         layout: "month_view",
         theme: "light",
+        // After a date is tapped on a phone, the booker scrolls its slot list
+        // into view. Safari refuses cross-origin scrollIntoView, so on Safari
+        // Cal instead asks the parent page to scroll by the list's offset
+        // *inside the iframe* — which is only right when the iframe's top is
+        // at the top of the viewport. A phone visitor has always already
+        // scrolled down to reach the calendar, so the page overshot by that
+        // amount and dumped them in the testimonials. Off; the slots render
+        // directly under the calendar and need no scroll at all.
+        "ui.autoscroll": "false",
+        // Phones hide the event-details column (see applyUi); this keeps the
+        // timezone picker available above the calendar when they do.
+        showTimezoneWhenEventDetailsHidden: "true",
       },
       calLink,
     });
@@ -145,6 +157,12 @@ export default function CalEmbed({
     // the event details; the see-through phone-country dropdown), so below the
     // desktop breakpoint the embed gets the page base color as a solid fill:
     // visually identical to the blend, but opaque wherever surfaces overlap.
+    //
+    // cal-bg-emphasis is the pill Cal draws behind every day that has open
+    // slots; unavailable days are plain muted text. It must contrast with
+    // cal-bg — the previous #e8e9f1 was one shade off the page base, so
+    // bookable and unbookable dates looked identical. White pills read at a
+    // glance and match the site's white-cards-on-lavender language.
     const wideScreen = window.matchMedia("(min-width: 1024px)");
     const applyUi = () => {
       ns("ui", {
@@ -152,19 +170,26 @@ export default function CalEmbed({
         cssVarsPerTheme: {
           light: {
             "cal-brand": "#4934FB",
+            "cal-brand-emphasis": "#3d2ae8",
+            "cal-brand-text": "#ffffff",
             "cal-bg": wideScreen.matches ? "transparent" : "#e9e7f4",
-            "cal-bg-emphasis": "#e8e9f1",
+            "cal-bg-emphasis": "#ffffff",
             "cal-bg-subtle": "#f2f2f8",
             "cal-bg-muted": "#f6f6fb",
             "cal-border": "rgba(4,22,48,0.10)",
-            "cal-border-subtle": "rgba(4,22,48,0.08)",
+            "cal-border-subtle": "rgba(4,22,48,0.12)",
             "cal-border-emphasis": "rgba(4,22,48,0.18)",
             "color-white": "#ffffff",
             popover: "#ffffff",
           },
           dark: { "cal-brand": "#fafafa" },
         },
-        hideEventTypeDetails: false,
+        // On a phone the details column (avatar, title, four-line description,
+        // duration, location) stacks above the calendar and pushes it a whole
+        // screen down. The page heading already says what the call is, and
+        // the confirm step repeats the title, duration and time — so phones
+        // open straight on the calendar. Desktop keeps the three-column view.
+        hideEventTypeDetails: !wideScreen.matches,
         layout: "month_view",
       });
     };
@@ -238,7 +263,7 @@ export default function CalEmbed({
       )}
       <div
         id={elementId.current}
-        className="min-h-[620px] w-full overflow-y-auto"
+        className={`w-full ${status === "ready" ? "" : "min-h-[620px]"}`}
       />
     </div>
   );

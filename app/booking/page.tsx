@@ -21,28 +21,25 @@ export default function BookingPage() {
       <div className="bg-hero">
         <FunnelHeader current={2} />
 
-        <section className="px-6 pb-16 pt-12">
+        <section className="px-6 pb-8 pt-12 sm:pb-16">
           <div className="mx-auto max-w-3xl text-center">
             <Reveal>
               <h1 className="text-4xl font-black leading-[1.1] tracking-tight sm:text-5xl">
                 Book Your Call With The Savvy Expat
               </h1>
-              <p className="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-ink/60">
-                Select A Time To Schedule Your Free Consult Where You&apos;ll
-                Gain Expert Tips &amp; Strategies From The Savvy Expat.
-              </p>
             </Reveal>
           </div>
 
-          <Reveal delay={160}>
-            <div className="mx-auto mt-12 max-w-5xl">
-              <CalEmbed
-                calLink={CAL_LINK}
-                namespace={CAL_NAMESPACE}
-                nextHref="/thank-you"
-              />
-            </div>
-          </Reveal>
+          {/* Not wrapped in Reveal: an interactive widget that fades and
+              slides in on scroll reads as lag, and the transform on the
+              wrapper skews the embed's own measurements while it animates. */}
+          <div className="mx-auto mt-8 max-w-5xl sm:mt-12">
+            <CalEmbed
+              calLink={CAL_LINK}
+              namespace={CAL_NAMESPACE}
+              nextHref="/thank-you"
+            />
+          </div>
         </section>
       </div>
 
