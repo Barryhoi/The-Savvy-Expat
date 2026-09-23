@@ -79,28 +79,20 @@ export default function CalEmbed({
     ns("on", { action: "linkFailed", callback: markFailed });
     ns("on", { action: "bookingSuccessful", callback: onBooked });
 
-    // No useSlotsViewOnSmallScreen here, deliberately. That flag swaps the
-    // whole booker for a separate slots-only view when a date is tapped on a
-    // phone — but the swapped-in view keeps the month view's reported height,
-    // so the visitor got four slot buttons followed by ~500px of dead page
-    // before the next section, and (before cal-bg was solid) the old view
-    // bleeding through the new one. Without the flag, Cal's natural stacked
-    // mobile layout lists the day's slots directly under the calendar and the
-    // iframe height tracks the real content. Desktop is unaffected either way.
     ns("inline", {
       elementOrSelector: `#${elementId.current}`,
       config: {
         layout: "month_view",
         theme: "light",
-        // After a date is tapped on a phone, the booker scrolls its slot list
-        // into view. Safari refuses cross-origin scrollIntoView, so on Safari
-        // Cal instead asks the parent page to scroll by the list's offset
-        // *inside the iframe* — which is only right when the iframe's top is
-        // at the top of the viewport. A phone visitor has always already
-        // scrolled down to reach the calendar, so the page overshot by that
-        // amount and dumped them in the testimonials. Off; the slots render
-        // directly under the calendar and need no scroll at all.
+        // Mobile date taps open Cal's dedicated time picker. Keeping the slots
+        // below the month grid triggers a separate SDK route-change scroll to
+        // the embed's top, which hides the times the visitor just requested.
+        // The dedicated picker puts date, timezone and slots together in view
+        // on every selection; desktop keeps the side-by-side month layout.
+        // Disable the legacy Safari parent-scroll fallback, whose iframe-local
+        // offset can otherwise overshoot into the content below the calendar.
         "ui.autoscroll": "false",
+        useSlotsViewOnSmallScreen: "true",
       },
       calLink,
     });
