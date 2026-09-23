@@ -7,7 +7,7 @@ import { readAttribution } from "@/lib/attribution";
 
 const EMBED_SCRIPT = "https://embed.typeform.com/next/embed.js";
 /** How long to wait before deciding the embed is never going to appear. */
-const LOAD_TIMEOUT_MS = 8000;
+const LOAD_TIMEOUT_MS = 15000;
 
 interface TypeformApi {
   /** Scans the DOM for `data-tf-*` elements and mounts them. */
@@ -114,8 +114,40 @@ export default function TypeformEmbed({
       setDirectUrl(`${fallbackUrl}#${hiddenPairs.join("&")}`);
     }
 
+    // Let long mobile questions extend the page. A maximum height clips the
+    // services list into a second scroll area inside the iframe.
+    const phone = window.matchMedia("(max-width: 767px)").matches;
+    const minHeight = phone ? Math.max(480, window.innerHeight) : 320;
+    // A swipe should scroll the services list, not answer/skip the question.
+    if (phone) containerRef.current?.setAttribute("data-tf-disable-scroll", "true");
+    containerRef.current?.setAttribute(
+      "data-tf-auto-resize",
+      phone ? String(minHeight) : "320,900"
+    );
+
+    // Typeform announces a question before its SDK applies the new height.
+    // Align after that layout update, without a smooth animation competing
+    // with iframe focus and the browser's scroll anchoring during a resize.
+    let scrollFrame = 0;
+    const scrollToForm = () => {
+      window.cancelAnimationFrame(scrollFrame);
+      scrollFrame = window.requestAnimationFrame(() => {
+        scrollFrame = window.requestAnimationFrame(() => {
+          scrollFrame = 0;
+          containerRef.current?.scrollIntoView({ behavior: "instant", block: "start" });
+        });
+      });
+    };
+
     const onMessage = (event: MessageEvent) => {
-      if (!event.origin.includes("typeform.com")) return;
+      const iframe = containerRef.current?.querySelector("iframe");
+      if (
+        event.origin !== "https://form.typeform.com" ||
+        !iframe ||
+        event.source !== iframe.contentWindow
+      ) {
+        return;
+      }
       const data = event.data;
       const type =
         typeof data === "string"
@@ -124,30 +156,21 @@ export default function TypeformEmbed({
             ? (data as { type?: string }).type
             : undefined;
       if (type === "form-ready") setStatus("ready");
+      if (
+        phone &&
+        (type === "form-screen-changed" ||
+          (type === "form-height-changed" && scrollFrame !== 0))
+      ) {
+        scrollToForm();
+      }
       if (type === "form-submit") router.push(nextHref);
     };
     window.addEventListener("message", onMessage);
-
-    // The embed script locks the page by writing `overflow: hidden` onto
-    // <body> — it assumes it owns the whole viewport. This is an inline embed
-    // inside a normal scrolling page, so strip that back off whenever it
-    // appears, otherwise nothing below the form can be reached.
-    const body = document.body;
-    const originalOverflow = body.style.overflow;
-    const unlockScroll = () => {
-      if (body.style.overflow === "hidden") body.style.overflow = originalOverflow;
-    };
-    const bodyObserver = new MutationObserver(unlockScroll);
-    bodyObserver.observe(body, {
-      attributes: true,
-      attributeFilter: ["style"],
-    });
 
     loadTypeform()
       .then((tf) => {
         if (cancelled) return;
         tf.load();
-        unlockScroll();
       })
       .catch(() => {
         if (!cancelled) setStatus("failed");
@@ -163,40 +186,35 @@ export default function TypeformEmbed({
       cancelled = true;
       window.removeEventListener("message", onMessage);
       window.clearTimeout(readyTimer);
-      bodyObserver.disconnect();
-      body.style.overflow = originalOverflow;
+      window.cancelAnimationFrame(scrollFrame);
     };
   }, [formId, nextHref, fallbackUrl, router]);
 
-  if (status === "failed") {
-    return (
-      <div className="flex min-h-[360px] items-center justify-center p-8">
-        <div className="mx-auto max-w-sm text-center">
-          <p className="text-lg font-black">The form didn&apos;t load</p>
-          <p className="mt-2 text-sm leading-relaxed text-ink/60">
-            Usually an ad blocker or a dropped connection. You can open it
-            directly instead — it&apos;s the same form.
-          </p>
-          <a
-            href={directUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-shine mt-6 inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-bold text-on-primary shadow-glow transition-all duration-300 hover:-translate-y-0.5"
-          >
-            Open the form
-          </a>
-        </div>
+  const fallback = (
+    <div className="flex min-h-[360px] items-center justify-center p-8">
+      <div className="mx-auto max-w-sm text-center">
+        <p className="text-lg font-black">The form didn&apos;t load</p>
+        <p className="mt-2 text-sm leading-relaxed text-ink/60">
+          Usually an ad blocker or a dropped connection. You can open it
+          directly instead — it&apos;s the same form.
+        </p>
+        <a
+          href={directUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn-shine mt-6 inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-bold text-on-primary shadow-glow transition-all duration-300 hover:-translate-y-0.5"
+        >
+          Open the form
+        </a>
       </div>
-    );
-  }
+    </div>
+  );
 
-  // The height floor only holds space for the spinner. Once the form is up,
-  // `data-tf-auto-resize` sizes the iframe to the question on screen (within
-  // the min,max bounds below), so a two-line question no longer sits in a
-  // 560px box with a dead void underneath. `data-tf-inline-on-mobile` keeps
-  // the form in the page on phones instead of Typeform's full-screen takeover.
+  // Inline mode avoids the mobile launcher/fullscreen takeover. The loading
+  // placeholder reserves space until the SDK applies the question's height.
   return (
-    <div className={`relative w-full ${status === "ready" ? "" : "min-h-[420px]"} ${className}`}>
+    <div className={`relative w-full [overflow-anchor:none] ${status === "ready" ? "" : "min-h-[420px]"} ${className}`}>
+      {status === "failed" && fallback}
       {status === "loading" && (
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
           <p className="flex items-center gap-3 text-sm font-medium text-ink/50">
@@ -208,11 +226,12 @@ export default function TypeformEmbed({
           </p>
         </div>
       )}
+      {/* Keep the iframe mounted after a timeout so a late ready event can recover it. */}
       <div
         ref={containerRef}
+        hidden={status === "failed"}
         data-tf-widget={formId}
         data-tf-opacity="50"
-        data-tf-auto-resize="320,900"
         data-tf-inline-on-mobile
         className="w-full"
       />
