@@ -71,8 +71,8 @@ function loadTypeform(): Promise<TypeformApi> {
  * which the direct-link fallback below never followed anyway. To move the
  * funnel to a different form, change FORM_ID on the page.
  *
- * The submit handoff listens for the embed's `form-submit` message and
- * navigates client-side, so the hop to the calendar is instant.
+ * Typeform owns the ending: qualified applicants redirect to the calendar;
+ * other applicants see the configured ending. Never navigate on every submit.
  */
 export default function TypeformEmbed({
   formId,
@@ -163,7 +163,8 @@ export default function TypeformEmbed({
       ) {
         scrollToForm();
       }
-      if (type === "form-submit") router.push(nextHref);
+      // Do not redirect on form-submit: it also fires for disqualified endings.
+      // The SDK follows the redirect configured on the qualified ending only.
     };
     window.addEventListener("message", onMessage);
 
@@ -233,6 +234,7 @@ export default function TypeformEmbed({
         data-tf-widget={formId}
         data-tf-opacity="50"
         data-tf-inline-on-mobile
+        data-tf-redirect-target="_top"
         className="w-full"
       />
     </div>

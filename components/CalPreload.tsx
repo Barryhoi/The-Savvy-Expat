@@ -24,7 +24,7 @@ export default function CalPreload() {
       preloadCalBooker();
     };
     const onMessage = (event: MessageEvent) => {
-      if (!event.origin.includes("typeform.com")) return;
+      if (event.origin !== "https://form.typeform.com") return;
       const data = event.data;
       const type =
         typeof data === "string"

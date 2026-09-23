@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { CAL_ORIGIN, ensureCalLoader } from "@/lib/booking";
 
 /** How long to wait before deciding the calendar is never going to appear. */
-const LOAD_TIMEOUT_MS = 8000;
+const LOAD_TIMEOUT_MS = 15000;
 
 /**
  * The booking calendar, wired to hand the visitor to the confirmation page.
@@ -31,6 +31,9 @@ export default function CalEmbed({
   const [status, setStatus] = useState<"loading" | "ready" | "failed">("loading");
 
   useEffect(() => {
+    let active = true;
+    let navigated = false;
+    setStatus("loading");
     const Cal = ensureCalLoader();
     router.prefetch(nextHref);
 
@@ -49,6 +52,32 @@ export default function CalEmbed({
       setStatus("failed");
       return;
     }
+
+    const markReady = () => {
+      if (!active) return;
+      window.clearTimeout(timer);
+      setStatus("ready");
+    };
+    const markFailed = () => {
+      if (!active) return;
+      window.clearTimeout(timer);
+      setStatus("failed");
+    };
+    const onBooked = (event: {
+      detail?: { data?: { confirmed?: boolean; booking?: { paymentUid?: string } } };
+    }) => {
+      if (!active || navigated) return;
+      // Let Cal finish pending approvals or payment before claiming confirmation.
+      const data = event.detail?.data;
+      if (!data || data.confirmed === false || data.booking?.paymentUid) return;
+      navigated = true;
+      router.push(nextHref);
+    };
+
+    // Register before mounting: cached calendars can report ready immediately.
+    ns("on", { action: "linkReady", callback: markReady });
+    ns("on", { action: "linkFailed", callback: markFailed });
+    ns("on", { action: "bookingSuccessful", callback: onBooked });
 
     // No useSlotsViewOnSmallScreen here, deliberately. That flag swaps the
     // whole booker for a separate slots-only view when a date is tapped on a
@@ -72,9 +101,6 @@ export default function CalEmbed({
         // amount and dumped them in the testimonials. Off; the slots render
         // directly under the calendar and need no scroll at all.
         "ui.autoscroll": "false",
-        // Phones hide the event-details column (see applyUi); this keeps the
-        // timezone picker available above the calendar when they do.
-        showTimezoneWhenEventDetailsHidden: "true",
       },
       calLink,
     });
@@ -126,48 +152,26 @@ export default function CalEmbed({
           },
           dark: { "cal-brand": "#fafafa" },
         },
-        // On a phone the details column (avatar, title, four-line description,
-        // duration, location) stacks above the calendar and pushes it a whole
-        // screen down. The page heading already says what the call is, and
-        // the confirm step repeats the title, duration and time — so phones
-        // open straight on the calendar. Desktop keeps the three-column view.
-        hideEventTypeDetails: !wideScreen.matches,
+        // Cal also applies this option to the final booking-details screen.
+        // Keep the summary visible so phones can verify date, time and timezone.
+        hideEventTypeDetails: false,
         layout: "month_view",
       });
     };
     applyUi();
     wideScreen.addEventListener("change", applyUi);
 
-    const markReady = () => {
-      window.clearTimeout(timer);
-      setStatus("ready");
-    };
-
-    // Cal's own readiness event is the fast path, but don't depend on it:
-    // watching for the iframe Cal mounts is what actually proves the calendar
-    // is on screen, whatever the embed decides to name its events.
-    ns("on", { action: "linkReady", callback: markReady });
-
+    // React can rerun the effect with an existing embed (including StrictMode).
+    // An iframe alone proves nothing; only Cal's completed loading state does.
     const host = document.getElementById(elementId.current);
-    const observer = new MutationObserver(() => {
-      if (host?.querySelector("iframe")) {
-        markReady();
-        observer.disconnect();
-      }
-    });
-    if (host) {
-      if (host.querySelector("iframe")) markReady();
-      else observer.observe(host, { childList: true, subtree: true });
-    }
-
-    ns("on", {
-      action: "bookingSuccessful",
-      callback: () => router.push(nextHref),
-    });
+    if (host?.querySelector('cal-inline[loading="done"]')) markReady();
 
     return () => {
+      active = false;
       window.clearTimeout(timer);
-      observer.disconnect();
+      ns("off", { action: "linkReady", callback: markReady });
+      ns("off", { action: "linkFailed", callback: markFailed });
+      ns("off", { action: "bookingSuccessful", callback: onBooked });
       wideScreen.removeEventListener("change", applyUi);
     };
   }, [calLink, namespace, nextHref, router]);
@@ -175,7 +179,11 @@ export default function CalEmbed({
   return (
     <div className="relative">
       {status !== "ready" && (
-        <div className="absolute inset-0 z-10 flex items-center justify-center p-8">
+        <div
+          role="status"
+          aria-live="polite"
+          className="absolute inset-0 z-10 flex items-center justify-center bg-[#e9e7f4] p-8"
+        >
           {status === "loading" ? (
             <p className="flex items-center gap-3 text-sm font-medium text-ink/50">
               <span
@@ -205,7 +213,8 @@ export default function CalEmbed({
       )}
       <div
         id={elementId.current}
-        className={`w-full ${status === "ready" ? "" : "min-h-[620px]"}`}
+        aria-hidden={status === "failed" ? true : undefined}
+        className={`w-full ${status === "ready" ? "" : "min-h-[620px]"} ${status === "failed" ? "invisible" : ""}`}
       />
     </div>
   );
