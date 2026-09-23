@@ -42,8 +42,8 @@ export default function FormPage() {
               Step 1: Fill Out This Form
             </h1>
             <p className="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-ink/60">
-              Once you submit this form, you&apos;ll be redirected to a calendar
-              to schedule a call with our head relocation specialist!
+              Tell us about your move. If we&apos;re a fit, you&apos;ll continue to
+              the calendar to book a 30-minute call with our relocation team.
             </p>
           </Reveal>
         </div>
