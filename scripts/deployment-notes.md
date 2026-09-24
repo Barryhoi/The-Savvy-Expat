@@ -32,7 +32,7 @@ Production remains at bb80d60. The isolated branch is booking-migration-preview.
 - Existing Close lead-status → opportunity Make scenario remains unchanged.
 
 ## Required before launch
-1. Add server-only CALENDLY_API_TOKEN to Vercel Preview for this Calendly organization. Still absent at final check. The existing Preview CLOSE_API_KEY works; the extra-underscore Production variable was left untouched.
+1. DONE: CALENDLY_API_TOKEN added by user and validated for Evan's Savvy Expat organization, Sam membership, exact 30-minute event, and 26 live slots. User configured Preview and Production; only Preview was deployed. The existing Preview CLOSE_API_KEY works; the extra-underscore Production variable was left untouched.
 2. Register signed invitee.created/invitee.canceled webhooks against a stable reachable Preview callback using an approved protection-aware configuration. CALENDLY_WEBHOOK_SIGNING_KEY already exists in Preview. No subscription registered yet.
 3. Test actual live availability API and real booking → Close → confirmation, then cancellation, reschedule, duplicate delivery, and out-of-order delivery. No real booking was made during these checks.
 4. Inspect native Calendly–Close contact-creation settings to avoid competition with anonymous application identity resolution. Native custom mappings do not update existing contacts; this implementation performs those updates server-side.
@@ -51,3 +51,15 @@ One intentionally retained lead: PREVIEW QA Migration Test, savvy-migration-qa-2
 - Code commit: b9c646f; subsequent documentation-only update records the saved notification workflow.
 - Final deployed application smoke test returned HTTP 200 with qualified=true for the existing synthetic receipt.
 - Small-screen booking-page document width matched the 320px viewport.
+
+## Token-enabled preview verification (September 25)
+- Latest URL: https://the-savvy-expat-42jszd0iq-barry-operations.vercel.app/form
+- Deployment dpl_4ypf3zD2z71K3zB7sFWE4DWF12pd READY, code d830cb5, cloud build 9 seconds.
+- Prior token-enabled preview mtsd56lli returned 26 real available slots through /api/booking/availability after the retained QA application submission.
+- Chrome completed anonymous qualified applications on both token-enabled previews, preserving optional identity. No booking submitted, no additional Close lead created by these anonymous applications.
+- At 390px selecting a date moved down to Available times; selected slot opened the correct Calendly detail form with 30-minute duration and required WhatsApp field.
+- Found and fixed Calendly clipping at 320px: mobile iframe now uses full viewport width. Latest preview visually verified all fields and Schedule Event button fully visible at 320px; desktop details also fit. Real iPhone Safari remains untested.
+- Removed iframe onLoad readiness shortcut; loading now ends on Calendly postMessage so an empty iframe does not prematurely hide loading feedback. Verified loading indicator clears when real Calendly content arrives.
+- TypeScript, qualification parity tests, webhook signature tests, and production build pass. Latest deployed unsigned webhook rejects with 401.
+- Webhook creation was BLOCKED by automatic approval review before execution: proposed Sam-scoped signed subscription used an existing project automation-bypass credential in its callback URL to reach the protected preview. Review requires explicit user approval for sharing that credential with Calendly; no subscription or callback reachability test was created/executed. Do not retry or work around without authorization. Latest preview URL above must replace the older proposed callback URL if authorized.
+- Production and Make remain untouched. Actual booking, Close booking fields, notifications, reschedule/cancellation and live webhook deliveries still require testing.
