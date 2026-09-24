@@ -1,62 +1,28 @@
-import Reveal from "@/components/Reveal";
 import FunnelHeader from "@/components/FunnelHeader";
-import TypeformEmbed from "@/components/TypeformEmbed";
-import CalPreload from "@/components/CalPreload";
-import { CAL_ORIGIN } from "@/lib/booking";
-
-// Typeform "Expat Relocation Application Form". Embedded by its form id, not
-// the share panel's live-embed id (01JV8BYD4BGZE7ET5GAGRVH6AS), which resolved
-// to this same form after an extra round trip — see TypeformEmbed.
-const TYPEFORM_FORM_ID = "my8rCVz6";
-const TYPEFORM_EMBED_SCRIPT = "https://embed.typeform.com/next/embed.js";
-
+import IntakeForm from "@/components/IntakeForm";
 export const metadata = {
-  title: "Book A Call — Step 1 — The Savvy Expat",
-  description:
-    "Tell us about your move to the Philippines, then pick a time to speak with our head relocation specialist.",
+  title: "Your Relocation Application — The Savvy Expat",
   robots: { index: false, follow: false },
 };
-
-// No site footer on the funnel pages: a newsletter box and social links under
-// the form are exits from a flow that should end in a booked call.
 export default function FormPage() {
   return (
-    <div className="bg-hero flex min-h-screen flex-col overflow-x-clip">
-      {/* Start the embed script and the form's connections at parse time,
-          not after hydration — they're on the critical path to the form.
-          The hosts are the ones the form's own waterfall hits: the SDK, the
-          form document, its renderer bundles, and its cover image. */}
-      <link rel="preload" as="script" href={TYPEFORM_EMBED_SCRIPT} />
-      <link rel="preconnect" href="https://embed.typeform.com" />
-      <link rel="preconnect" href="https://form.typeform.com" />
-      <link rel="preconnect" href="https://renderer-assets.typeform.com" />
-      <link rel="preconnect" href="https://images.typeform.com" />
-      <link rel="preconnect" href={CAL_ORIGIN} />
-
+    <div className="bg-hero min-h-screen">
       <FunnelHeader current={1} />
-
-      <main className="flex-1 px-6 pb-24 pt-12">
-        <div className="mx-auto max-w-3xl text-center">
-          <Reveal>
-            <h1 className="text-4xl font-black leading-[1.1] tracking-tight sm:text-5xl">
-              Step 1: Fill Out This Form
-            </h1>
-            <p className="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-ink/60">
-              Tell us about your move. If we&apos;re a fit, you&apos;ll continue to
-              the calendar to book a 30-minute call with our relocation team.
-            </p>
-          </Reveal>
+      <main className="mx-auto max-w-3xl px-4 pb-16 pt-8 sm:px-6 sm:pt-12">
+        <div className="mb-8 text-center">
+          <p className="text-xs font-bold uppercase tracking-[.2em] text-primary">
+            Your move starts here
+          </p>
+          <h1 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">
+            Tell us about your move
+          </h1>
+          <p className="mt-3 text-ink/60">
+            If we’re a fit, you’ll choose a time for your 30-minute discovery
+            call.
+          </p>
         </div>
-
-        {/* Not wrapped in Reveal: an interactive widget that fades and slides
-            in on scroll reads as lag, and the animating transform skews the
-            embed's own measurements. */}
-        <div className="mx-auto mt-8 max-w-3xl sm:mt-10">
-          <TypeformEmbed formId={TYPEFORM_FORM_ID} nextHref="/booking" />
-        </div>
+        <IntakeForm />
       </main>
-
-      <CalPreload />
     </div>
   );
 }

@@ -11,11 +11,11 @@ import { categorizePost, getCategory } from "@/lib/categories";
 import type { BeehiivPost } from "@/types/beehiiv";
 
 interface PostPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export async function generateMetadata({ params }: PostPageProps) {
-  const post = await getPost(params.id);
+  const post = await getPost((await params).id);
   if (!post) return { title: "Newsletter Not Found — The Savvy Expat" };
   return {
     title: `${post.title} — The Savvy Expat`,
@@ -99,7 +99,7 @@ function RelatedCard({ post }: { post: BeehiivPost }) {
 }
 
 export default async function PostPage({ params }: PostPageProps) {
-  const post = await getPost(params.id);
+  const post = await getPost((await params).id);
 
   if (!post) {
     notFound();

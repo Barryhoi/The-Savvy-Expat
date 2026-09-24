@@ -643,3 +643,11 @@ details[open] .accordion-body {
   }
   .sweep-once::after { display: none; }
 }
+
+/* Native application: one page scroll, touch-sized controls, no embedded form. */
+.intake-card { background: #fff; border: 1px solid rgba(4,22,48,.09); border-radius: 24px; padding: clamp(24px, 5vw, 48px); box-shadow: 0 20px 70px -40px rgba(4,22,48,.3); }
+.intake-input { width:100%; min-height:56px; border:1px solid #d9d9e5; border-radius:12px; padding:14px 16px; font-size:16px; background:#fff; color:#041630; }
+.intake-input:focus-visible, .intake-choice:focus-within { outline:3px solid #4934fb; outline-offset:3px; }
+.intake-choice { display:flex; align-items:center; gap:14px; min-height:58px; padding:16px; border:1px solid #d9d9e5; border-radius:12px; cursor:pointer; font-size:16px; line-height:1.45; overflow-wrap:anywhere; }
+.intake-choice-selected { background:#f0edff; border-color:#4934fb; }
+@media(prefers-reduced-motion:reduce) { .intake-card * { scroll-behavior:auto!important; transition:none!important; } }

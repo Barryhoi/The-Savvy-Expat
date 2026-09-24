@@ -1,3 +1,7 @@
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { applicationFromToken } from "@/lib/application";
+import { readRecord } from "@/lib/receipt-store";
 import Reveal from "@/components/Reveal";
 import FunnelHeader from "@/components/FunnelHeader";
 import YouTubeEmbed from "@/components/YouTubeEmbed";
@@ -12,7 +16,6 @@ export const metadata = {
   robots: { index: false, follow: false },
 };
 
-
 function ConfirmedBadge() {
   return (
     <p className="inline-flex items-center gap-2.5 rounded-full border border-primary/20 bg-white/80 py-1.5 pl-1.5 pr-4 shadow-sm backdrop-blur">
@@ -26,7 +29,15 @@ function ConfirmedBadge() {
   );
 }
 
-export default function ThankYouPage() {
+export default async function ThankYouPage() {
+  const receipt = await applicationFromToken(
+    (await cookies()).get("savvy_booking")?.value,
+  );
+  if (!receipt?.value.leadId) redirect("/form");
+  const booking = await readRecord<{ status: string }>(
+    `lead-bookings/${receipt.value.leadId}`,
+  );
+  if (booking?.value.status !== "active") redirect("/booking");
   return (
     <div className="flex min-h-screen flex-col overflow-x-clip">
       <div className="bg-hero">
