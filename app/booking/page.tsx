@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import FunnelHeader from "@/components/FunnelHeader";
 import DiscoveryCalendar from "@/components/DiscoveryCalendar";
 import { applicationFromToken } from "@/lib/application";
+import { readRecord } from "@/lib/receipt-store";
 export const dynamic = "force-dynamic";
 export const metadata = {
   title: "Book Your Discovery Call — The Savvy Expat",
@@ -13,6 +14,16 @@ export default async function BookingPage() {
     (await cookies()).get("savvy_application")?.value,
   );
   if (!receipt?.value.qualified) redirect("/form");
+  if (receipt.value.leadId) {
+    const booking = await readRecord<{ status: string; applicationId: string }>(
+      `lead-bookings/${receipt.value.leadId}`,
+    );
+    if (
+      booking?.value.status === "active" &&
+      booking.value.applicationId === receipt.value.id
+    )
+      redirect("/thank-you");
+  }
   const { id, answers } = receipt.value;
   return (
     <div className="min-h-screen bg-hero">

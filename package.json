@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "tsc --noEmit",
-    "test": "tsc lib/intake.ts --outDir /private/tmp/savvy-intake-tests --module commonjs --target es2020 --resolveJsonModule --esModuleInterop --skipLibCheck && node tests/intake.test.cjs"
+    "test": "node scripts/test.mjs"
   },
   "dependencies": {
     "@vercel/blob": "^2.8.0",

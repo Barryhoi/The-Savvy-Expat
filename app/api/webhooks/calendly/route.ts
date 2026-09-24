@@ -1,4 +1,4 @@
-import { createHmac, timingSafeEqual } from "node:crypto";
+import { validCalendlySignature } from "@/lib/webhook-signature";
 import { NextRequest, NextResponse } from "next/server";
 import { syncBooking } from "@/lib/booking-sync";
 export const runtime = "nodejs";
@@ -11,21 +11,7 @@ export async function POST(request: NextRequest) {
   if (raw.length > 100000)
     return NextResponse.json({ error: "Too large" }, { status: 413 });
   const signature = request.headers.get("calendly-webhook-signature") || "";
-  const parts = signature.split(",").map((p) => p.trim().split("="));
-  const timestamp = parts.find(([k]) => k === "t")?.[1];
-  const expected = createHmac("sha256", secret)
-    .update(`${timestamp}.${raw}`)
-    .digest("hex");
-  const valid =
-    timestamp &&
-    Math.abs(Date.now() / 1000 - Number(timestamp)) < 300 &&
-    parts.some(
-      ([k, v]) =>
-        k === "v1" &&
-        /^[a-f0-9]{64}$/.test(v) &&
-        timingSafeEqual(Buffer.from(v, "hex"), Buffer.from(expected, "hex")),
-    );
-  if (!valid)
+  if (!validCalendlySignature(raw, signature, secret))
     return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
   try {
     const data = JSON.parse(raw);

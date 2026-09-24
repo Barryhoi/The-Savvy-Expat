@@ -7,6 +7,7 @@ import {
 import { calendlyApi, providerPath, resolveEventType } from "./calendly";
 import { closeApi, customFields, syncApplication } from "./close";
 import config from "./close-fields.json";
+import { syncApplicationFollowups } from "./application-followups";
 import { digest, readRecord, withLock, writeRecord } from "./receipt-store";
 
 export async function syncBooking(
@@ -66,11 +67,12 @@ export async function syncBooking(
       await writeRecord(applicationKey(id), application, receipt.etag);
     }
     if (!application.leadId) throw new Error("NO_LEAD");
+    await syncApplicationFollowups(application);
     await withLock(`lead-booking:${application.leadId}`, async () => {
       const current = await closeApi(`lead/${application.leadId}/`);
       if (current.organization_id !== config.organizationId)
         throw new Error("WRONG_ORGANIZATION");
-      const currentInvitee = current.custom?.[config.fields.bookingId];
+      const currentInvitee = current[`custom.${config.fields.bookingId}`];
       const latestKey = `lead-bookings/${application.leadId}`;
       const latest = await readRecord<{
         createdAt: string;
@@ -119,7 +121,12 @@ export async function syncBooking(
       await closeApi(`lead/${application.leadId}/`, "PUT", fields);
       await writeRecord(
         latestKey,
-        { createdAt: invitee.created_at, inviteeUri, status: invitee.status },
+        {
+          createdAt: invitee.created_at,
+          inviteeUri,
+          status: invitee.status,
+          applicationId: id,
+        },
         latest?.etag,
       );
       // Preview writes fields only: existing Make/Close follow-ups must not be
@@ -159,6 +166,19 @@ export async function syncBooking(
         }
         await closeApi(`lead/${application.leadId}/`, "PUT", {
           status_id: config.bookedStatusId,
+        });
+      }
+      if (
+        process.env.VERCEL_ENV === "production" &&
+        process.env.BOOKING_LIVE_AUTOMATIONS === "true" &&
+        invitee.status === "canceled" &&
+        !invitee.rescheduled &&
+        current.status_id === config.bookedStatusId
+      ) {
+        // Existing Make cancellation outcome, guarded against demoting a lead
+        // that a closer has already advanced after the booking.
+        await closeApi(`lead/${application.leadId}/`, "PUT", {
+          status_id: config.canceledStatusId,
         });
       }
     });

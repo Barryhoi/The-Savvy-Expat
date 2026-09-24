@@ -30,14 +30,19 @@ function ConfirmedBadge() {
 }
 
 export default async function ThankYouPage() {
+  const jar = await cookies();
   const receipt = await applicationFromToken(
-    (await cookies()).get("savvy_booking")?.value,
+    jar.get("savvy_application")?.value || jar.get("savvy_booking")?.value,
   );
   if (!receipt?.value.leadId) redirect("/form");
-  const booking = await readRecord<{ status: string }>(
+  const booking = await readRecord<{ status: string; applicationId: string }>(
     `lead-bookings/${receipt.value.leadId}`,
   );
-  if (booking?.value.status !== "active") redirect("/booking");
+  if (
+    booking?.value.status !== "active" ||
+    booking.value.applicationId !== receipt.value.id
+  )
+    redirect("/booking");
   return (
     <div className="flex min-h-screen flex-col overflow-x-clip">
       <div className="bg-hero">

@@ -29,6 +29,7 @@ export default function DiscoveryCalendar({
     [frameReady, setFrameReady] = useState(false),
     [confirming, setConfirming] = useState(false);
   const [booked, setBooked] = useState(false);
+  const [frameDelayed, setFrameDelayed] = useState(false);
   const pendingInvitee = useRef<string | null>(null),
     confirmingRef = useRef(false);
   const frame = useRef<HTMLIFrameElement>(null),
@@ -78,9 +79,15 @@ export default function DiscoveryCalendar({
   useEffect(() => {
     if (selected || fallback) {
       setFrameReady(false);
+      setFrameDelayed(false);
       details.current?.scrollIntoView({ block: "start", behavior: "instant" });
     }
   }, [selected, fallback]);
+  useEffect(() => {
+    if ((!selected && !fallback) || frameReady) return;
+    const timer = window.setTimeout(() => setFrameDelayed(true), 15000);
+    return () => window.clearTimeout(timer);
+  }, [selected, fallback, frameReady]);
   const makeUrl = (base: string) => {
     const url = new URL(base);
     url.searchParams.set(
@@ -313,7 +320,9 @@ export default function DiscoveryCalendar({
               )}
               {!frameReady && (
                 <p role="status" className="my-5">
-                  Loading secure booking…
+                  {frameDelayed
+                    ? "The calendar is taking longer than expected. You can open secure booking in a new tab below."
+                    : "Loading secure booking…"}
                 </p>
               )}
               {confirming && (
@@ -338,16 +347,8 @@ export default function DiscoveryCalendar({
                   Retry confirmation sync
                 </button>
               )}
-              <iframe
-                ref={frame}
-                title="Confirm your discovery call with Sam"
-                src={makeUrl(selected?.url || eventUrl)}
-                onLoad={() => setFrameReady(true)}
-                style={{ width: "100%", height, border: 0 }}
-                allow="payment"
-              />
               {!booked && (
-                <p className="mt-3 text-sm">
+                <p className="my-4 text-sm">
                   <a
                     href={makeUrl(selected?.url || eventUrl)}
                     target="_blank"
@@ -358,6 +359,18 @@ export default function DiscoveryCalendar({
                   </a>
                 </p>
               )}
+              <iframe
+                ref={frame}
+                title="Confirm your discovery call with Sam"
+                src={makeUrl(selected?.url || eventUrl)}
+                onLoad={() => setFrameReady(true)}
+                style={{
+                  width: "100%",
+                  height: frameDelayed && !frameReady ? 400 : height,
+                  border: 0,
+                }}
+                allow="payment"
+              />
             </>
           )}
         </section>
