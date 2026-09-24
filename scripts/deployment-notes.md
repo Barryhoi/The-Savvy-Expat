@@ -36,10 +36,18 @@ Production remains at bb80d60. The isolated branch is booking-migration-preview.
 2. Register signed invitee.created/invitee.canceled webhooks against a stable reachable Preview callback using an approved protection-aware configuration. CALENDLY_WEBHOOK_SIGNING_KEY already exists in Preview. No subscription registered yet.
 3. Test actual live availability API and real booking → Close → confirmation, then cancellation, reschedule, duplicate delivery, and out-of-order delivery. No real booking was made during these checks.
 4. Inspect native Calendly–Close contact-creation settings to avoid competition with anonymous application identity resolution. Native custom mappings do not update existing contacts; this implementation performs those updates server-side.
-5. Recreate Cal workflow 442916: immediate new-booking email to lea@thesavvyexpat.com with event, start/end/timezone, attendee name/email/phone, notes and meeting link. Unsaved Calendly drafts were canceled; no new workflow activated.
+5. Verify delivery of the saved Calendly workflow c54561f7-531f-4cda-a19b-f67142e20f03, New discovery call - notify Lea. Applies only to Sam’s discovery call, immediately when booked; recipient lea@thesavvyexpat.com, subject New Call Booked: Expat Relocation Discovery Call. Body contains Event Date, Event Time, Invitee Full Name, Invitee Email, Location, and Questions And Answers variables. Saved and confirmed in Calendly. No notification sent or real booking created during setup.
 6. Verify production opportunity mapping/assignment and gated follow-ups with an approved test before activation. These production-only side effects have not been run.
 7. Complete real iPhone Safari and desktop end-to-end booking verification. The in-app browser did not load the external Calendly iframe during local testing; normal Chrome loaded the public Calendly page successfully. Native availability/date-to-times interaction awaits the API token.
 8. User review and explicit production approval. Never promote this preview as-is.
 
 ## Test data
 One intentionally retained lead: PREVIEW QA Migration Test, savvy-migration-qa-20260925@example.com, lead_4Ng6a7qP7mAo9Lf5MCO4U38RMhNJWO75qToMxulHLGx. Marked Application environment=Preview. No newsletter enrollment, opportunity creation, outgoing email, or booking was initiated by the application test.
+
+## Final Preview deployment
+- URL: https://the-savvy-expat-e9dllveub-barry-operations.vercel.app/form
+- Deployment: dpl_6iiFoiwEkuE4SpSKna6hhnwjjvuH
+- Status: READY; Next.js 16.3.6; Vercel build completed in 10 seconds.
+- Code commit: b9c646f; subsequent documentation-only update records the saved notification workflow.
+- Final deployed application smoke test returned HTTP 200 with qualified=true for the existing synthetic receipt.
+- Small-screen booking-page document width matched the 320px viewport.
