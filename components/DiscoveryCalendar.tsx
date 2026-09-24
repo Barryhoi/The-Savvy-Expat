@@ -361,11 +361,10 @@ export default function DiscoveryCalendar({
               )}
               <iframe
                 ref={frame}
+                className="discovery-embed"
                 title="Confirm your discovery call with Sam"
                 src={makeUrl(selected?.url || eventUrl)}
-                onLoad={() => setFrameReady(true)}
                 style={{
-                  width: "100%",
                   height: frameDelayed && !frameReady ? 400 : height,
                   border: 0,
                 }}
