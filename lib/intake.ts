@@ -53,6 +53,14 @@ export function contactStep(answers: Answers): number | null {
   if (validateAnswer("phone", answers.phone)) return 2;
   return null;
 }
+// US is the default: accept local formatting and an optional leading 1.
+export function normalizePhone(value: unknown): string | null {
+  if (typeof value !== "string" || !/^\+?[\d\s().-]+$/.test(value.trim())) return null;
+  const digits = value.replace(/\D/g, "");
+  if (digits.length === 10) return `+1${digits}`;
+  if (digits.length === 11 && digits.startsWith("1")) return `+${digits}`;
+  return null;
+}
 export function validateAnswer(key: string, value: unknown): string | null {
   const q = questions.find((q) => q.key === key);
   if (!q || key === "final" || key === "name") return null;
@@ -62,7 +70,7 @@ export function validateAnswer(key: string, value: unknown): string | null {
     (Array.isArray(value) && !value.length);
   if (empty) return q.required
     ? key === "email" ? "Please enter your email address."
-      : key === "phone" ? "Please enter your phone number with its country code."
+      : key === "phone" ? "Please enter your 10-digit US phone number."
       : "Please choose an answer to continue."
     : null;
   if (q.multiple) {
@@ -78,8 +86,8 @@ export function validateAnswer(key: string, value: unknown): string | null {
       return "Please choose one of the listed answers.";
     if (key === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim()))
       return "Please enter a valid email address.";
-    if (key === "phone" && (!/^\+[1-9][\d\s().-]{6,29}$/.test(value.trim()) || !/^\d{7,15}$/.test(value.replace(/\D/g, ""))))
-      return "Please enter your phone number with its country code.";
+    if (key === "phone" && !normalizePhone(value))
+      return "Please enter your 10-digit US phone number.";
   }
   return null;
 }
@@ -102,7 +110,7 @@ export function validateSubmission(input: unknown): Answers {
     if (error) throw new Error(`${q.title} ${error}`);
     result[q.key] = Array.isArray(value)
       ? Array.from(new Set(value))
-      : (value as string).trim();
+      : q.key === "phone" ? normalizePhone(value)! : (value as string).trim();
     // Reject at exactly the same point as the published Typeform. Later answers
     // are neither required nor accepted on that branch.
     if (qualification(result)) break;

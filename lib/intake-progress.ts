@@ -1,4 +1,4 @@
-import { questions, qualification, validateName, validateAnswer, type Answers } from "./intake";
+import { normalizePhone, questions, qualification, validateName, validateAnswer, type Answers } from "./intake";
 export const ABANDONMENT_MS = 30 * 60 * 1000;
 export function validateProgress(input: unknown): Answers {
   if (!input || typeof input !== "object" || Array.isArray(input)) throw new Error("INVALID_PROGRESS");
@@ -14,7 +14,7 @@ export function validateProgress(input: unknown): Answers {
     }
     const error = validateAnswer(q.key, value);
     if (error) throw new Error(error);
-    answers[q.key] = Array.isArray(value) ? Array.from(new Set(value)) : String(value).trim();
+    answers[q.key] = Array.isArray(value) ? Array.from(new Set(value)) : q.key === "phone" ? normalizePhone(value)! : String(value).trim();
     if (qualification(answers)) break;
   }
   return answers;

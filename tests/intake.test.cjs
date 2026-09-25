@@ -81,15 +81,15 @@ for (const key of ["firstName", "lastName", "email", "phone"]) {
     }
   }
 }
-for (const phone of ["+++++++", "+( )....", "2025550148", "+1234567890123456"]) {
+for (const phone of ["+++++++", "+( )....", "202555014", "+1234567890123456"]) {
   assert.throws(() => validateSubmission({ ...base, phone }));
 }
-for (const phone of ["+1 (202) 555-0148", "+63 917 123 4567", "+44 20 7946 0018"]) {
-  assert.equal(validateSubmission({ ...base, phone }).phone, phone);
+for (const phone of ["7208109892", "17208109892", "+17208109892", "(720) 810-9892", "1 (720) 810-9892"]) {
+  assert.equal(validateSubmission({ ...base, phone }).phone, "+17208109892");
 }
 const { contactStep } = require(require("node:path").join(process.env.SAVVY_TEST_OUTPUT, "intake.js"));
 assert.equal(contactStep({}), 0);
 assert.equal(contactStep({ ...base, email: "" }), 1);
 assert.equal(contactStep({ ...base, phone: "" }), 2);
 assert.equal(contactStep(base), null);
-console.log("PASS: all disqualification branches require contact details; international phone validation; legacy draft recovery");
+console.log("PASS: all disqualification branches require contact details; US-default phone normalization; legacy draft recovery");

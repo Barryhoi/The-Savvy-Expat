@@ -21,7 +21,7 @@
     {
       "key": "phone",
       "title": "What’s your phone number?",
-      "description": "Include your country code so our team can reach you.",
+      "description": "Enter your US phone number. We’ll add +1 automatically.",
       "type": "phone_number",
       "required": true,
       "choices": [],

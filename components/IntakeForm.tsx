@@ -359,7 +359,7 @@ export default function IntakeForm() {
               value={answers[q.key] || ""}
               onChange={(e) => change(q.key, e.target.value)}
               placeholder={
-                q.key === "phone" ? "+1 555 123 4567" : "Type your answer…"
+                q.key === "phone" ? "(555) 123-4567" : "Type your answer…"
               }
             />
           ) : null}
