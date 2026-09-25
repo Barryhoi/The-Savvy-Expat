@@ -79,9 +79,19 @@ export async function syncApplication(
   return withLock(`identity:${email}`, async () => {
     const key = `identities/${digest(email)}`;
     let record = await readRecord<{ leadId?: string; creating?: boolean; createdByApplication?: string }>(key);
-    let lead = record?.value.leadId
-      ? ((await closeApi(`lead/${record.value.leadId}/`)) as Lead)
-      : await exactLead(email);
+    let lead: Lead | null = null;
+    if (record?.value.leadId) {
+      try {
+        lead = await closeApi(`lead/${record.value.leadId}/`) as Lead;
+      } catch (error) {
+        // Close may have had a lead removed after we cached its ID. Recover by
+        // exact email before deciding whether to create a replacement.
+        if (!(error instanceof Error) || error.message !== "CLOSE_404") throw error;
+        lead = await exactLead(email);
+      }
+    } else {
+      lead = await exactLead(email);
+    }
     const update = async () => {
       // Re-read while sharing the booking lock so a concurrent booking wins over
       // a repeat submission instead of being overwritten by TFS.

@@ -20,6 +20,7 @@ process.env.CLOSE_API_KEY = 'test-key';
 global.fetch = async (url, options) => {
   const endpoint = new URL(url).pathname.replace('/api/v1/', '');
   assert.ok(endpoint.startsWith('lead/') || endpoint.startsWith('contact/'), 'no tasks or messages');
+  if (options.method === 'GET' && endpoint === 'lead/lead_deleted/') return Response.json({}, { status: 404 });
   const body = options.body ? JSON.parse(options.body) : null;
   if (options.method === 'POST') { creates++; lead = { ...body, id: 'lead_test', organization_id: c.organizationId, contacts: body.contacts.map(contact => ({ ...contact, id: 'contact_test', phones: contact.phones || [] })) }; }
   if (options.method === 'PUT' && endpoint.startsWith('lead/')) Object.assign(lead, body);
@@ -70,5 +71,12 @@ const at = '2026-09-25T00:00:00Z';
   records.clear(); lead = null;
   await syncApplication('direct-dq', { ...a, timeline: '12+ months from now' }, at);
   assert.equal(lead.status_id, c.tfdqStatusId);
-  console.log('PASS: real sync function creates TFS/TFDQ, partial-to-TFS, TFNB-to-TFS, one lead on retries, booking-race and historical/advanced-stage protection; no tasks');
+  records.clear(); lead = null;
+  records.set('identities/qa@example.com', { value: { leadId: 'lead_deleted' }, etag: 'stale' });
+  const previousCreates = creates;
+  const recovered = await syncApplication('recover-stale-id', a, at);
+  assert.equal(recovered.leadId, 'lead_test', 'stale cached Close ID should recover by exact email before creating');
+  assert.equal(records.get('identities/qa@example.com').value.leadId, 'lead_test');
+  assert.equal(creates, previousCreates + 1, 'stale deleted lead is replaced once');
+  console.log('PASS: real sync function creates TFS/TFDQ, partial-to-TFS, TFNB-to-TFS, one lead on retries, stale-ID recovery, booking-race and historical/advanced-stage protection; no tasks');
 })().catch(e => { console.error(e); process.exitCode = 1; });

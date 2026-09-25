@@ -177,3 +177,8 @@ One intentionally retained lead: PREVIEW QA Migration Test, savvy-migration-qa-2
 - Confirmation now shows the saved phone number and optional note field immediately, styled to match the supplied screenshot. Removed the contact-details and add-note disclosure controls.
 - READY preview: https://the-savvy-expat-me0oozt70-barry-operations.vercel.app/form; deployment dpl_CRYs9XwsBxXJSCDjoC7G2aNg7Z4k; code 340e0e5; cloud build9s.
 - WhatsApp requirement, booking API payload, and existing booking/CRM behavior are unchanged. Regression suite, typecheck, and cloud build pass. Production and Make unchanged.
+
+## 2026-09-25 — Recover stale Close lead references
+- Preview logs showed repeated CLOSE_404 responses during application progress saves and final submit. Read-only check confirmed the cached lead ID was missing and exact-email lookup found no existing lead for the test address.
+- On cached-lead 404, sync now searches by exact email and creates a replacement only when none exists, then repairs the identity pointer. Added regression coverage for this stale-ID case.
+- Preview redeploy pending. Production and Make unchanged.
