@@ -181,4 +181,6 @@ One intentionally retained lead: PREVIEW QA Migration Test, savvy-migration-qa-2
 ## 2026-09-25 — Recover stale Close lead references
 - Preview logs showed repeated CLOSE_404 responses during application progress saves and final submit. Read-only check confirmed the cached lead ID was missing and exact-email lookup found no existing lead for the test address.
 - On cached-lead 404, sync now searches by exact email and creates a replacement only when none exists, then repairs the identity pointer. Added regression coverage for this stale-ID case.
-- Preview redeploy pending. Production and Make unchanged.
+- READY preview: https://the-savvy-expat-f7i6ais7z-barry-operations.vercel.app/form; deployment dpl_7VWRWThGJNTYBwZ2iDPzZpYhSbkK; code175e47c; cloud build8s.
+- Replayed the two already-submitted, unsynced preview receipts in submission order. Both now resolve to one Close lead, marked TFS; verified latest application ID and Qualified custom field. No booking or follow-up task created. Preview-only newsletter automation stayed disabled.
+- Regression suite, typecheck, and cloud build pass. Production and Make unchanged. Preview login protection remains enabled.
