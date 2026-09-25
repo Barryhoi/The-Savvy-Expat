@@ -1,4 +1,5 @@
 import "server-only";
+import { hasApplicationBooking } from "./application-booking";
 import { getApplication } from "./application";
 import { closeApi, syncApplication, type Lead } from "./close";
 import config from "./close-fields.json";
@@ -47,7 +48,7 @@ export async function checkAbandonment(id: string, now = Date.now()) {
       if (lead.organization_id !== config.organizationId) throw new Error("WRONG_ORGANIZATION");
       const eligible = lead[`custom.${config.fields.applicationId}`] === id &&
         lead[`custom.${config.fields.qualification}`] === "Qualified" &&
-        !["Booked", "Rescheduled"].includes(String(lead[`custom.${config.fields.bookingStatus}`])) &&
+        !(await hasApplicationBooking(id, lead)) &&
         [config.tfsStatusId, config.tfnbStatusId].includes(lead.status_id);
       if (eligible && lead.status_id !== config.tfnbStatusId)
         await closeApi(`lead/${lead.id}/`, "PUT", { status_id: config.tfnbStatusId });

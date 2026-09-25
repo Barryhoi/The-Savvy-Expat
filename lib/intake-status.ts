@@ -5,10 +5,11 @@ export function intakeStatus(
   mode: "submitted" | "draft",
   disqualified: boolean,
   lead?: { status_id: string; [key: string]: unknown } | null,
+  hasCurrentBooking = lead ? ["Booked", "Rescheduled"].includes(String(lead[`custom.${config.fields.bookingStatus}`])) : false,
 ): string | undefined {
   if (mode === "draft") return lead ? undefined : config.potentialStatusId;
   if (lead && (
-    ["Booked", "Rescheduled"].includes(String(lead[`custom.${config.fields.bookingStatus}`])) ||
+    hasCurrentBooking ||
     ![config.potentialStatusId, config.tfsStatusId, config.tfnbStatusId, config.tfdqStatusId].includes(lead.status_id)
   )) return undefined;
   return disqualified ? config.tfdqStatusId : config.tfsStatusId;

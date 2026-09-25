@@ -6,7 +6,7 @@ const id = 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee';
 const records = new Map();
 const writes = [];
 const locks = [];
-let status = config.tfnbStatusId;
+let status = config.tfnbStatusId, currentApplication = id;
 const original = Module._load;
 Module._load = function(name, ...args) {
   if (name === 'server-only') return {};
@@ -28,7 +28,7 @@ Module._load = function(name, ...args) {
     closeApi: async (url, method, body) => {
       assert.match(url, /^lead\//, 'optional automation off must not create an opportunity or task');
       if (method === 'PUT') { writes.push(body); if (body.status_id) status = body.status_id; }
-      return { organization_id: config.organizationId, status_id: status };
+      return { ['custom.'+config.fields.applicationId]: currentApplication, organization_id: config.organizationId, status_id: status };
     },
   };
   return original.call(this, name, ...args);
@@ -48,5 +48,9 @@ const { syncBooking } = require(path.join(process.env.SAVVY_TEST_OUTPUT, 'bookin
   await syncBooking('invitee_preview', id);
   assert.equal(status, config.tfnbStatusId, 'preview must not activate existing production status automations');
   assert.equal(writes[0].bookingStatus, 'Booked');
+  records.clear(); writes.length = 0; currentApplication = 'newer-application';
+  process.env.VERCEL_ENV = 'production';
+  await syncBooking('invitee_old_late', id);
+  assert.equal(writes.length, 0, 'older application webhook cannot overwrite newer submission');
   console.log('PASS: verified production booking changes TFNB to Booked with optional automations off; duplicate and preview guards');
 })().catch(e => { console.error(e); process.exitCode = 1; });

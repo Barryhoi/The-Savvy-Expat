@@ -76,6 +76,9 @@ export async function syncBooking(
       const current = await closeApi(`lead/${application.leadId}/`);
       if (current.organization_id !== config.organizationId)
         throw new Error("WRONG_ORGANIZATION");
+      // Delayed events for an older form must not overwrite the new form's stage.
+      const currentApplication = current[`custom.${config.fields.applicationId}`];
+      if (currentApplication && currentApplication !== id) return;
       const currentInvitee = current[`custom.${config.fields.bookingId}`];
       const latestKey = `lead-bookings/${application.leadId}`;
       const latest = await readRecord<{

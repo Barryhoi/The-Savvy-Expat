@@ -9,6 +9,7 @@ Module._load = function(id, ...args) {
   if (id === 'server-only') return {};
   if (id === './application') return { getApplication: async id => applications.has(id) ? { value: applications.get(id) } : null };
   if (id === './receipt-store') return {
+    digest: value => value,
     readRecord: async key => records.get(key) || null,
     writeRecord: async (key, value) => { records.set(key, { value, etag: 'v1' }); return { etag: 'v1' }; },
     withLock: async (key, fn) => fn(),
@@ -61,6 +62,12 @@ function seed(id, extra={}) { records.set('drafts/'+id, { value: { id, answers, 
     assert.equal(await checkAbandonment(kind, at+ABANDONMENT_MS), 'excluded', kind);
   }
   assert.equal(patches.length, 1);
+  seed('new-after-old-booking'); applications.set('new-after-old-booking', submitted('new-after-old-booking'));
+  lead['custom.'+config.fields.bookingStatus] = 'Booked';
+  lead['custom.'+config.fields.bookingId] = 'older-invitee';
+  records.set('bookings/older-invitee', { value: { applicationId: 'older-form' } });
+  assert.equal(await checkAbandonment('new-after-old-booking', at+ABANDONMENT_MS), 'marked');
+  assert.equal(lead.status_id, config.tfnbStatusId, 'old booking cannot suppress TFNB');
   await saveProgress('resume', 10, answers);
   const first = records.get('drafts/resume').value;
   await saveProgress('resume', 9, { ...answers, firstName: 'stale' });

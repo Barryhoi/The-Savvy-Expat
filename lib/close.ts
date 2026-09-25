@@ -1,6 +1,7 @@
 import "server-only";
 import config from "./close-fields.json";
 import { qualification, questions, type Answers } from "./intake";
+import { hasApplicationBooking } from "./application-booking";
 import { intakeStatus } from "./intake-status";
 import { digest, readRecord, withLock, writeRecord } from "./receipt-store";
 
@@ -94,7 +95,7 @@ export async function syncApplication(
         ["Booked", "Rescheduled"].includes(String(lead[`custom.${config.fields.bookingStatus}`] || ""))
       )) return { leadId: lead.id, created: false, protected: true };
       const reason = mode === "submitted" ? qualification(answers) : null;
-      const status = intakeStatus(mode, !!reason, lead);
+      const status = intakeStatus(mode, !!reason, lead, lead ? await hasApplicationBooking(id, lead) : false);
       const values: Record<string, unknown> = {
         ...answers,
         services: Array.isArray(answers.services)
