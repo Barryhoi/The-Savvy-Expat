@@ -762,3 +762,7 @@ details[open] .accordion-body {
 @media(max-width:850px) { .booking-overview h2 { margin-top:12px; } }
 @media(max-width:700px) { .funnel-logo { height:40px; } .form-intro h1 { font-size:32px; } .application-final .application-question { font-size:28px; } .application-card #question-description { font-size:16px; } .calendar-day { width:38px; height:40px; } .booking-overview h2 { font-size:28px; } .calendar-steps { gap:16px; } }
 @media(max-width:360px) { .calendar-day { width:30px; } .time-choice { font-size:15px; } .application-final .application-question { font-size:26px; } }
+@media(max-width:400px) {
+  .application-final .application-actions { flex-direction:column-reverse; align-items:stretch; gap:8px; }
+  .application-final .application-actions button { white-space:nowrap; }
+}
