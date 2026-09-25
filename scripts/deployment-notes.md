@@ -172,3 +172,7 @@ One intentionally retained lead: PREVIEW QA Migration Test, savvy-migration-qa-2
 - Mobile availability list now expands in the page flow instead of creating a nested scroll region. The continue button names the selected local time so the visitor can confirm their choice before moving on.
 - READY preview: https://the-savvy-expat-mofelgtgc-barry-operations.vercel.app/form; deployment dpl_28B6FoX2HnmTMWtfy2suke1ppr2F; code 92f9665; cloud build10s.
 - No calendar/API or automation behavior changed. Regression suite and typecheck pass; cloud build succeeded. Production and Make unchanged.
+
+## 2026-09-25 — Booking details shown inline
+- Confirmation now shows the saved phone number and optional note field immediately, styled to match the supplied screenshot. Removed the contact-details and add-note disclosure controls.
+- WhatsApp requirement, booking API payload, and existing booking/CRM behavior are unchanged. Regression suite and typecheck pass; preview redeploy pending.
