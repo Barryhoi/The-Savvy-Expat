@@ -24,6 +24,17 @@ export default function IntakeForm() {
   const [submissionId, setSubmissionId] = useState("");
   const heading = useRef<HTMLHeadingElement>(null);
   const attempted = useRef(false);
+  const advanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const submitting = useRef(false);
+  const [advancing, setAdvancing] = useState(false);
+  useEffect(() => () => {
+    if (advanceTimer.current) clearTimeout(advanceTimer.current);
+  }, []);
+  function cancelAdvance() {
+    if (advanceTimer.current) clearTimeout(advanceTimer.current);
+    advanceTimer.current = null;
+    setAdvancing(false);
+  }
   const q = questions[step];
 
   useEffect(() => {
@@ -67,14 +78,27 @@ export default function IntakeForm() {
   }, [step, rejected]);
 
   const change = (key: string, value: string | string[]) => {
+    let id = submissionId;
     if (attempted.current) {
-      setSubmissionId(crypto.randomUUID());
+      id = crypto.randomUUID();
+      setSubmissionId(id);
       attempted.current = false;
     }
     setAnswers((a) => ({ ...a, [key]: value }));
     setError("");
+    return id;
   };
-  async function submit() {
+  function chooseSingle(value: string) {
+    if (submitting.current) return;
+    cancelAdvance();
+    const id = change(q.key, value);
+    const updated = { ...answers, [q.key]: value };
+    setAdvancing(true);
+    advanceTimer.current = setTimeout(() => next(updated, id), 250);
+  }
+  async function submit(currentAnswers = answers, id = submissionId) {
+    if (submitting.current) return;
+    submitting.current = true;
     attempted.current = true;
     setBusy(true);
     setError("");
@@ -83,8 +107,8 @@ export default function IntakeForm() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          id: submissionId,
-          answers,
+          id,
+          answers: currentAnswers,
           attribution: readAttribution(),
         }),
       });
@@ -107,12 +131,14 @@ export default function IntakeForm() {
           : "Please try again. Your answers are still here.",
       );
     } finally {
+      submitting.current = false;
       setBusy(false);
     }
   }
-  function next() {
-    if (busy) return;
-    const message = validateAnswer(q.key, answers[q.key]);
+  function next(currentAnswers = answers, id = submissionId) {
+    cancelAdvance();
+    if (submitting.current) return;
+    const message = validateAnswer(q.key, currentAnswers[q.key]);
     if (message) {
       setError(message);
       return;
@@ -121,10 +147,10 @@ export default function IntakeForm() {
       questions.slice(0, step + 1).map((question) => question.key),
     );
     const visitedAnswers = Object.fromEntries(
-      Object.entries(answers).filter(([key]) => visitedKeys.has(key)),
+      Object.entries(currentAnswers).filter(([key]) => visitedKeys.has(key)),
     );
     if (qualification(visitedAnswers) || step === questions.length - 1) {
-      void submit();
+      void submit(currentAnswers, id);
       return;
     }
     setError("");
@@ -239,8 +265,9 @@ export default function IntakeForm() {
                       type={q.multiple ? "checkbox" : "radio"}
                       name={q.key}
                       checked={selected}
+                      onClick={() => { if (!q.multiple && selected) chooseSingle(choice); }}
                       onChange={() =>
-                        change(
+                        !q.multiple ? chooseSingle(choice) : change(
                           q.key,
                           q.multiple
                             ? selected
@@ -259,6 +286,7 @@ export default function IntakeForm() {
                   </label>
                 );
               })}
+              {!q.multiple && <p className="text-sm text-ink/65" role="status">{advancing ? "Moving to the next step…" : "Select an answer to continue automatically."}</p>}
               {q.multiple && (
                 <p className="text-sm text-ink/55">Choose all that apply.</p>
               )}
@@ -298,6 +326,7 @@ export default function IntakeForm() {
             type="button"
             disabled={step === 0 || busy}
             onClick={() => {
+              cancelAdvance();
               setError("");
               setStep((s) => s - 1);
             }}
