@@ -11,7 +11,7 @@ const base = {
   firstName: "Test",
   lastName: "Applicant",
   email: "test@example.com",
-  phone: "",
+  phone: "+1 202 555 0148",
   situation: "I'm actively planning my move and need professional help",
   commitment: "Fully committed - just need execution",
   timeline: "0-3 months from now",
@@ -41,10 +41,14 @@ for (const patch of [
   { motivation: "To visit" },
   { motivation: "To scout the country" },
   { logistics: "" },
-  { firstName: "", lastName: "", email: "", phone: "" },
+
 ])
   assert.equal(qualification(validateSubmission({ ...base, ...patch })), null);
 for (const key of [
+  "firstName",
+  "lastName",
+  "email",
+  "phone",
   "situation",
   "commitment",
   "timeline",
@@ -67,5 +71,25 @@ assert.deepEqual(
   ["Finding a rental"],
 );
 console.log(
-  "PASS: qualification parity, early exits, optional identity/logistics, all required fields, choice validation, length bounds and duplicate services",
+  "PASS: qualification parity, early exits, required identity and optional logistics, all required fields, choice validation, length bounds and duplicate services",
 );
+
+for (const key of ["firstName", "lastName", "email", "phone"]) {
+  for (const empty of ["", "   ", undefined]) {
+    for (const [rule, answer] of Object.entries(rejectionRules)) {
+      assert.throws(() => validateSubmission({ ...base, [rule]: answer, [key]: empty }));
+    }
+  }
+}
+for (const phone of ["+++++++", "+( )....", "2025550148", "+1234567890123456"]) {
+  assert.throws(() => validateSubmission({ ...base, phone }));
+}
+for (const phone of ["+1 (202) 555-0148", "+63 917 123 4567", "+44 20 7946 0018"]) {
+  assert.equal(validateSubmission({ ...base, phone }).phone, phone);
+}
+const { contactStep } = require(require("node:path").join(process.env.SAVVY_TEST_OUTPUT, "intake.js"));
+assert.equal(contactStep({}), 0);
+assert.equal(contactStep({ ...base, email: "" }), 1);
+assert.equal(contactStep({ ...base, phone: "" }), 2);
+assert.equal(contactStep(base), null);
+console.log("PASS: all disqualification branches require contact details; international phone validation; legacy draft recovery");

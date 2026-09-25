@@ -5,7 +5,7 @@
       "title": "Before we get started, what’s your full name?",
       "description": "",
       "type": "contact_info",
-      "required": false,
+      "required": true,
       "choices": [],
       "multiple": false
     },
@@ -14,16 +14,16 @@
       "title": "And your email, {{field:7acc7644-998b-4603-9271-cc89960f6e01}}?",
       "description": "We’ll use this to follow up.",
       "type": "email",
-      "required": false,
+      "required": true,
       "choices": [],
       "multiple": false
     },
     {
       "key": "phone",
       "title": "What’s your phone number?",
-      "description": "",
+      "description": "Include your country code so our team can reach you.",
       "type": "phone_number",
-      "required": false,
+      "required": true,
       "choices": [],
       "multiple": false
     },

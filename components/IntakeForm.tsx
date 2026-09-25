@@ -7,6 +7,8 @@ import {
   qualification,
   ending,
   validateAnswer,
+  validateName,
+  contactStep,
   type Answers,
   type Rejection,
 } from "@/lib/intake";
@@ -47,7 +49,7 @@ export default function IntakeForm() {
         saved.version === 1
       ) {
         setAnswers(saved.answers || {});
-        setStep(Math.max(0, Math.min(questions.length - 1, saved.step || 0)));
+        setStep(Math.max(0, Math.min(questions.length - 1, saved.step || 0, contactStep(saved.answers || {}) ?? questions.length - 1)));
         id = saved.id || id;
       }
     } catch {
@@ -98,6 +100,12 @@ export default function IntakeForm() {
   }
   async function submit(currentAnswers = answers, id = submissionId) {
     if (submitting.current) return;
+    const missingContact = contactStep(currentAnswers);
+    if (missingContact !== null) {
+      setStep(missingContact);
+      setError("Please complete your contact details before continuing.");
+      return;
+    }
     submitting.current = true;
     attempted.current = true;
     setBusy(true);
@@ -138,7 +146,7 @@ export default function IntakeForm() {
   function next(currentAnswers = answers, id = submissionId) {
     cancelAdvance();
     if (submitting.current) return;
-    const message = validateAnswer(q.key, currentAnswers[q.key]);
+    const message = q.key === "name" ? validateName(currentAnswers) : validateAnswer(q.key, currentAnswers[q.key]);
     if (message) {
       setError(message);
       return;
@@ -242,6 +250,9 @@ export default function IntakeForm() {
                   <input
                     className="intake-input mt-2"
                     autoComplete={i ? "family-name" : "given-name"}
+                    required
+                    aria-invalid={!!error}
+                    aria-describedby={error ? "form-error" : undefined}
                     maxLength={150}
                     value={answers[key] || ""}
                     onChange={(e) => change(key, e.target.value)}
@@ -296,6 +307,7 @@ export default function IntakeForm() {
               aria-labelledby="question-title"
               aria-invalid={!!error}
               aria-describedby={error ? "form-error" : undefined}
+              required={q.required}
               className="intake-input"
               type={
                 q.key === "email" ? "email" : q.key === "phone" ? "tel" : "text"

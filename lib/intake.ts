@@ -40,14 +40,31 @@ export function qualification(answers: Answers): Rejection | null {
 export function ending(reason: Rejection) {
   return schema.endings[reason];
 }
+export function validateName(input: Record<string, unknown>): string | null {
+  if (typeof input.firstName !== "string" || !input.firstName.trim() || input.firstName.length > 150)
+    return "Please enter your first name.";
+  if (typeof input.lastName !== "string" || !input.lastName.trim() || input.lastName.length > 150)
+    return "Please enter your last name.";
+  return null;
+}
+export function contactStep(answers: Answers): number | null {
+  if (validateName(answers)) return 0;
+  if (validateAnswer("email", answers.email)) return 1;
+  if (validateAnswer("phone", answers.phone)) return 2;
+  return null;
+}
 export function validateAnswer(key: string, value: unknown): string | null {
   const q = questions.find((q) => q.key === key);
   if (!q || key === "final" || key === "name") return null;
   const empty =
     value === undefined ||
-    value === "" ||
+    (typeof value === "string" && !value.trim()) ||
     (Array.isArray(value) && !value.length);
-  if (empty) return q.required ? "Please choose an answer to continue." : null;
+  if (empty) return q.required
+    ? key === "email" ? "Please enter your email address."
+      : key === "phone" ? "Please enter your phone number with its country code."
+      : "Please choose an answer to continue."
+    : null;
   if (q.multiple) {
     if (
       !Array.isArray(value) ||
@@ -59,9 +76,9 @@ export function validateAnswer(key: string, value: unknown): string | null {
       return "Please enter a valid answer (up to 4,000 characters).";
     if (q.choices.length && !q.choices.includes(value))
       return "Please choose one of the listed answers.";
-    if (key === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
+    if (key === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim()))
       return "Please enter a valid email address.";
-    if (key === "phone" && !/^\+?[\d\s().-]{7,30}$/.test(value))
+    if (key === "phone" && (!/^\+[1-9][\d\s().-]{6,29}$/.test(value.trim()) || !/^\d{7,15}$/.test(value.replace(/\D/g, ""))))
       return "Please enter your phone number with its country code.";
   }
   return null;
@@ -70,6 +87,8 @@ export function validateSubmission(input: unknown): Answers {
   if (!input || typeof input !== "object" || Array.isArray(input))
     throw new Error("Invalid application.");
   const source = input as Record<string, unknown>;
+  const nameError = validateName(source);
+  if (nameError) throw new Error(nameError);
   const result: Answers = {};
   for (const key of ["firstName", "lastName"]) {
     const value = source[key] ?? "";

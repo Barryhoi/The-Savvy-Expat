@@ -70,8 +70,7 @@ export async function syncApplication(
   const email = String(answers.email || "")
     .trim()
     .toLowerCase();
-  // Optional identity is preserved. Anonymous applications stay in the private
-  // receipt store and are attached after Calendly supplies a verified identity.
+  // Retain support for historical receipts; new submissions require identity.
   if (!email) return { leadId: null, created: false };
   return withLock(`identity:${email}`, async () => {
     const key = `identities/${digest(email)}`;
@@ -115,7 +114,7 @@ export async function syncApplication(
           name:
             [answers.firstName, answers.lastName].filter(Boolean).join(" ") ||
             email,
-          status_id: config.potentialStatusId,
+          status_id: reason ? config.tfdqStatusId : config.potentialStatusId,
           contacts: [
             {
               name:
@@ -143,7 +142,11 @@ export async function syncApplication(
       }
       created = true;
     } else {
-      await closeApi(`lead/${lead.id}/`, "PUT", custom);
+      await closeApi(`lead/${lead.id}/`, "PUT", {
+        ...custom,
+        ...(reason ? { status_id: config.tfdqStatusId }
+          : lead.status_id === config.tfdqStatusId ? { status_id: config.potentialStatusId } : {}),
+      });
       const contact = lead.contacts.find((c) =>
         c.emails.some((e) => e.email.trim().toLowerCase() === email),
       );
