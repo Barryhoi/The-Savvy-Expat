@@ -16,7 +16,7 @@ const app={id:'app',qualified:true,leadId:'lead',answers:{firstName:'QA',lastNam
 const details={start:new Date(Date.now()+86400000).toISOString(),timezone:'Asia/Manila',whatsapp:'Yes',notes:''};
 (async()=>{
  for(const change of [{start:'bad'},{timezone:'Fake/Zone'},{whatsapp:'maybe'},{notes:'a'.repeat(2001)}])assert.throws(()=>validateBookingDetails({...details,...change}));
- await createNativeBooking(app,details);await createNativeBooking(app,details);assert.equal(posts,1,'replay never creates twice');
+ await createNativeBooking(app,details);await createNativeBooking(app,details);assert.equal(posts,1,'replay never creates twice');await createNativeBooking(app,{...details,start:'2020-01-01T00:00:00Z'});assert.equal(posts,1,'saved confirmation remains recoverable after the appointment time');
  records.clear();fail='timeout';await assert.rejects(createNativeBooking(app,details),/BOOKING_UNCERTAIN/);fail='';await assert.rejects(createNativeBooking(app,details),/BOOKING_UNCERTAIN/);assert.equal(posts,2,'uncertain POST is not retried');
  existing={value:{applicationId:'app',status:'active',inviteeUri:'webhook-recovery'}};assert.equal(await createNativeBooking(app,details),'webhook-recovery');assert.equal(posts,2);existing=null;
  records.clear();fail='CALENDLY_409';await assert.rejects(createNativeBooking(app,details),/SLOT_UNAVAILABLE/);fail='';await createNativeBooking(app,details);assert.equal(posts,4,'definitive rejection permits retry');

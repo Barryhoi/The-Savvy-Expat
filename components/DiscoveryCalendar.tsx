@@ -75,17 +75,10 @@ export default function DiscoveryCalendar({
     }
   }, [date]);
   useEffect(() => {
-    if (selected) details.current?.scrollIntoView({ block: "start", behavior: "instant" });
+    if (selected) { details.current?.focus({ preventScroll: true }); details.current?.scrollIntoView({ block: "start", behavior: "instant" }); }
   }, [selected]);
   const makeUrl = (base: string) => {
     const url = new URL(base);
-    url.searchParams.set(
-      "embed_domain",
-      typeof window !== "undefined" ? window.location.hostname : "",
-    );
-    url.searchParams.set("embed_type", "Inline");
-    url.searchParams.set("hide_gdpr_banner", "1");
-    url.searchParams.set("hide_landing_page_details", "1");
     url.searchParams.set("primary_color", "4934fb");
     url.searchParams.set("timezone", zone);
     url.searchParams.set("utm_content", `se_${application.id}`);
@@ -149,7 +142,7 @@ export default function DiscoveryCalendar({
               <div className="calendar-footer"><button disabled={loading} onClick={() => {setChoice(null);setRetry(n => n + 1);}}>Refresh times</button><a href={makeUrl(eventUrl)} target="_blank" rel="noopener noreferrer">Trouble booking? ↗</a></div>
             </>
           ) : (
-            <div className="booking-details" ref={details}>
+            <div className="booking-details outline-none" tabIndex={-1} ref={details}>
               <NativeBookingDetails application={application} start={selected.start} zone={zone} onBack={() => { setSelected(null); setChoice(null); setError(""); setRetry(n => n + 1); }} />
             </div>
           )}

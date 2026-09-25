@@ -15,7 +15,6 @@ export function validateBookingDetails(input: BookingDetails): BookingDetails {
 }
 type Attempt = { hash: string; state: "pending" | "rejected" | "created"; inviteeUri?: string };
 export async function createNativeBooking(application: Application, input: BookingDetails) {
-  const details = validateBookingDetails(input);
   if (!application.qualified || !application.leadId) throw Error("APPLICATION_REQUIRED");
   return withLock(`native-booking:${application.id}`, async () => {
     const key = `native-bookings/${application.id}`;
@@ -25,6 +24,7 @@ export async function createNativeBooking(application: Application, input: Booki
     const existing = await readRecord<{ applicationId: string; inviteeUri: string; status: string }>(`lead-bookings/${application.leadId}`);
     if (existing?.value.applicationId === application.id && existing.value.status === "active") return existing.value.inviteeUri;
     if (prior?.value.state === "pending") throw Error("BOOKING_UNCERTAIN");
+    const details = validateBookingDetails(input);
     const lead = await closeApi(`lead/${application.leadId}/`);
     if (lead.organization_id !== config.organizationId || lead[`custom.${config.fields.applicationId}`] !== application.id) throw Error("APPLICATION_CHANGED");
     const eventType = await resolveEventType();
