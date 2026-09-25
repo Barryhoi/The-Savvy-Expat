@@ -232,24 +232,22 @@ export default function IntakeForm() {
     String(answers.firstName || ""),
   ).replace(/,\s*\?$/, "?");
   return (
-    <section className={`intake-card application-card ${q.type === "statement" ? "application-final" : ""}`} aria-busy={busy}>
+    <section className="intake-card application-card" aria-busy={busy}>
       <div className="mb-8 flex items-center justify-between text-xs font-bold uppercase tracking-widest text-ink/50">
-        <span>{step < 13 ? `Question ${step + 1} of 13` : "Your next step"}</span>
-        <span>
-          {q.required ? "Required" : q.type === "statement" ? "" : "Optional"}
-        </span>
+        <span>Question {step + 1} of {questions.length}</span>
+        <span>{q.required ? "Required" : "Optional"}</span>
       </div>
       <div
         className="mb-8 h-1 overflow-hidden rounded-full bg-primary/10"
         role="progressbar"
         aria-label="Application progress"
         aria-valuemin={0}
-        aria-valuemax={14}
+        aria-valuemax={questions.length}
         aria-valuenow={step + 1}
       >
         <div
           className="h-full bg-primary transition-[width]"
-          style={{ width: `${((step + 1) / 14) * 100}%` }}
+          style={{ width: `${((step + 1) / questions.length) * 100}%` }}
         />
       </div>
       <form
@@ -275,10 +273,9 @@ export default function IntakeForm() {
             {q.description}
           </p>
         )}
-        {q.type === "statement" && <div className="call-summary"><span>30-minute discovery call</span><span>Online via Google Meet</span></div>}
         <fieldset
           disabled={busy}
-          className={q.type === "statement" ? "hidden" : "mt-7"}
+          className="mt-7"
           aria-labelledby="question-title"
           aria-describedby={q.description ? "question-description" : undefined}
         >
@@ -342,7 +339,7 @@ export default function IntakeForm() {
                 <p className="text-sm text-ink/55">Choose all that apply.</p>
               )}
             </div>
-          ) : q.type !== "statement" ? (
+          ) : (
             <input
               aria-labelledby="question-title"
               aria-invalid={!!error}
@@ -362,7 +359,7 @@ export default function IntakeForm() {
                 q.key === "phone" ? "(555) 123-4567" : "Type your answer…"
               }
             />
-          ) : null}
+          )}
         </fieldset>
         {saveWarning && !error && <p role="status" className="mt-4 text-sm text-ink/65">Reconnecting to save your progress. Your answers are still here.</p>}
         {error && (
@@ -392,7 +389,7 @@ export default function IntakeForm() {
             type="submit"
             className="min-h-12 rounded-xl bg-primary px-7 py-3 font-bold text-white shadow-glow disabled:opacity-60"
           >
-            {busy ? "Saving…" : q.type === "statement" ? "Choose a time →" : "Continue →"}
+            {busy ? "Saving…" : step === questions.length - 1 ? "Choose a time →" : "Continue →"}
           </button>
         </div>
       </form>

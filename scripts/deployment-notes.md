@@ -161,3 +161,8 @@ One intentionally retained lead: PREVIEW QA Migration Test, savvy-migration-qa-2
 - Removed sidebar, repeated intro, nested progress indicator and sales copy. Calendar begins with Choose a time and short duration/location line. Confirmation becomes a compact550px card: date/time/timezone with Change, saved name/email with expandable phone, required WhatsApp, collapsed optional notes, single confirm button and terms. Existing API payload and status/qualification logic unchanged.
 - Visually checked actual NativeBookingDetails component on local temporary design-review fixture at desktop,320x844 and390x700. Main confirmation controls fit; no horizontal overflow. Verified WhatsApp enables button and optional notes expand. Console showed development notices only. Fixture removed before deployment; no public test route. Stopped local server and restored browser viewport.
 - Typecheck, existing regression suite, diff check and cloud build pass. Authenticated deployed booking page200 and compact-layout markup verified. No new appointment or notification generated. Production and Make unchanged. Active audited webhook remains m0d111epa.
+
+## 2026-09-25 — Direct form-to-calendar handoff
+- Removed the redundant final statement screen. The last real intake question now submits the same answers and takes qualified applicants directly to `/booking`; disqualified answers still go to their existing disqualification ending and CRM handling.
+- Progress now reports 13 actual questions. Old saved sessions whose cursor pointed at the former statement clamp to the final real question.
+- Qualification rules and submitted CRM fields are unchanged. Intake regression suite, typecheck, and whitespace checks pass. Preview redeploy pending.

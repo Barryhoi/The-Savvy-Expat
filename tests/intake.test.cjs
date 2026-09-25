@@ -23,7 +23,8 @@ const base = {
   obstacle: "",
   whyUs: "",
 };
-assert.equal(questions.length, 14);
+assert.equal(questions.length, 13);
+assert.equal(questions.some((question) => question.key === "final"), false);
 assert.equal(qualification(validateSubmission(base)), null);
 for (const [key, value] of Object.entries(rejectionRules)) {
   const result = validateSubmission({ ...base, [key]: value });

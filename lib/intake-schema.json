@@ -153,15 +153,6 @@
       "required": false,
       "choices": [],
       "multiple": false
-    },
-    {
-      "key": "final",
-      "title": "Next, choose a time for your discovery call.",
-      "description": "We’ll talk through your plans for the Philippines and how our team can help. Choose an available time on the next page, then confirm your booking.",
-      "type": "statement",
-      "required": false,
-      "choices": [],
-      "multiple": false
     }
   ],
   "endings": {
