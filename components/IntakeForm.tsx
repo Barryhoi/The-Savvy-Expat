@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import {
   questions,
+  choiceLabel,
   qualification,
   ending,
   validateAnswer,
@@ -254,7 +255,7 @@ export default function IntakeForm() {
                         )
                       }
                     />
-                    <span className="choice-letter" aria-hidden="true">{String.fromCharCode(65 + i)}</span><span className="choice-text">{choice}</span><span className="choice-check" aria-hidden="true">{selected ? "✓" : ""}</span>
+                    <span className="choice-letter" aria-hidden="true">{String.fromCharCode(65 + i)}</span><span className="choice-text">{choiceLabel(choice)}</span><span className="choice-check" aria-hidden="true">{selected ? "✓" : ""}</span>
                   </label>
                 );
               })}

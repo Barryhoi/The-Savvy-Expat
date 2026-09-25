@@ -1,6 +1,28 @@
 import schema from "./intake-schema.json";
 
 export const questions = schema.questions;
+// Display copy is separate from the original answer values used by qualification,
+// saved applications, and CRM fields.
+const choiceLabels: Record<string, string> = {
+  "Fully committed - just need execution": "Fully committed — I just need help with the move",
+  "Mostly committed - a few concerns left": "Mostly committed — I have a few concerns left",
+  "Unsure - still weighing options": "Unsure — I’m still weighing my options",
+  "0-3 months from now": "0–3 months from now",
+  "3-6 months from now": "3–6 months from now",
+  "6 months - 1 year from now": "6 months to 1 year from now",
+  "Attaining healthcare": "Setting up healthcare",
+  "Opening up a bank account": "Opening a bank account",
+  "Hiring  Local Staff": "Hiring local staff",
+  "Travel Itinerary for scouting trip": "Planning an itinerary for a scouting trip",
+  "$1,000 - $2,500": "$1,000–$2,500",
+  "$3,000 - $4,000": "$3,000–$4,000",
+  "I have the funds but they're tied up right now": "I have the funds, but they’re tied up right now",
+  "None, I'm ready to get professional help now": "None — I’m ready to get professional help now",
+  "I'm not ready to move forward, still finalizing logistics": "I’m not ready to move forward — I’m still finalizing arrangements",
+};
+export function choiceLabel(value: string): string {
+  return choiceLabels[value] || value;
+}
 export type Answers = Record<string, string | string[]>;
 export const rejectionRules = {
   situation: "I'm at an early stage and mainly looking for advice",

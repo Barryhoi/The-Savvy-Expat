@@ -53,11 +53,11 @@ export default async function ThankYouPage() {
             <Reveal>
               <ConfirmedBadge />
               <h1 className="mt-7 text-4xl font-black leading-[1.1] tracking-tight sm:text-5xl">
-                Your Call Has Been Successfully Booked
+                Your discovery call is booked.
               </h1>
               <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-ink/60">
-                Please Check Your Email And Watch This Short Video Before Our
-                Call
+                Check your email for your booking details, and watch this short video
+                before your call.
               </p>
             </Reveal>
           </div>
@@ -86,7 +86,7 @@ export default async function ThankYouPage() {
           a newsletter box and social links here only dilute the ending. */}
       <main className="flex-1 pb-16">
         <ClientVideos
-          heading="While You Wait, Meet A Few Clients"
+          heading="While you wait, meet a few of our clients"
           subheading="They all started with the same call you just booked."
         />
       </main>

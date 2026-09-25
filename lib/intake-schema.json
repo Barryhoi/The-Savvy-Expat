@@ -20,7 +20,7 @@
     },
     {
       "key": "phone",
-      "title": "Your phone number?",
+      "title": "What’s your phone number?",
       "description": "",
       "type": "phone_number",
       "required": false,
@@ -43,7 +43,7 @@
     {
       "key": "commitment",
       "title": "How committed are you to relocating to the Philippines?",
-      "description": "We only work with expats serious on coming to the Philippines.",
+      "description": "We work with expats who are serious about coming to the Philippines.",
       "type": "multiple_choice",
       "required": true,
       "choices": [
@@ -55,8 +55,8 @@
     },
     {
       "key": "timeline",
-      "title": "What is your target timeline to be in the Philippines?",
-      "description": "Please do not book a call if your situation is too premature to use our services.",
+      "title": "When do you plan to arrive in the Philippines?",
+      "description": "Please book a call only when you’re ready to use our relocation services.",
       "type": "multiple_choice",
       "required": true,
       "choices": [
@@ -69,7 +69,7 @@
     },
     {
       "key": "motivation",
-      "title": "Tell us more about your motivation to come to the Philippines.",
+      "title": "What brings you to the Philippines?",
       "description": "",
       "type": "multiple_choice",
       "required": true,
@@ -83,7 +83,7 @@
     {
       "key": "services",
       "title": "Which services do you need?",
-      "description": "We're here to make your transition as smooth as possible. Kindly tell us how we can help you.",
+      "description": "We’re here to make your transition as smooth as possible. Tell us how we can help.",
       "type": "picture_choice",
       "required": false,
       "choices": [
@@ -99,8 +99,8 @@
     },
     {
       "key": "budget",
-      "title": "Once you're settled in the Philippines, what estimated monthly budget will you working with?",
-      "description": "This helps us a gauge how to best tailor your lifestyle according to your budget",
+      "title": "What monthly budget do you expect to have once you’re settled in the Philippines?",
+      "description": "This helps us tailor our recommendations to your budget.",
       "type": "multiple_choice",
       "required": true,
       "choices": [
@@ -126,8 +126,8 @@
     },
     {
       "key": "logistics",
-      "title": "What logistical ends do you need to finalize before making the move?",
-      "description": "IMPORTANT: Do not book a call if finalizing logistical ends will postpone or hold you back from using our professional relocation help.",
+      "title": "What arrangements do you still need to finalize before making the move?",
+      "description": "Please book a call only if you’re ready to use our relocation services without waiting for other arrangements to be finalized.",
       "type": "multiple_choice",
       "required": false,
       "choices": [
@@ -138,8 +138,8 @@
     },
     {
       "key": "obstacle",
-      "title": "What is the biggest thing holding you back from moving forward without our professional help?",
-      "description": "We only help expats that need assistance. Please do not book a call if you prefer handling this move alone. We only help expats serious about getting A-Z help.",
+      "title": "What is the biggest challenge you would need our help to overcome?",
+      "description": "We work with expats who want support throughout their move. Please book a call only if you’re interested in professional relocation help.",
       "type": "short_text",
       "required": false,
       "choices": [],
@@ -148,7 +148,7 @@
     {
       "key": "whyUs",
       "title": "What specifically made you want to speak with Evan or The Savvy Expat team?",
-      "description": "We are a relationship based organization.",
+      "description": "We value getting to know you and understanding what you’re looking for.",
       "type": "short_text",
       "required": false,
       "choices": [],
@@ -165,9 +165,9 @@
     }
   ],
   "endings": {
-    "timeline": "Our services are tailored for those planning to make the move in less than 6 months. If your timeline is still further out, we encourage you to reach back out when you're closer to making the transition—we’ll be here to support you when the time is right.",
-    "commitment": "Our services are tailored to those who committed coming to the Philippines. If now is not yet the quite the right time, we encourage you to reach out when you're ready.",
-    "situation": "Our services are tailored to those who are ready to make the move with a set timeline in mind. As you're plans progress, please reach out when you're ready. We hope to connect when the time is right. See our YouTube channel for more advice.",
-    "logistics": "Thank you for your interest in The Savvy Expat.\nWe only work with expats who are fully ready to commit to our assistance without waiting on outside logistics. Reach back out when you're ready."
+    "timeline": "Our relocation services are designed for people who are ready to plan their move. Please get back in touch when you’re closer to relocating to the Philippines. We’ll be here when the time is right.",
+    "commitment": "Our services are designed for people who have decided to come to the Philippines. If you’re still weighing your options, please get back in touch when you’re ready to move forward.",
+    "situation": "Our services are designed for people who are ready to plan their move and work with a relocation team. As your plans develop, please get back in touch. In the meantime, you can find more guidance on our YouTube channel.",
+    "logistics": "Thank you for your interest in The Savvy Expat. We work with people who are ready to use our relocation services. Please get back in touch once your remaining arrangements are settled and you’re ready to move forward."
   }
 }
