@@ -30,7 +30,7 @@ const { validateProgress, abandonmentDue, ABANDONMENT_MS } = require(path.join(o
 const { saveProgress, checkAbandonment } = require(path.join(output, 'intake-abandonment.js'));
 const answers = { firstName: 'QA', lastName: 'Test', email: 'qa@example.com', phone: '+12025550148' };
 const at = Date.parse('2026-09-25T00:00:00.000Z');
-function eligible(id) { return { id: 'lead_test', organization_id: config.organizationId, status_id: config.tfsStatusId, ['custom.'+config.legacyFields.applicationId]: id, ['custom.'+config.fields.qualification]: 'Qualified' }; }
+function eligible(id) { return { id: 'lead_test', organization_id: config.organizationId, status_id: config.tfsStatusId, ['custom.'+config.legacyFields.applicationId]: id }; }
 function seed(id, extra={}) { records.set('drafts/'+id, { value: { id, answers, revision: 1, updatedAt: new Date(at).toISOString(), leadId: 'lead_test', ...extra }, etag: 'v1' }); records.set('identities/'+answers.email, { value: { applicationId: id } }); lead = eligible(id); }
 (async () => {
   assert.deepEqual(validateProgress(answers), answers);

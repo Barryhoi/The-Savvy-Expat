@@ -51,7 +51,7 @@ export async function checkAbandonment(id: string, now = Date.now()) {
       const currentApplication = identity?.value.applicationId ??
         (legacyApplicationField ? lead[`custom.${legacyApplicationField}`] : undefined);
       const eligible = currentApplication === id &&
-        lead[`custom.${config.fields.qualification}`] === "Qualified" &&
+        application.qualified &&
         !(await hasApplicationBooking(id, lead)) &&
         [config.tfsStatusId, config.tfnbStatusId].includes(lead.status_id);
       if (eligible && lead.status_id !== config.tfnbStatusId)

@@ -28,12 +28,12 @@ const definitions = {
   logistics: ["Outstanding logistics", "text"],
   obstacle: ["Biggest relocation obstacle", "text"],
   whyUs: ["Why The Savvy Expat", "text"],
-  qualification: ["Application qualification", "text"],
-  reason: ["Disqualification reason", "text"],
 };
 const retained = JSON.parse(fs.readFileSync("lib/close-fields.json", "utf8"));
 const existing = (await api("custom_field/lead/")).data;
 const fields = { ...retained.fields };
+for (const key of ["qualification", "reason", "sourcePlatform", "sourceVideo"])
+  delete fields[key];
 for (const [key, [name, type]] of Object.entries(definitions)) {
   let found = existing.filter((f) => f.name === name);
   if (found.length > 1) throw new Error("Ambiguous " + name);

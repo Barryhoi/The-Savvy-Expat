@@ -104,7 +104,7 @@ export async function syncApplication(
         : false;
       if (mode === "draft" && lead && (
         lead.status_id !== config.potentialStatusId ||
-        ["Qualified", "Disqualified"].includes(String(lead[`custom.${config.fields.qualification}`] || "")) ||
+        (record?.value.applicationId && record.value.applicationId !== id) ||
         hasBooking
       )) return { leadId: lead.id, created: false, protected: true };
       const reason = mode === "submitted" ? qualification(answers) : null;
@@ -114,8 +114,6 @@ export async function syncApplication(
         services: Array.isArray(answers.services)
           ? answers.services.join("; ")
           : answers.services,
-        qualification: mode === "draft" ? "In progress" : reason ? "Disqualified" : "Qualified",
-        reason: reason || "None",
       };
       const blankAnswers = Object.fromEntries(
         questions

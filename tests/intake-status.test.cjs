@@ -36,7 +36,7 @@ const at = '2026-09-25T00:00:00Z';
   const result = await syncApplication('app1', a, at);
   assert.equal(lead.status_id, c.tfsStatusId);
   assert.equal(lead['custom.'+c.legacyFields.applicationId], undefined, 'application metadata stays in private receipts, not lead custom fields');
-  assert.equal(lead['custom.'+c.fields.qualification], 'Qualified');
+  assert.equal(Object.hasOwn(c.fields, 'qualification'), false, 'qualification stays in the private application receipt and pipeline status');
   assert.equal(result.created, true, 'new lead follow-up eligibility survives partial capture');
   await syncApplication('app1', a, at);
   assert.equal(creates, 1);
