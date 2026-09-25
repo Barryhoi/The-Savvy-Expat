@@ -730,9 +730,14 @@ details[open] .accordion-body {
 .time-choice { flex-shrink:0; min-height:44px; border:1px solid #cbc3ff; border-radius:7px; color:#4934fb; font-size:16px; font-weight:700; padding:10px 6px; }
 .time-choice:hover { background:#f6f3ff; }
 .time-choice.selected { background:#4934fb; color:white; border-color:#4934fb; }
-.calendar-continue { display:flex; align-items:center; justify-content:space-between; width:100%; min-height:46px; padding:12px 16px; border-radius:7px; background:#4934fb; color:white; font-size:16px; font-weight:700; margin-top:16px; }
-.calendar-continue:disabled { background:#efedf5; color:#8b879b; }
-.time-hint { text-align:center; font-size:12px; color:#526078; margin-top:8px; }
+.calendar-continue { display:flex; align-items:center; justify-content:center; gap:10px; width:100%; min-height:50px; padding:11px 14px; border:1px solid transparent; border-radius:10px; background:#4934fb; color:white; font-size:16px; line-height:1.2; font-weight:700; margin-top:16px; box-shadow:0 5px 14px #4934fb26; transition:background-color .18s ease, box-shadow .18s ease, transform .18s ease; }
+.calendar-continue:hover:not(:disabled) { background:#3924e8; box-shadow:0 7px 18px #4934fb38; transform:translateY(-1px); }
+.calendar-continue:active:not(:disabled) { transform:translateY(0); }
+.calendar-continue-arrow { display:grid; place-items:center; flex:0 0 26px; width:26px; height:26px; border-radius:50%; background:#ffffff24; font-size:17px; line-height:1; }
+.calendar-continue:disabled { background:#efedf5; color:#8b879b; box-shadow:none; }
+.calendar-continue:disabled .calendar-continue-arrow { background:#e4e1eb; }
+.time-hint { text-align:center; font-size:12px; line-height:1.5; color:#657084; margin-top:9px; }
+.time-hint strong { color:#041630; font-weight:700; }
 .calendar-footer { display:flex; justify-content:space-between; gap:16px; padding-top:22px; font-size:13px; color:#4934fb; }
 .calendar-footer button { min-height:40px; }
 .calendar-error { margin-top:16px; padding:12px; font-size:13px; background:#fff1f1; color:#991b1b; border-radius:8px; }

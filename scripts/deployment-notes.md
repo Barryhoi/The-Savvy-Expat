@@ -184,3 +184,8 @@ One intentionally retained lead: PREVIEW QA Migration Test, savvy-migration-qa-2
 - READY preview: https://the-savvy-expat-f7i6ais7z-barry-operations.vercel.app/form; deployment dpl_7VWRWThGJNTYBwZ2iDPzZpYhSbkK; code175e47c; cloud build8s.
 - Replayed the two already-submitted, unsynced preview receipts in submission order. Both now resolve to one Close lead, marked TFS; verified latest application ID and Qualified custom field. No booking or follow-up task created. Preview-only newsletter automation stayed disabled.
 - Regression suite, typecheck, and cloud build pass. Production and Make unchanged. Preview login protection remains enabled.
+
+## 2026-09-25 — Booking time button polish
+- Selected-time CTA now has a short, stable “Continue” label with a fixed arrow badge; the chosen local time and next step appear in the helper line below so the button does not awkwardly wrap on narrow phones.
+- READY preview: https://the-savvy-expat-bloa0uy45-barry-operations.vercel.app/form; deployment dpl_D9LFpi9WopJPskHz38LC6xXWtoZ1; cloud build9s.
+- Typecheck, booking/CRM regression suite, and Vercel production build pass. Preview remains protected. Production and Make unchanged.

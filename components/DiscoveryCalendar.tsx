@@ -127,8 +127,8 @@ export default function DiscoveryCalendar({
                     {loading ? <p role="status">Finding available times…</p> : chosen.map(slot => <button key={slot.start} aria-pressed={choice?.start === slot.start} className={choice?.start === slot.start ? "time-choice selected" : "time-choice"} onClick={() => setChoice(slot)}>{new Intl.DateTimeFormat("en", {timeZone: zone, hour: "numeric", minute: "2-digit"}).format(new Date(slot.start))}</button>)}
                     {!loading && !error && !chosen.length && <p>No times available in the current booking window. Please check again later.</p>}
                   </div>
-                  <button className="calendar-continue" disabled={!choice || loading} onClick={() => setSelected(choice)}>{choice ? `Continue with ${new Intl.DateTimeFormat("en", { timeZone: zone, hour: "numeric", minute: "2-digit" }).format(new Date(choice.start))}` : "Continue"}<span aria-hidden="true">→</span></button>
-                  <p className="time-hint">{choice ? "Next: confirm your details" : "Select a time to continue"}</p>
+                  <button className="calendar-continue" aria-label={choice ? "Continue with selected time" : "Choose a time to continue"} disabled={!choice || loading} onClick={() => setSelected(choice)}><span>{choice ? "Continue" : "Choose a time"}</span><span className="calendar-continue-arrow" aria-hidden="true">→</span></button>
+                  <p className="time-hint">{choice ? <><strong>{new Intl.DateTimeFormat("en", { timeZone: zone, hour: "numeric", minute: "2-digit" }).format(new Date(choice.start))}</strong> selected <span aria-hidden="true">·</span> Confirm your details next</> : "Select a time to continue"}</p>
                 </div>
               </div>
               {error && <p role="alert" className="calendar-error">{error}</p>}
