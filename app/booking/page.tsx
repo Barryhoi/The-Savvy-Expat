@@ -26,12 +26,10 @@ export default async function BookingPage() {
   }
   const { id, answers } = receipt.value;
   return (
-    <div className="min-h-screen bg-hero">
+    <div className="min-h-screen funnel-page">
       <FunnelHeader current={2} />
-      <main className="px-4 pb-16 pt-8 sm:px-6 sm:pt-12">
-        <h1 className="mx-auto mb-8 max-w-3xl text-center text-3xl font-black tracking-tight sm:text-4xl">
-          Let’s plan your move
-        </h1>
+      <main className="booking-main">
+        <div className="booking-intro"><p className="funnel-eyebrow">Your discovery call</p><h1>Let’s plan your <span>next chapter.</span></h1><p>Choose a time to talk about your move to the Philippines.</p></div>
         <DiscoveryCalendar
           application={{
             id,

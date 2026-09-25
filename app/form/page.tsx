@@ -6,15 +6,15 @@ export const metadata = {
 };
 export default function FormPage() {
   return (
-    <div className="bg-hero min-h-screen">
+    <div className="funnel-page min-h-screen">
       <FunnelHeader current={1} />
-      <main className="mx-auto max-w-3xl px-4 pb-16 pt-8 sm:px-6 sm:pt-12">
-        <div className="mb-8 text-center">
+      <main className="form-main">
+        <div className="form-intro">
           <p className="text-xs font-bold uppercase tracking-[.2em] text-primary">
             Your move starts here
           </p>
           <h1 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">
-            Tell us about your move
+            A new chapter. A clear plan.
           </h1>
           <p className="mt-3 text-ink/60">
             If we’re a fit, you’ll choose a time for your 30-minute discovery

@@ -157,7 +157,7 @@ export default function IntakeForm() {
     String(answers.firstName || ""),
   );
   return (
-    <section className="intake-card" aria-busy={busy}>
+    <section className="intake-card application-card" aria-busy={busy}>
       <div className="mb-8 flex items-center justify-between text-xs font-bold uppercase tracking-widest text-ink/50">
         <span>{step < 13 ? `Question ${step + 1} of 13` : "Last step"}</span>
         <span>
@@ -188,7 +188,7 @@ export default function IntakeForm() {
           ref={heading}
           tabIndex={-1}
           id="question-title"
-          className="scroll-mt-6 text-2xl font-black leading-snug tracking-tight outline-none sm:text-3xl"
+          className="application-question"
         >
           {title}
         </h2>
@@ -233,7 +233,7 @@ export default function IntakeForm() {
                     className={`intake-choice ${selected ? "intake-choice-selected" : ""}`}
                   >
                     <input
-                      className="h-5 w-5 shrink-0 accent-[#4934fb]"
+                      className="choice-control"
                       type={q.multiple ? "checkbox" : "radio"}
                       name={q.key}
                       checked={selected}
@@ -253,7 +253,7 @@ export default function IntakeForm() {
                         )
                       }
                     />
-                    <span>{choice}</span>
+                    <span className="choice-letter" aria-hidden="true">{String.fromCharCode(65 + i)}</span><span className="choice-text">{choice}</span><span className="choice-check" aria-hidden="true">{selected ? "✓" : ""}</span>
                   </label>
                 );
               })}
@@ -291,7 +291,7 @@ export default function IntakeForm() {
             {error}
           </p>
         )}
-        <div className="mt-8 flex items-center justify-between gap-4">
+        <div className="application-actions">
           <button
             type="button"
             disabled={step === 0 || busy}

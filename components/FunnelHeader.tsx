@@ -23,8 +23,9 @@ function TickIcon() {
  */
 export default function FunnelHeader({ current }: { current: 1 | 2 | 3 }) {
   return (
-    <header className="px-6 pt-10">
-      <div className="mx-auto max-w-2xl">
+    <header className="funnel-header">
+      <div className="funnel-header-inner">
+        <div className="funnel-brand"><span aria-hidden="true">✦</span> The Savvy Expat</div>
         <ol className="mx-auto flex max-w-md items-center justify-center gap-2 sm:gap-3">
           {STEPS.map((step, i) => {
             const done = step.n < current;
