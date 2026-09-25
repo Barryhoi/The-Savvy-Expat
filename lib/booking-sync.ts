@@ -125,7 +125,16 @@ export async function syncBooking(
         rescheduleUrl: invitee.reschedule_url || "",
         cancelUrl: invitee.cancel_url || "",
       });
-      await closeApi(`lead/${application.leadId}/`, "PUT", fields);
+      const stagePatch: Record<string, string> = {};
+      if (process.env.VERCEL_ENV === "production") {
+        if (invitee.status === "active" && [config.potentialStatusId, config.tfsStatusId, config.tfnbStatusId, config.tfdqStatusId, config.bookedStatusId, config.canceledStatusId].includes(current.status_id))
+          stagePatch.status_id = config.bookedStatusId;
+        if (invitee.status === "canceled" && !invitee.rescheduled && current.status_id === config.bookedStatusId)
+          stagePatch.status_id = config.canceledStatusId;
+      }
+      // Persist booking details and its pipeline transition together. Optional
+      // newsletter/opportunity settings must not leave a canceled call Booked.
+      await closeApi(`lead/${application.leadId}/`, "PUT", { ...fields, ...stagePatch });
       await writeRecord(
         latestKey,
         {
@@ -136,14 +145,6 @@ export async function syncBooking(
         },
         latest?.etag,
       );
-      // A verified booking always advances the production lead from TFNB to
-      // Booked. This status transition does not depend on newsletter/opportunity
-      // automation activation. Preview keeps existing downstream outreach quiet.
-      if (process.env.VERCEL_ENV === "production" && invitee.status === "active") {
-        await closeApi(`lead/${application.leadId}/`, "PUT", {
-          status_id: config.bookedStatusId,
-        });
-      }
       // Preview writes fields only: existing Make/Close follow-ups must not be
       // triggered by test data. Production automation activation is explicit.
       if (
@@ -181,19 +182,7 @@ export async function syncBooking(
         }
 
       }
-      if (
-        process.env.VERCEL_ENV === "production" &&
-        process.env.BOOKING_LIVE_AUTOMATIONS === "true" &&
-        invitee.status === "canceled" &&
-        !invitee.rescheduled &&
-        current.status_id === config.bookedStatusId
-      ) {
-        // Existing Make cancellation outcome, guarded against demoting a lead
-        // that a closer has already advanced after the booking.
-        await closeApi(`lead/${application.leadId}/`, "PUT", {
-          status_id: config.canceledStatusId,
-        });
-      }
+
     });
     await writeRecord(
       jobKey,

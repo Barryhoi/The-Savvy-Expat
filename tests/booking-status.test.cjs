@@ -6,7 +6,7 @@ const id = 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee';
 const records = new Map();
 const writes = [];
 const locks = [];
-let status = config.tfnbStatusId, currentApplication = id;
+let status = config.tfnbStatusId, currentApplication = id, inviteeStatus = "active", rescheduled = false, currentInvitee;
 const original = Module._load;
 Module._load = function(name, ...args) {
   if (name === 'server-only') return {};
@@ -15,7 +15,7 @@ Module._load = function(name, ...args) {
   if (name === './calendly') return {
     providerPath: uri => uri,
     resolveEventType: async () => 'event_type_test',
-    calendlyApi: async uri => ({ resource: uri.includes('invitee') ? { status: 'active', event: 'event_test', email: 'qa@example.com', tracking: { utm_content: 'se_'+id }, created_at: '2026-09-25T00:00:00Z', timezone: 'Asia/Manila' } : { event_type: 'event_type_test', start_time: '2026-09-26T00:00:00Z' } }),
+    calendlyApi: async uri => ({ resource: uri.includes('invitee') ? { status: inviteeStatus, rescheduled, event: 'event_test', email: 'qa@example.com', tracking: { utm_content: 'se_'+id }, created_at: '2026-09-25T00:00:00Z', timezone: 'Asia/Manila' } : { event_type: 'event_type_test', start_time: '2026-09-26T00:00:00Z' } }),
   };
   if (name === './receipt-store') return {
     digest: value => value,
@@ -28,7 +28,7 @@ Module._load = function(name, ...args) {
     closeApi: async (url, method, body) => {
       assert.match(url, /^lead\//, 'optional automation off must not create an opportunity or task');
       if (method === 'PUT') { writes.push(body); if (body.status_id) status = body.status_id; }
-      return { ['custom.'+config.fields.applicationId]: currentApplication, organization_id: config.organizationId, status_id: status };
+      return { ['custom.'+config.fields.bookingId]: currentInvitee, ['custom.'+config.fields.applicationId]: currentApplication, organization_id: config.organizationId, status_id: status };
     },
   };
   return original.call(this, name, ...args);
@@ -52,5 +52,17 @@ const { syncBooking } = require(path.join(process.env.SAVVY_TEST_OUTPUT, 'bookin
   process.env.VERCEL_ENV = 'production';
   await syncBooking('invitee_old_late', id);
   assert.equal(writes.length, 0, 'older application webhook cannot overwrite newer submission');
+  currentApplication = id;
+  for (const scenario of ['cancel', 'reschedule', 'advanced', 'old-cancel']) {
+    records.clear(); writes.length = 0;
+    status = scenario === 'advanced' ? 'closed-sale' : config.bookedStatusId;
+    inviteeStatus = scenario === 'advanced' ? 'active' : 'canceled';
+    rescheduled = scenario === 'reschedule';
+    currentInvitee = scenario === 'old-cancel' ? 'replacement-invitee' : undefined;
+    await syncBooking('invitee_'+scenario, id);
+    assert.equal(status, scenario === 'advanced' ? 'closed-sale' : scenario === 'cancel' ? config.canceledStatusId : config.bookedStatusId, scenario);
+    if (scenario === 'old-cancel') assert.equal(writes.length, 0);
+    if (scenario === 'cancel') assert.equal(writes[0].bookingStatus, 'Canceled');
+  }
   console.log('PASS: verified production booking changes TFNB to Booked with optional automations off; duplicate and preview guards');
 })().catch(e => { console.error(e); process.exitCode = 1; });
