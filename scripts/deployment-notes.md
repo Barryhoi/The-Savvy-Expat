@@ -91,3 +91,8 @@ One intentionally retained lead: PREVIEW QA Migration Test, savvy-migration-qa-2
 - QA qualified application without identity: 43728e98-9a79-4539-95bc-37a694a3aee2. No booking submitted in this redesign pass. No new contact identity entered.
 - Calendly emitted its third-party Datadog no-session-storage telemetry warning; embed still loaded. Real iPhone Safari not exercised.
 - Production and Make untouched. Existing webhook remains on m0m90zni4 preview; retain that deployment as documented above.
+
+## 2026-09-25 — Brand correction requested from screenshots
+- Latest preview: https://the-savvy-expat-4ke13kojm-barry-operations.vercel.app/form (592ec19; deployment dpl_4zQmseKt4JzWmytZZ4huwZKE1ayh).
+- Compared live Savvy homepage. Restored actual logo, Satoshi weights, purple/navy palette and lavender background; enlarged and darkened supporting text/calendar controls. Removed custom Sam name/title block. Replaced confusing final statement with an accurate booking handoff and explicit Choose a time CTA; qualification questions and rules unchanged.
+- Type check, tests, and cloud build passed. Desktop final screen and booking calendar inspected. 320px calendar and final full-width CTA visually verified; qualified application still routes to live availability. No real booking submitted; production/Make unchanged.
