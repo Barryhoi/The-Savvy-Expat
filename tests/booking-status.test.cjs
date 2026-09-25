@@ -19,16 +19,15 @@ Module._load = function(name, ...args) {
   };
   if (name === './receipt-store') return {
     digest: value => value,
-    readRecord: async key => records.get(key) || null,
+    readRecord: async key => key === 'identities/qa@example.com' ? { value: { applicationId: currentApplication } } : records.get(key) || null,
     writeRecord: async (key, value) => { records.set(key, { value, etag: 'v1' }); return { etag: 'v1' }; },
     withLock: async (key, fn) => { locks.push(key); return fn(); },
   };
   if (name === './close') return {
-    customFields: values => values,
     closeApi: async (url, method, body) => {
       assert.match(url, /^lead\//, 'optional automation off must not create an opportunity or task');
       if (method === 'PUT') { writes.push(body); if (body.status_id) status = body.status_id; }
-      return { ['custom.'+config.fields.bookingId]: currentInvitee, ['custom.'+config.fields.applicationId]: currentApplication, organization_id: config.organizationId, status_id: status };
+      return { ['custom.'+config.legacyFields.applicationId]: currentApplication, organization_id: config.organizationId, status_id: status };
     },
   };
   return original.call(this, name, ...args);
@@ -46,8 +45,12 @@ const { syncBooking } = require(path.join(process.env.SAVVY_TEST_OUTPUT, 'bookin
   records.clear(); writes.length = 0; status = config.tfnbStatusId;
   process.env.VERCEL_ENV = 'preview';
   await syncBooking('invitee_preview', id);
-  assert.equal(status, config.tfnbStatusId, 'preview must not activate existing production status automations');
-  assert.equal(writes[0].bookingStatus, 'Booked');
+  assert.equal(status, config.bookedStatusId, 'verified preview bookings run the core Booked stage transition');
+  assert.deepEqual(writes[0], { status_id: config.bookedStatusId }, 'booking sync writes no booking custom fields');
+  records.clear(); writes.length = 0; status = config.tfsStatusId;
+  records.set('bookings/invitee_previously_synced', { value: { updatedAt: '2026-09-25T00:00:00Z', synced: true } });
+  await syncBooking('invitee_previously_synced', id);
+  assert.equal(status, config.bookedStatusId, 'legacy successful preview booking replays once to repair the missing stage transition');
   records.clear(); writes.length = 0; currentApplication = 'newer-application';
   process.env.VERCEL_ENV = 'production';
   await syncBooking('invitee_old_late', id);
@@ -59,10 +62,11 @@ const { syncBooking } = require(path.join(process.env.SAVVY_TEST_OUTPUT, 'bookin
     inviteeStatus = scenario === 'advanced' ? 'active' : 'canceled';
     rescheduled = scenario === 'reschedule';
     currentInvitee = scenario === 'old-cancel' ? 'replacement-invitee' : undefined;
+    if (scenario !== 'advanced') records.set('lead-bookings/lead_test', { value: { applicationId: id, inviteeUri: currentInvitee || 'invitee_'+scenario, status: 'active', createdAt: '2026-09-25T00:00:00Z' } });
     await syncBooking('invitee_'+scenario, id);
     assert.equal(status, scenario === 'advanced' ? 'closed-sale' : scenario === 'cancel' ? config.canceledStatusId : config.bookedStatusId, scenario);
     if (scenario === 'old-cancel') assert.equal(writes.length, 0);
-    if (scenario === 'cancel') assert.equal(writes[0].bookingStatus, 'Canceled');
+    if (scenario === 'cancel') assert.deepEqual(writes[0], { status_id: config.canceledStatusId });
   }
-  console.log('PASS: verified production booking changes TFNB to Booked with optional automations off; duplicate and preview guards');
+  console.log('PASS: verified booking moves leads to Booked without booking custom fields; legacy replay, duplicate, reschedule, cancellation and advanced-stage guards');
 })().catch(e => { console.error(e); process.exitCode = 1; });

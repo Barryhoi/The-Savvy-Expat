@@ -78,7 +78,7 @@ export async function syncApplication(
   if (!email) return { leadId: null, created: false };
   return withLock(`identity:${email}`, async () => {
     const key = `identities/${digest(email)}`;
-    let record = await readRecord<{ leadId?: string; creating?: boolean; createdByApplication?: string }>(key);
+    let record = await readRecord<{ leadId?: string; creating?: boolean; createdByApplication?: string; applicationId?: string }>(key);
     let lead: Lead | null = null;
     if (record?.value.leadId) {
       try {
@@ -99,13 +99,16 @@ export async function syncApplication(
       if (lead && lead.organization_id !== config.organizationId)
         throw new Error("WRONG_ORGANIZATION");
       // A partial repeat visit cannot replace a completed application or booking.
+      const hasBooking = lead
+        ? await hasApplicationBooking(id, lead)
+        : false;
       if (mode === "draft" && lead && (
         lead.status_id !== config.potentialStatusId ||
         ["Qualified", "Disqualified"].includes(String(lead[`custom.${config.fields.qualification}`] || "")) ||
-        ["Booked", "Rescheduled"].includes(String(lead[`custom.${config.fields.bookingStatus}`] || ""))
+        hasBooking
       )) return { leadId: lead.id, created: false, protected: true };
       const reason = mode === "submitted" ? qualification(answers) : null;
-      const status = intakeStatus(mode, !!reason, lead, lead ? await hasApplicationBooking(id, lead) : false);
+      const status = intakeStatus(mode, !!reason, lead, hasBooking);
       const values: Record<string, unknown> = {
         ...answers,
         services: Array.isArray(answers.services)
@@ -113,10 +116,6 @@ export async function syncApplication(
           : answers.services,
         qualification: mode === "draft" ? "In progress" : reason ? "Disqualified" : "Qualified",
         reason: reason || "None",
-        applicationId: id,
-        submittedAt: mode === "submitted" ? submittedAt : undefined,
-        environment:
-          process.env.VERCEL_ENV === "production" ? "Production" : "Preview",
       };
       const blankAnswers = Object.fromEntries(
         questions
@@ -193,7 +192,7 @@ export async function syncApplication(
             await closeApi(`contact/${contact.id}/`, "PUT", patch);
         }
       }
-      await writeRecord(key, { leadId: lead!.id, creating: false, createdByApplication: created ? id : record?.value.createdByApplication }, record?.etag);
+      await writeRecord(key, { leadId: lead!.id, creating: false, applicationId: id, createdByApplication: created ? id : record?.value.createdByApplication }, record?.etag);
       return { leadId: lead!.id, created: created || record?.value.createdByApplication === id };
     };
     return lead ? withLock(`lead-booking:${lead.id}`, update) : update();

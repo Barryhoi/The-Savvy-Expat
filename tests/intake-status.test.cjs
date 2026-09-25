@@ -12,7 +12,7 @@ Module._load = function(name, ...args) {
     digest: value => value,
     readRecord: async key => records.get(key) || null,
     writeRecord: async (key, value) => { records.set(key, { value, etag: 'v1' }); return { etag: 'v1' }; },
-    withLock: async (key, fn) => { locks.push(key); if (bookingWins && key.startsWith('lead-booking:')) { lead.status_id = c.bookedStatusId; lead['custom.'+c.fields.bookingStatus] = 'Booked'; bookingWins = false; } return fn(); },
+    withLock: async (key, fn) => { locks.push(key); if (bookingWins && key.startsWith('lead-booking:')) { lead.status_id = c.bookedStatusId; records.set('lead-bookings/lead_test', { value: { applicationId: 'app5', status: 'active' } }); bookingWins = false; } return fn(); },
   };
   return original.call(this, name, ...args);
 };
@@ -35,6 +35,8 @@ const at = '2026-09-25T00:00:00Z';
   assert.equal(lead.status_id, c.potentialStatusId);
   const result = await syncApplication('app1', a, at);
   assert.equal(lead.status_id, c.tfsStatusId);
+  assert.equal(lead['custom.'+c.legacyFields.applicationId], undefined, 'application metadata stays in private receipts, not lead custom fields');
+  assert.equal(lead['custom.'+c.fields.qualification], 'Qualified');
   assert.equal(result.created, true, 'new lead follow-up eligibility survives partial capture');
   await syncApplication('app1', a, at);
   assert.equal(creates, 1);
@@ -46,15 +48,14 @@ const at = '2026-09-25T00:00:00Z';
   await syncApplication('app4', a, at);
   assert.equal(lead.status_id, c.tfsStatusId);
   lead.status_id = c.potentialStatusId;
-  lead['custom.'+c.fields.bookingStatus] = 'Booked';
-  lead['custom.'+c.fields.bookingId] = 'old-invitee';
-  records.set('bookings/old-invitee', { value: { applicationId: 'older-application' } });
+  records.set('lead-bookings/lead_test', { value: { applicationId: 'older-application', status: 'active' } });
   await syncApplication('new-submission', a, at);
   assert.equal(lead.status_id, c.tfsStatusId, 'older booking cannot block TFS');
   lead.status_id = c.potentialStatusId;
-  records.set('bookings/old-invitee', { value: { applicationId: 'new-submission' } });
+  records.set('lead-bookings/lead_test', { value: { applicationId: 'new-submission', status: 'active' } });
   await syncApplication('new-submission', a, at);
   assert.equal(lead.status_id, c.potentialStatusId, 'same-application booking is protected');
+  records.delete('lead-bookings/lead_test');
   bookingWins = true;
   await syncApplication('app5', a, at);
   assert.equal(lead.status_id, c.bookedStatusId, 'booking between lookup and locked write must win');

@@ -5,7 +5,7 @@ import { closeApi, syncApplication, type Lead } from "./close";
 import config from "./close-fields.json";
 import { qualification, type Answers } from "./intake";
 import { abandonmentDue } from "./intake-progress";
-import { readRecord, writeRecord, withLock, removePendingDraft } from "./receipt-store";
+import { digest, readRecord, writeRecord, withLock, removePendingDraft } from "./receipt-store";
 export type Draft = { id: string; revision: number; answers: Answers; updatedAt: string; leadId?: string | null; protected?: boolean; marked?: boolean };
 export async function saveProgress(id: string, revision: number, answers: Answers) {
   return withLock(`application:${id}`, async () => {
@@ -46,7 +46,11 @@ export async function checkAbandonment(id: string, now = Date.now()) {
     return withLock(`identity:${email}`, () => withLock(`lead-booking:${application.leadId}`, async () => {
       const lead = await closeApi(`lead/${application.leadId}/`) as Lead;
       if (lead.organization_id !== config.organizationId) throw new Error("WRONG_ORGANIZATION");
-      const eligible = lead[`custom.${config.fields.applicationId}`] === id &&
+      const identity = await readRecord<{ applicationId?: string }>(`identities/${digest(email)}`);
+      const legacyApplicationField = config.legacyFields?.applicationId;
+      const currentApplication = identity?.value.applicationId ??
+        (legacyApplicationField ? lead[`custom.${legacyApplicationField}`] : undefined);
+      const eligible = currentApplication === id &&
         lead[`custom.${config.fields.qualification}`] === "Qualified" &&
         !(await hasApplicationBooking(id, lead)) &&
         [config.tfsStatusId, config.tfnbStatusId].includes(lead.status_id);

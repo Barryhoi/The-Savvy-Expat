@@ -5,7 +5,9 @@ export function intakeStatus(
   mode: "submitted" | "draft",
   disqualified: boolean,
   lead?: { status_id: string; [key: string]: unknown } | null,
-  hasCurrentBooking = lead ? ["Booked", "Rescheduled"].includes(String(lead[`custom.${config.fields.bookingStatus}`])) : false,
+  hasCurrentBooking = lead
+    ? [config.bookedStatusId, config.canceledStatusId].includes(lead.status_id)
+    : false,
 ): string | undefined {
   if (mode === "draft") return lead ? undefined : config.potentialStatusId;
   if (lead && (

@@ -30,22 +30,6 @@ const definitions = {
   whyUs: ["Why The Savvy Expat", "text"],
   qualification: ["Application qualification", "text"],
   reason: ["Disqualification reason", "text"],
-  applicationId: ["Application reference", "text"],
-  submittedAt: ["Application submitted at", "datetime"],
-  bookingStatus: ["Discovery call status", "text"],
-  bookingStart: ["Discovery call starts at", "datetime"],
-  bookingTimezone: ["Booking timezone", "text"],
-  bookingHost: ["Discovery call host", "text"],
-  bookingEmail: ["Booking email", "text"],
-  bookingPhone: ["Booking phone number", "text"],
-  whatsapp: ["Has WhatsApp", "text"],
-  bookingNotes: ["Booking additional notes", "text"],
-  bookingId: ["Calendly invitee URI", "text"],
-  bookingEvent: ["Calendly event URI", "text"],
-  meetingUrl: ["Discovery call meeting link", "text"],
-  rescheduleUrl: ["Reschedule call link", "text"],
-  cancelUrl: ["Cancel call link", "text"],
-  environment: ["Application environment", "text"],
 };
 const retained = JSON.parse(fs.readFileSync("lib/close-fields.json", "utf8"));
 const existing = (await api("custom_field/lead/")).data;

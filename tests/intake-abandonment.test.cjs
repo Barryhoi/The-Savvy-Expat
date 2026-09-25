@@ -30,8 +30,8 @@ const { validateProgress, abandonmentDue, ABANDONMENT_MS } = require(path.join(o
 const { saveProgress, checkAbandonment } = require(path.join(output, 'intake-abandonment.js'));
 const answers = { firstName: 'QA', lastName: 'Test', email: 'qa@example.com', phone: '+12025550148' };
 const at = Date.parse('2026-09-25T00:00:00.000Z');
-function eligible(id) { return { id: 'lead_test', organization_id: config.organizationId, status_id: config.tfsStatusId, ['custom.'+config.fields.applicationId]: id, ['custom.'+config.fields.qualification]: 'Qualified' }; }
-function seed(id, extra={}) { records.set('drafts/'+id, { value: { id, answers, revision: 1, updatedAt: new Date(at).toISOString(), leadId: 'lead_test', ...extra }, etag: 'v1' }); lead = eligible(id); }
+function eligible(id) { return { id: 'lead_test', organization_id: config.organizationId, status_id: config.tfsStatusId, ['custom.'+config.legacyFields.applicationId]: id, ['custom.'+config.fields.qualification]: 'Qualified' }; }
+function seed(id, extra={}) { records.set('drafts/'+id, { value: { id, answers, revision: 1, updatedAt: new Date(at).toISOString(), leadId: 'lead_test', ...extra }, etag: 'v1' }); records.set('identities/'+answers.email, { value: { applicationId: id } }); lead = eligible(id); }
 (async () => {
   assert.deepEqual(validateProgress(answers), answers);
   assert.equal(validateProgress({ ...answers, phone: "(202) 555-0148" }).phone, "+12025550148");
@@ -55,17 +55,14 @@ function seed(id, extra={}) { records.set('drafts/'+id, { value: { id, answers, 
   for (const kind of ['dq', 'booked', 'rescheduled', 'newer', 'manual']) {
     seed(kind); applications.set(kind, submitted(kind));
     if (kind === 'dq') applications.get(kind).qualified = false;
-    if (kind === 'booked') lead['custom.'+config.fields.bookingStatus] = 'Booked';
-    if (kind === 'rescheduled') lead['custom.'+config.fields.bookingStatus] = 'Rescheduled';
-    if (kind === 'newer') lead['custom.'+config.fields.applicationId] = 'new-application';
+    if (kind === 'booked' || kind === 'rescheduled') records.set('lead-bookings/lead_test', { value: { applicationId: kind, status: 'active' } });
+    if (kind === 'newer') records.set('identities/'+answers.email, { value: { applicationId: 'new-application' } });
     if (kind === 'manual') lead.status_id = 'manual-sales-stage';
     assert.equal(await checkAbandonment(kind, at+ABANDONMENT_MS), 'excluded', kind);
   }
   assert.equal(patches.length, 1);
   seed('new-after-old-booking'); applications.set('new-after-old-booking', submitted('new-after-old-booking'));
-  lead['custom.'+config.fields.bookingStatus] = 'Booked';
-  lead['custom.'+config.fields.bookingId] = 'older-invitee';
-  records.set('bookings/older-invitee', { value: { applicationId: 'older-form' } });
+  records.set('lead-bookings/lead_test', { value: { applicationId: 'older-form', status: 'active' } });
   assert.equal(await checkAbandonment('new-after-old-booking', at+ABANDONMENT_MS), 'marked');
   assert.equal(lead.status_id, config.tfnbStatusId, 'old booking cannot suppress TFNB');
   await saveProgress('resume', 10, answers);

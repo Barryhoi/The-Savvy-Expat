@@ -5,7 +5,7 @@ import {
   type Application,
 } from "./application";
 import { calendlyApi, providerPath, resolveEventType } from "./calendly";
-import { closeApi, customFields, syncApplication } from "./close";
+import { closeApi, syncApplication } from "./close";
 import config from "./close-fields.json";
 import { syncApplicationFollowups } from "./application-followups";
 import { digest, readRecord, withLock, writeRecord } from "./receipt-store";
@@ -42,11 +42,11 @@ export async function syncBooking(
     const receipt = await getApplication(id);
     if (!receipt?.value.qualified) throw new Error("APPLICATION_NOT_QUALIFIED");
     const jobKey = `bookings/${digest(inviteeUri)}`;
-    const prior = await readRecord<{ updatedAt: string; synced: boolean }>(
+    const prior = await readRecord<{ updatedAt: string; synced: boolean; stageSynced?: boolean }>(
       jobKey,
     );
     const updatedAt = invitee.updated_at || invitee.created_at;
-    if (prior?.value.synced && prior.value.updatedAt === updatedAt)
+    if (prior?.value.synced && prior.value.stageSynced && prior.value.updatedAt === updatedAt)
       return { confirmed: invitee.status === "active" };
     const pending = await writeRecord(
       jobKey,
@@ -77,9 +77,14 @@ export async function syncBooking(
       if (current.organization_id !== config.organizationId)
         throw new Error("WRONG_ORGANIZATION");
       // Delayed events for an older form must not overwrite the new form's stage.
-      const currentApplication = current[`custom.${config.fields.applicationId}`];
+      const email = String(application.answers.email || invitee.email || "").trim().toLowerCase();
+      const identity = email
+        ? await readRecord<{ applicationId?: string }>(`identities/${digest(email)}`)
+        : null;
+      const legacyApplicationField = config.legacyFields?.applicationId;
+      const currentApplication = identity?.value.applicationId ??
+        (legacyApplicationField ? current[`custom.${legacyApplicationField}`] : undefined);
       if (currentApplication && currentApplication !== id) return;
-      const currentInvitee = current[`custom.${config.fields.bookingId}`];
       const latestKey = `lead-bookings/${application.leadId}`;
       const latest = await readRecord<{
         createdAt: string;
@@ -94,47 +99,19 @@ export async function syncBooking(
       if (
         older ||
         (invitee.status !== "active" &&
-          currentInvitee &&
-          currentInvitee !== inviteeUri)
+          latest &&
+          latest.value.inviteeUri !== inviteeUri)
       )
         return;
-      const qa = (invitee.questions_and_answers || []) as {
-        question: string;
-        answer: string;
-      }[];
-      const answer = (name: string) =>
-        qa.find((q) => q.question.trim().toLowerCase() === name.toLowerCase())
-          ?.answer || "";
-      const fields = customFields({
-        bookingStatus:
-          invitee.status === "active"
-            ? "Booked"
-            : invitee.rescheduled
-              ? "Rescheduled"
-              : "Canceled",
-        bookingStart: event.start_time,
-        bookingTimezone: invitee.timezone,
-        bookingHost: "Sam — sam@thesavvyexpat.com",
-        bookingEmail: invitee.email,
-        bookingPhone: answer("Phone number"),
-        whatsapp: answer("Do you have WhatsApp?"),
-        bookingNotes: answer("Additional notes"),
-        bookingId: inviteeUri,
-        bookingEvent: invitee.event,
-        meetingUrl: event.location?.join_url || event.location?.location || "",
-        rescheduleUrl: invitee.reschedule_url || "",
-        cancelUrl: invitee.cancel_url || "",
-      });
       const stagePatch: Record<string, string> = {};
-      if (process.env.VERCEL_ENV === "production") {
-        if (invitee.status === "active" && [config.potentialStatusId, config.tfsStatusId, config.tfnbStatusId, config.tfdqStatusId, config.bookedStatusId, config.canceledStatusId].includes(current.status_id))
-          stagePatch.status_id = config.bookedStatusId;
-        if (invitee.status === "canceled" && !invitee.rescheduled && current.status_id === config.bookedStatusId)
-          stagePatch.status_id = config.canceledStatusId;
-      }
-      // Persist booking details and its pipeline transition together. Optional
-      // newsletter/opportunity settings must not leave a canceled call Booked.
-      await closeApi(`lead/${application.leadId}/`, "PUT", { ...fields, ...stagePatch });
+      if (invitee.status === "active" && [config.potentialStatusId, config.tfsStatusId, config.tfnbStatusId, config.tfdqStatusId, config.bookedStatusId, config.canceledStatusId].includes(current.status_id))
+        stagePatch.status_id = config.bookedStatusId;
+      if (invitee.status === "canceled" && !invitee.rescheduled && current.status_id === config.bookedStatusId)
+        stagePatch.status_id = config.canceledStatusId;
+      // A verified appointment updates the core pipeline stage in Preview and
+      // Production; optional outreach/opportunity automations stay production-gated.
+      if (Object.keys(stagePatch).length)
+        await closeApi(`lead/${application.leadId}/`, "PUT", stagePatch);
       await writeRecord(
         latestKey,
         {
@@ -145,8 +122,8 @@ export async function syncBooking(
         },
         latest?.etag,
       );
-      // Preview writes fields only: existing Make/Close follow-ups must not be
-      // triggered by test data. Production automation activation is explicit.
+      // Preview can update the core stage for a verified booking; optional
+      // newsletter/opportunity follow-ups remain production-gated.
       if (
         process.env.VERCEL_ENV === "production" &&
         process.env.BOOKING_LIVE_AUTOMATIONS === "true" &&
@@ -186,7 +163,7 @@ export async function syncBooking(
     });
     await writeRecord(
       jobKey,
-      { inviteeUri, applicationId: id, updatedAt, synced: true },
+      { inviteeUri, applicationId: id, updatedAt, synced: true, stageSynced: true },
       pending.etag,
     );
     return { confirmed: invitee.status === "active" };

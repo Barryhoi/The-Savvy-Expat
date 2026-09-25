@@ -26,7 +26,14 @@ export async function createNativeBooking(application: Application, input: Booki
     if (prior?.value.state === "pending") throw Error("BOOKING_UNCERTAIN");
     const details = validateBookingDetails(input);
     const lead = await closeApi(`lead/${application.leadId}/`);
-    if (lead.organization_id !== config.organizationId || lead[`custom.${config.fields.applicationId}`] !== application.id) throw Error("APPLICATION_CHANGED");
+    const email = String(application.answers.email || "").trim().toLowerCase();
+    const identity = email
+      ? await readRecord<{ applicationId?: string }>(`identities/${digest(email)}`)
+      : null;
+    const legacyApplicationField = config.legacyFields?.applicationId;
+    const currentApplication = identity?.value.applicationId ??
+      (legacyApplicationField ? lead[`custom.${legacyApplicationField}`] : undefined);
+    if (lead.organization_id !== config.organizationId || currentApplication !== application.id) throw Error("APPLICATION_CHANGED");
     const eventType = await resolveEventType();
     const { resource: event } = await calendlyApi(new URL(eventType).pathname);
     if (event.duration !== 30 || event.locations?.[0]?.kind !== "google_conference") throw Error("EVENT_CONFIGURATION_CHANGED");
