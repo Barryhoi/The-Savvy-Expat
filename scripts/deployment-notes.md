@@ -81,3 +81,13 @@ One intentionally retained lead: PREVIEW QA Migration Test, savvy-migration-qa-2
 - Added tests reproducing lock/network races, unchanged retry payloads, bounded outage retries and false-confirmation rejection. TypeScript, all tests and cloud build passed.
 - Latest review URL: https://the-savvy-expat-a5ilxs5ji-barry-operations.vercel.app/form. READY deployment dpl_EE1dCzoKqvTxnGnCwELgb69FL48r, code b9da848, build 9 seconds.
 - Remaining launch checks: real iPhone Safari; Lea notification receipt; production environment/signing/storage configuration and intentionally gated newsletter/pipeline activation. Production launch still requires explicit user approval. Make was not changed.
+
+## 2026-09-25 — Savvy visual redesign based on Ryan booking
+- Preview: https://the-savvy-expat-lzikgvzgr-barry-operations.vercel.app/form
+- Deployment: dpl_2RtZtuajJGyuwEvL6HA2pT9qzpFd; READY; Next.js cloud build 10s; code b45dc04.
+- Compared live ryanunhinged.com/book and its NativeBookingCalendar/booking.css source. Adopted host overview, month calendar, adjacent bounded time list, selected-time Continue, and two-step booking indicator in Savvy purple/navy/lavender.
+- Form refreshed with branded header, typography, progress, lettered selection cards, checkmarks, mobile inputs, keyboard focus and optional-name prompt cleanup. Original questions/options/qualification/API integrations retained.
+- npm run lint, npm test and cloud build passed. Chrome desktop and emulated 390px/320px inspected. Required validation, multiple selections, full qualified form progression, mobile date-to-times downward scrolling, chosen-time Continue and exact Calendly date/time/timezone handoff verified. Final preview form and optional-name prompt verified at 320px.
+- QA qualified application without identity: 43728e98-9a79-4539-95bc-37a694a3aee2. No booking submitted in this redesign pass. No new contact identity entered.
+- Calendly emitted its third-party Datadog no-session-storage telemetry warning; embed still loaded. Real iPhone Safari not exercised.
+- Production and Make untouched. Existing webhook remains on m0m90zni4 preview; retain that deployment as documented above.
