@@ -36,19 +36,15 @@ export default function NativeBookingDetails({ application, start, zone, onBack 
     finally { lock.current = false; setBusy(false); }
   }
   return <div className="native-confirmation">
-    <button className="native-back" onClick={onBack} disabled={busy || pending}>← Change date or time</button>
-    <p className="funnel-eyebrow">ONE LAST STEP</p>
-    <h2>Make it official.</h2>
-    <p className="native-subtitle">Confirm your details and we’ll save your spot.</p>
-    <div className="native-slot"><span className="native-slot-icon" aria-hidden="true">✓</span><div><strong>{new Intl.DateTimeFormat("en", { timeZone: zone, weekday: "long", month: "long", day: "numeric" }).format(new Date(start))}</strong><p>{new Intl.DateTimeFormat("en", { timeZone: zone, hour: "numeric", minute: "2-digit" }).format(new Date(start))} · 30 minutes</p><span>{zone.replaceAll("_", " ")} · Google Meet</span></div></div>
-    <div className="native-contact"><div><span>Your name</span><strong>{application.name}</strong></div><div><span>Confirmation email</span><strong>{application.email}</strong></div><div><span>Phone number</span><strong>{application.phone}</strong></div></div>
+    <h1>Confirm your call.</h1>
+    <div className="native-slot"><div><strong>{new Intl.DateTimeFormat("en", { timeZone: zone, weekday: "short", month: "short", day: "numeric" }).format(new Date(start))}</strong><p>{new Intl.DateTimeFormat("en", { timeZone: zone, hour: "numeric", minute: "2-digit" }).format(new Date(start))}<span className="native-zone">{zone.replaceAll("_", " ")}</span></p><span>30 min · Google Meet</span></div><button type="button" className="native-change" onClick={onBack} disabled={busy || pending} aria-label="Change date or time">Change</button></div>
+    <div className="native-recipient"><strong>{application.name}</strong><p>Confirmation to <span>{application.email}</span></p><details><summary>Contact details</summary><p>{application.phone}</p></details></div>
     <form onSubmit={submit}>
-      <fieldset disabled={busy || pending} className="native-whatsapp"><legend>Do you have WhatsApp? <span>Required</span></legend><div>{["Yes", "No"].map(value => <label key={value} className={whatsapp === value ? "chosen" : ""}><input required type="radio" name="whatsapp" value={value} checked={whatsapp === value} onChange={() => setWhatsapp(value)} />{value}</label>)}</div></fieldset>
-      <label className="native-notes">Anything else you’d like us to know? <span>Optional</span><textarea maxLength={2000} rows={3} value={notes} onChange={e => setNotes(e.target.value)} disabled={busy || pending} placeholder="Share a question or anything helpful for our call." /></label>
+      <fieldset disabled={busy || pending} className="native-whatsapp"><legend>Do you have WhatsApp?</legend><div>{["Yes", "No"].map(value => <label key={value} className={whatsapp === value ? "chosen" : ""}><input required type="radio" name="whatsapp" value={value} checked={whatsapp === value} onChange={() => setWhatsapp(value)} />{value}</label>)}</div></fieldset>
+      <details className="native-optional-note"><summary>Add a note <span>(optional)</span></summary><label className="native-notes"><span className="sr-only">Anything else you’d like us to know?</span><textarea maxLength={2000} rows={3} value={notes} onChange={e => setNotes(e.target.value)} disabled={busy || pending} placeholder="Anything helpful for our call?" /></label></details>
       {error && <p className="calendar-error" role="alert">{error}</p>}
       <button className="native-confirm-button" disabled={busy || (!pending && !whatsapp)} type="submit">{busy ? "Confirming your booking…" : pending ? "Check booking status" : "Confirm booking"}<span aria-hidden="true">→</span></button>
-      <p className="native-reassurance">Your confirmation and meeting link will be sent by email.</p>
-      <p className="native-terms">By confirming, you agree to Calendly’s <a href="https://calendly.com/legal/participant-terms-conditions" target="_blank" rel="noopener noreferrer">Participant Terms</a> and <a href="https://calendly.com/privacy" target="_blank" rel="noopener noreferrer">Privacy Notice</a>.</p>
+      <p className="native-terms">By booking, you agree to Calendly’s <a href="https://calendly.com/legal/participant-terms-conditions" target="_blank" rel="noopener noreferrer">Participant Terms</a> and <a href="https://calendly.com/privacy" target="_blank" rel="noopener noreferrer">Privacy Notice</a>.</p>
     </form>
   </div>;
 }

@@ -802,3 +802,50 @@ details[open] .accordion-body {
 .native-terms a { text-decoration:underline; }
 .native-confirmation input:focus-visible,.native-confirmation textarea:focus-visible,.native-terms a:focus-visible { outline:3px solid #8b7aff; outline-offset:3px; }
 @media(max-width:700px) { .native-confirmation { padding:0; } .native-confirmation h2 { font-size:29px; } .native-slot { padding:16px; gap:12px; } .native-slot strong { font-size:16px; } .native-slot-icon { width:32px; height:32px; } .native-contact { grid-template-columns:1fr; gap:16px; } .native-contact div:nth-child(2) { grid-row:auto; } .native-back { margin-bottom:18px; } }
+
+/* Keep the booking decision clear and compact on every screen. */
+.booking-simple-main { padding:40px 20px 56px; }
+.savvy-booking.booking-simple { display:block; max-width:800px; border-radius:20px; }
+.booking-simple .booking-scheduler { padding:32px; }
+.booking-simple-heading { margin-bottom:28px; }
+.booking-simple-heading h1,.native-confirmation h1 { font-size:32px; font-weight:800; letter-spacing:-1px; line-height:1.15; }
+.booking-simple-heading p { font-size:15px; color:#59657b; margin-top:10px; }
+.savvy-booking.booking-confirm-step { max-width:550px; }
+.booking-confirm-step .booking-details { padding:0; }
+.booking-simple .native-confirmation { padding:0; }
+.booking-simple .native-slot { justify-content:space-between; align-items:flex-start; gap:14px; padding:18px; margin:24px 0 20px; border-radius:12px; }
+.booking-simple .native-slot strong { font-size:18px; }
+.native-slot .native-zone { display:block; font-size:13px; color:#59657b; font-weight:400; margin-top:3px; }
+.native-change { color:#4934fb; text-decoration:underline; text-underline-offset:3px; font-size:14px; font-weight:650; min-height:44px; padding:0 4px; flex-shrink:0; }
+.native-change:disabled { opacity:.5; cursor:not-allowed; }
+.native-recipient { margin-bottom:22px; font-size:14px; color:#59657b; }
+.native-recipient>strong { display:block; color:#07172f; font-size:16px; font-weight:650; }
+.native-recipient>p { margin-top:5px; line-height:1.6; }
+.native-recipient>p>span { color:#34425c; overflow-wrap:anywhere; }
+.native-recipient summary { font-size:13px; cursor:pointer; padding:8px 0; width:fit-content; min-height:36px; }
+.native-recipient details>p { padding:0 0 8px; }
+.booking-simple .native-whatsapp { margin-bottom:12px; }
+.booking-simple .native-whatsapp>div { margin-top:10px; }
+.native-optional-note summary { cursor:pointer; font-size:14px; color:#4934fb; font-weight:600; min-height:44px; padding:12px 0; }
+.native-optional-note summary>span { color:#647087; font-weight:400; }
+.booking-simple .native-confirm-button { margin-top:14px; }
+.booking-simple .native-terms { margin-top:12px; font-size:11px; line-height:1.6; }
+.native-recipient summary:focus-visible,.native-optional-note summary:focus-visible { outline:3px solid #8b7aff; outline-offset:2px; border-radius:3px; }
+@media(max-width:700px) {
+  .booking-simple-main { padding:20px 12px 32px; }
+  .savvy-booking.booking-simple { border-radius:16px; }
+  .booking-simple .booking-scheduler { padding:22px; }
+  .booking-simple-heading { margin-bottom:24px; }
+  .booking-simple-heading h1,.native-confirmation h1 { font-size:28px; letter-spacing:-.7px; }
+  .booking-simple .native-slot { margin:20px 0 18px; padding:15px; }
+  .booking-simple .native-slot strong { font-size:17px; }
+  .native-recipient { margin-bottom:16px; }
+  .booking-simple .native-terms { font-size:11px; }
+}
+@media(max-width:360px) {
+  .booking-simple .booking-scheduler { padding:18px; }
+  .booking-simple .native-slot { padding:12px; gap:8px; }
+  .native-change { font-size:13px; }
+  .booking-simple .native-slot strong { font-size:16px; }
+  .native-recipient>p>span { display:block; }
+}

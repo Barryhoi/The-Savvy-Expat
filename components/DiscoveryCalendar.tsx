@@ -98,18 +98,11 @@ export default function DiscoveryCalendar({
   const monthIndex = months.indexOf(activeMonth);
   const formatDay = (day: string, options: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat("en", { ...options, timeZone: "UTC" }).format(new Date(`${day}T12:00:00Z`));
   return (
-    <div className="savvy-booking">
-      <aside className="booking-overview">
-        <p className="booking-brand-label">THE SAVVY EXPAT</p>
-        <h2>Your relocation<br /><span>discovery call.</span></h2>
-        <div className="booking-meta"><span>30 minutes</span><span>Google Meet</span></div>
-        <p>Let’s talk about your goals, your timeline, and what you need for a smooth move to the Philippines.</p>
-        <div className="booking-note"><strong>What we’ll cover</strong><ul><li>Your plans for the Philippines</li><li>Your questions and concerns</li><li>How our team can help</li></ul></div>
-      </aside>
+    <div className={`savvy-booking booking-simple${selected ? " booking-confirm-step" : ""}`}>
       <section className="booking-scheduler">
-        <ol className="calendar-steps" aria-label="Booking progress"><li aria-current={!selected ? "step" : undefined}><span>{selected ? "✓" : "1"}</span>Choose a time</li><li aria-current={selected ? "step" : undefined}><span>2</span>Your details</li></ol>
           {!selected ? (
             <>
+              <header className="booking-simple-heading"><h1>Choose a time.</h1><p>30-minute discovery call · Google Meet</p></header>
               <div className="calendar-layout">
                 <div className="month-panel">
                   <div className="month-toolbar"><h2>{formatDay(`${activeMonth}-01`, { month: "long", year: "numeric" })}</h2><div>
