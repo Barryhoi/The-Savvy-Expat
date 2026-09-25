@@ -45,14 +45,14 @@ export async function createNativeBooking(application: Application, input: Booki
         invitee: { name: [application.answers.firstName, application.answers.lastName].filter(Boolean).join(" "), email: application.answers.email, timezone: details.timezone },
         location: { kind: "google_conference" },
         questions_and_answers: questions.filter((q: { name: string }) => values[q.name]).map((q: { name: string; position: number }) => ({ question: q.name, answer: values[q.name], position: q.position })),
-        tracking: { utm_content: `se_${application.id}` },
+        tracking: { utm_content: `se_${application.id}`, utm_campaign: null, utm_source: "savvy-expat", utm_medium: "website", utm_term: null, salesforce_uuid: null },
       });
     } catch (e) {
       const message = e instanceof Error ? e.message : "";
       // Definitive rejection is retryable. An uncertain POST must NEVER be repeated.
       if (/^CALENDLY_(400|401|403|404|409|422|429)$/.test(message)) {
         await writeRecord(key, { hash, state: "rejected" }, marker.etag);
-        throw Error(message === "CALENDLY_400" || message === "CALENDLY_409" ? "SLOT_UNAVAILABLE" : "BOOKING_UNAVAILABLE");
+        throw Error(message === "CALENDLY_409" ? "SLOT_UNAVAILABLE" : "BOOKING_UNAVAILABLE");
       }
       throw Error("BOOKING_UNCERTAIN");
     }

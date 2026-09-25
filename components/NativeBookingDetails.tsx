@@ -48,7 +48,7 @@ export default function NativeBookingDetails({ application, start, zone, onBack 
       {error && <p className="calendar-error" role="alert">{error}</p>}
       <button className="native-confirm-button" disabled={busy || (!pending && !whatsapp)} type="submit">{busy ? "Confirming your booking…" : pending ? "Check booking status" : "Confirm booking"}<span aria-hidden="true">→</span></button>
       <p className="native-reassurance">Your confirmation and meeting link will be sent by email.</p>
-      <p className="native-terms">By confirming, you agree to Calendly’s <a href="https://calendly.com/legal/terms" target="_blank" rel="noopener noreferrer">Terms</a> and <a href="https://calendly.com/privacy" target="_blank" rel="noopener noreferrer">Privacy Notice</a>.</p>
+      <p className="native-terms">By confirming, you agree to Calendly’s <a href="https://calendly.com/legal/participant-terms-conditions" target="_blank" rel="noopener noreferrer">Participant Terms</a> and <a href="https://calendly.com/privacy" target="_blank" rel="noopener noreferrer">Privacy Notice</a>.</p>
     </form>
   </div>;
 }
