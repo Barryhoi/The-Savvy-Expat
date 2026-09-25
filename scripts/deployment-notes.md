@@ -175,4 +175,5 @@ One intentionally retained lead: PREVIEW QA Migration Test, savvy-migration-qa-2
 
 ## 2026-09-25 — Booking details shown inline
 - Confirmation now shows the saved phone number and optional note field immediately, styled to match the supplied screenshot. Removed the contact-details and add-note disclosure controls.
-- WhatsApp requirement, booking API payload, and existing booking/CRM behavior are unchanged. Regression suite and typecheck pass; preview redeploy pending.
+- READY preview: https://the-savvy-expat-me0oozt70-barry-operations.vercel.app/form; deployment dpl_CRYs9XwsBxXJSCDjoC7G2aNg7Z4k; code 340e0e5; cloud build9s.
+- WhatsApp requirement, booking API payload, and existing booking/CRM behavior are unchanged. Regression suite, typecheck, and cloud build pass. Production and Make unchanged.
