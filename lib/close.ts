@@ -106,84 +106,84 @@ export async function syncApplication(
         submittedAt: mode === "submitted" ? submittedAt : undefined,
         environment:
           process.env.VERCEL_ENV === "production" ? "Production" : "Preview",
-    };
-    const blankAnswers = Object.fromEntries(
-      questions
-        .filter(
-          (q) => q.choices.length || ["obstacle", "whyUs"].includes(q.key),
-        )
-        .map((q) => [q.key, null]),
-    );
-    const custom = customFields({ ...blankAnswers, ...values });
-    let created = false;
-    if (!lead) {
-      if (record?.value.creating)
-        throw new Error("CREATE_REQUIRES_RECONCILIATION");
-      const marker = await writeRecord(key, { creating: true }, record?.etag);
-      record = { value: { creating: true }, etag: marker.etag };
-      // Never automatically repeat an uncertain create. A later request searches
-      // the exact email first and recovers the result if Close accepted it.
-      try {
-        lead = await closeApi("lead/", "POST", {
-          name:
-            [answers.firstName, answers.lastName].filter(Boolean).join(" ") ||
-            email,
-          status_id: status,
-          contacts: [
-            {
-              name:
-                [answers.firstName, answers.lastName]
-                  .filter(Boolean)
-                  .join(" ") || undefined,
-              emails: [{ email, type: "office" }],
-              ...(answers.phone
-                ? { phones: [{ phone: answers.phone, type: "mobile" }] }
-                : {}),
-            },
-          ],
-          ...custom,
-        });
-      } catch (error) {
-        // A definitive rejection did not create a lead; allow a corrected retry.
-        // Network timeouts and server errors retain the uncertain-create guard.
-        if (
-          error instanceof Error &&
-          /^CLOSE_(400|401|403|404|422|429)$/.test(error.message)
-        ) {
-          await writeRecord(key, { creating: false }, marker.etag);
-        }
-        throw error;
-      }
-      created = true;
-    } else {
-      await closeApi(`lead/${lead.id}/`, "PUT", {
-        ...custom,
-        ...(status ? { status_id: status } : {}),
-      });
-      const contact = lead.contacts.find((c) =>
-        c.emails.some((e) => e.email.trim().toLowerCase() === email),
-      );
-      if (contact) {
-        const name = [answers.firstName, answers.lastName]
-          .filter(Boolean)
-          .join(" ");
-        const phone = String(answers.phone || "");
-        const phones = contact.phones || [];
-        const patch = {
-          ...(name ? { name } : {}),
-          ...(phone &&
-          !phones.some(
-            (p) => p.phone.replace(/\D/g, "") === phone.replace(/\D/g, ""),
+      };
+      const blankAnswers = Object.fromEntries(
+        questions
+          .filter(
+            (q) => q.choices.length || ["obstacle", "whyUs"].includes(q.key),
           )
-            ? { phones: [...phones, { phone, type: "mobile" }] }
-            : {}),
-        };
-        if (Object.keys(patch).length)
-          await closeApi(`contact/${contact.id}/`, "PUT", patch);
+          .map((q) => [q.key, null]),
+      );
+      const custom = customFields({ ...blankAnswers, ...values });
+      let created = false;
+      if (!lead) {
+        if (record?.value.creating)
+          throw new Error("CREATE_REQUIRES_RECONCILIATION");
+        const marker = await writeRecord(key, { creating: true }, record?.etag);
+        record = { value: { creating: true }, etag: marker.etag };
+        // Never automatically repeat an uncertain create. A later request searches
+        // the exact email first and recovers the result if Close accepted it.
+        try {
+          lead = await closeApi("lead/", "POST", {
+            name:
+              [answers.firstName, answers.lastName].filter(Boolean).join(" ") ||
+              email,
+            status_id: status,
+            contacts: [
+              {
+                name:
+                  [answers.firstName, answers.lastName]
+                    .filter(Boolean)
+                    .join(" ") || undefined,
+                emails: [{ email, type: "office" }],
+                ...(answers.phone
+                  ? { phones: [{ phone: answers.phone, type: "mobile" }] }
+                  : {}),
+              },
+            ],
+            ...custom,
+          });
+        } catch (error) {
+          // A definitive rejection did not create a lead; allow a corrected retry.
+          // Network timeouts and server errors retain the uncertain-create guard.
+          if (
+            error instanceof Error &&
+            /^CLOSE_(400|401|403|404|422|429)$/.test(error.message)
+          ) {
+            await writeRecord(key, { creating: false }, marker.etag);
+          }
+          throw error;
+        }
+        created = true;
+      } else {
+        await closeApi(`lead/${lead.id}/`, "PUT", {
+          ...custom,
+          ...(status ? { status_id: status } : {}),
+        });
+        const contact = lead.contacts.find((c) =>
+          c.emails.some((e) => e.email.trim().toLowerCase() === email),
+        );
+        if (contact) {
+          const name = [answers.firstName, answers.lastName]
+            .filter(Boolean)
+            .join(" ");
+          const phone = String(answers.phone || "");
+          const phones = contact.phones || [];
+          const patch = {
+            ...(name ? { name } : {}),
+            ...(phone &&
+            !phones.some(
+              (p) => p.phone.replace(/\D/g, "") === phone.replace(/\D/g, ""),
+            )
+              ? { phones: [...phones, { phone, type: "mobile" }] }
+              : {}),
+          };
+          if (Object.keys(patch).length)
+            await closeApi(`contact/${contact.id}/`, "PUT", patch);
+        }
       }
-    }
-    await writeRecord(key, { leadId: lead!.id, creating: false, createdByApplication: created ? id : record?.value.createdByApplication }, record?.etag);
-    return { leadId: lead!.id, created: created || record?.value.createdByApplication === id };
+      await writeRecord(key, { leadId: lead!.id, creating: false, createdByApplication: created ? id : record?.value.createdByApplication }, record?.etag);
+      return { leadId: lead!.id, created: created || record?.value.createdByApplication === id };
     };
     return lead ? withLock(`lead-booking:${lead.id}`, update) : update();
   });
