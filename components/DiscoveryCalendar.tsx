@@ -1,6 +1,6 @@
 "use client";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { confirmBookingRequest } from "@/lib/booking-confirmation";
+import { useEffect, useRef, useState } from "react";
+import NativeBookingDetails from "./NativeBookingDetails";
 type Slot = { start: string; url: string };
 const eventUrl =
   "https://calendly.com/sam-thesavvyexpat/expat-relocation-discovery-call";
@@ -27,18 +27,9 @@ export default function DiscoveryCalendar({
   const timeList = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(true),
     [error, setError] = useState(""),
-    [retry, setRetry] = useState(0),
-    [fallback, setFallback] = useState(false);
-  const [height, setHeight] = useState(1050),
-    [frameReady, setFrameReady] = useState(false),
-    [confirming, setConfirming] = useState(false);
-  const [booked, setBooked] = useState(false);
-  const [frameDelayed, setFrameDelayed] = useState(false);
-  const pendingInvitee = useRef<string | null>(null),
-    confirmingRef = useRef(false);
-  const frame = useRef<HTMLIFrameElement>(null),
-    times = useRef<HTMLHeadingElement>(null),
-    details = useRef<HTMLHeadingElement>(null);
+    [retry, setRetry] = useState(0);
+  const times = useRef<HTMLHeadingElement>(null),
+    details = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const local = Intl.DateTimeFormat().resolvedOptions().timeZone;
     setZone(local);
@@ -84,17 +75,8 @@ export default function DiscoveryCalendar({
     }
   }, [date]);
   useEffect(() => {
-    if (selected || fallback) {
-      setFrameReady(false);
-      setFrameDelayed(false);
-      details.current?.scrollIntoView({ block: "start", behavior: "instant" });
-    }
-  }, [selected, fallback]);
-  useEffect(() => {
-    if ((!selected && !fallback) || frameReady) return;
-    const timer = window.setTimeout(() => setFrameDelayed(true), 15000);
-    return () => window.clearTimeout(timer);
-  }, [selected, fallback, frameReady]);
+    if (selected) details.current?.scrollIntoView({ block: "start", behavior: "instant" });
+  }, [selected]);
   const makeUrl = (base: string) => {
     const url = new URL(base);
     url.searchParams.set(
@@ -112,51 +94,6 @@ export default function DiscoveryCalendar({
     if (application.phone) url.searchParams.set("a2", application.phone);
     return url.toString();
   };
-  const confirmBooking = useCallback(async (uri: string) => {
-    if (confirmingRef.current) return;
-    confirmingRef.current = true;
-    pendingInvitee.current = uri;
-    setBooked(true);
-    setConfirming(true);
-    setError("");
-    try {
-      await confirmBookingRequest(uri);
-      try {
-        sessionStorage.removeItem("savvy-application-v1");
-      } catch {}
-      window.location.assign("/thank-you");
-    } catch {
-      setError(
-        "Your Calendly booking was created. Keep your confirmation email; we're still syncing the details. Please don't book a second time.",
-      );
-    } finally {
-      confirmingRef.current = false;
-      setConfirming(false);
-    }
-  }, []);
-  useEffect(() => {
-    function receive(event: MessageEvent) {
-      if (
-        event.origin !== "https://calendly.com" ||
-        event.source !== frame.current?.contentWindow
-      )
-        return;
-      const data = event.data;
-      if (!data || typeof data.event !== "string") return;
-      if (data.event.startsWith("calendly.")) setFrameReady(true);
-      if (data.event === "calendly.page_height") {
-        const h = Number(data.payload?.height);
-        if (Number.isFinite(h)) setHeight(Math.min(2400, Math.max(700, h)));
-      }
-      if (
-        data.event === "calendly.event_scheduled" &&
-        typeof data.payload?.invitee?.uri === "string"
-      )
-        void confirmBooking(data.payload.invitee.uri);
-    }
-    window.addEventListener("message", receive);
-    return () => window.removeEventListener("message", receive);
-  }, [confirmBooking]);
   const days = Array.from(new Set(slots.map((s) => dateKey(s.start, zone))));
   const activeMonth = month || days[0]?.slice(0, 7) || dateKey(new Date().toISOString(), zone).slice(0, 7);
   const months = Array.from(new Set(days.map(day => day.slice(0, 7))));
@@ -177,8 +114,8 @@ export default function DiscoveryCalendar({
         <div className="booking-note"><strong>What we’ll cover</strong><ul><li>Your plans for the Philippines</li><li>Your questions and concerns</li><li>How our team can help</li></ul></div>
       </aside>
       <section className="booking-scheduler">
-        <ol className="calendar-steps" aria-label="Booking progress"><li aria-current={!selected && !fallback ? "step" : undefined}><span>{selected || fallback ? "✓" : "1"}</span>Choose a time</li><li aria-current={selected || fallback ? "step" : undefined}><span>2</span>Your details</li></ol>
-          {!selected && !fallback ? (
+        <ol className="calendar-steps" aria-label="Booking progress"><li aria-current={!selected ? "step" : undefined}><span>{selected ? "✓" : "1"}</span>Choose a time</li><li aria-current={selected ? "step" : undefined}><span>2</span>Your details</li></ol>
+          {!selected ? (
             <>
               <div className="calendar-layout">
                 <div className="month-panel">
@@ -209,92 +146,11 @@ export default function DiscoveryCalendar({
                 </div>
               </div>
               {error && <p role="alert" className="calendar-error">{error}</p>}
-              <div className="calendar-footer"><button disabled={loading} onClick={() => {setChoice(null);setRetry(n => n + 1);}}>Refresh times</button><button onClick={() => {setError("");setFallback(true);}}>Trouble booking? ↗</button></div>
+              <div className="calendar-footer"><button disabled={loading} onClick={() => {setChoice(null);setRetry(n => n + 1);}}>Refresh times</button><a href={makeUrl(eventUrl)} target="_blank" rel="noopener noreferrer">Trouble booking? ↗</a></div>
             </>
           ) : (
-            <div className="booking-details">
-              <button
-                onClick={() => {
-                  setSelected(null);
-                  setChoice(null);
-                  setFallback(false);
-                  setError("");
-                  setRetry((n) => n + 1);
-                }}
-                disabled={confirming || booked}
-                className="mb-5 min-h-12 font-bold text-primary"
-              >
-                ← Change date or time
-              </button>
-              <h2
-                ref={details}
-                tabIndex={-1}
-                className="scroll-mt-6 text-xl font-black outline-none"
-              >
-                Confirm your details
-              </h2>
-              {selected && (
-                <p className="mt-3 text-sm font-bold">
-                  {new Intl.DateTimeFormat("en", {
-                    timeZone: zone,
-                    dateStyle: "full",
-                    timeStyle: "short",
-                  }).format(new Date(selected.start))}{" "}
-                  · {zone}
-                </p>
-              )}
-              {!frameReady && (
-                <p role="status" className="my-5">
-                  {frameDelayed
-                    ? "The calendar is taking longer than expected. You can open secure booking in a new tab below."
-                    : "Loading secure booking…"}
-                </p>
-              )}
-              {confirming && (
-                <p role="status" className="my-4">
-                  Confirming your booking…
-                </p>
-              )}
-              {error && (
-                <p role="alert" className="my-4 text-sm text-red-800">
-                  {error}
-                </p>
-              )}
-              {booked && error && (
-                <button
-                  disabled={confirming}
-                  onClick={() =>
-                    pendingInvitee.current &&
-                    void confirmBooking(pendingInvitee.current)
-                  }
-                  className="my-4 min-h-12 rounded-xl bg-primary px-5 font-bold text-white"
-                >
-                  Retry confirmation sync
-                </button>
-              )}
-              {!booked && (
-                <p className="my-4 text-sm">
-                  <a
-                    href={makeUrl(selected?.url || eventUrl)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-bold text-primary underline"
-                  >
-                    Having trouble? Open Calendly in a new tab.
-                  </a>
-                </p>
-              )}
-              <iframe
-                ref={frame}
-                className="discovery-embed"
-                title="Confirm your discovery call with Sam"
-                src={makeUrl(selected?.url || eventUrl)}
-                style={{
-                  height: frameDelayed && !frameReady ? 400 : height,
-                  border: 0,
-                }}
-                allow="payment"
-              />
+            <div className="booking-details" ref={details}>
+              <NativeBookingDetails application={application} start={selected.start} zone={zone} onBack={() => { setSelected(null); setChoice(null); setError(""); setRetry(n => n + 1); }} />
             </div>
           )}
       </section>

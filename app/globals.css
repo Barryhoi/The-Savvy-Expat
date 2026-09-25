@@ -767,3 +767,38 @@ details[open] .accordion-body {
   .application-final .application-actions button { white-space:nowrap; }
 }
 .booking-overview>.booking-brand-label { color:#4934fb; font-size:12px; line-height:1.5; margin-top:0; }
+
+/* Native discovery-call confirmation: shared Savvy typography and palette. */
+.native-confirmation { max-width:620px; margin:auto; padding:0 4px 10px; }
+.native-back { color:#4934fb; font-size:15px; font-weight:700; min-height:44px; margin-bottom:24px; }
+.native-back:disabled { opacity:.45; cursor:not-allowed; }
+.native-confirmation .funnel-eyebrow { font-size:11px; margin-bottom:10px; }
+.native-confirmation h2 { font-size:34px; font-weight:800; letter-spacing:-1px; line-height:1.15; }
+.native-subtitle { color:#59657b; margin-top:10px; font-size:16px; line-height:1.6; }
+.native-slot { display:flex; align-items:center; gap:16px; padding:20px; border:1px solid #ded8ff; background:#f5f2ff; border-radius:16px; margin:26px 0; }
+.native-slot-icon { display:grid; place-items:center; flex:none; width:40px; height:40px; background:#4934fb; color:white; border-radius:50%; font-weight:800; }
+.native-slot strong { font-size:18px; font-weight:750; }
+.native-slot p { margin:4px 0; font-size:16px; font-weight:600; }
+.native-slot div>span { font-size:13px; color:#59657b; overflow-wrap:anywhere; }
+.native-contact { display:grid; grid-template-columns:1fr 1fr; gap:18px 24px; padding-bottom:24px; border-bottom:1px solid #ebe8f2; margin-bottom:24px; }
+.native-contact div:nth-child(2) { grid-column:1/-1; grid-row:2; }
+.native-contact span { display:block; font-size:12px; color:#59657b; margin-bottom:5px; }
+.native-contact strong { font-weight:650; font-size:16px; overflow-wrap:anywhere; }
+.native-whatsapp { padding:0; border:0; margin:0 0 24px; }
+.native-whatsapp legend,.native-notes { color:#07172f; font-size:16px; font-weight:700; }
+.native-whatsapp legend span,.native-notes>span { font-size:12px; color:#647087; font-weight:500; margin-left:8px; }
+.native-whatsapp>div { display:flex; gap:12px; margin-top:12px; }
+.native-whatsapp label { display:flex; align-items:center; gap:10px; border:1px solid #d8d7e5; border-radius:10px; min-height:48px; padding:12px 24px; cursor:pointer; flex:1; font-weight:600; }
+.native-whatsapp label.chosen { background:#f3f0ff; border-color:#4934fb; color:#4934fb; }
+.native-whatsapp input { width:18px; height:18px; accent-color:#4934fb; }
+.native-notes { display:block; }
+.native-notes textarea { display:block; resize:vertical; width:100%; border:1px solid #d8d7e5; background:#fff; color:#07172f; padding:14px 16px; border-radius:10px; margin-top:12px; font:inherit; font-weight:400; font-size:16px; line-height:1.5; }
+.native-notes textarea::placeholder { color:#70798b; }
+.native-confirm-button { display:flex; align-items:center; justify-content:space-between; gap:12px; width:100%; min-height:56px; margin-top:24px; padding:15px 22px; background:#4934fb; color:white; border-radius:12px; font-size:17px; font-weight:750; box-shadow:0 6px 18px #4934fb20; }
+.native-confirm-button:hover:not(:disabled) { background:#3924df; }
+.native-confirm-button:disabled { opacity:.55; cursor:not-allowed; }
+.native-reassurance { text-align:center; color:#59657b; font-size:13px; line-height:1.6; margin-top:14px; }
+.native-terms { color:#70798b; font-size:11px; line-height:1.7; text-align:center; margin-top:14px; }
+.native-terms a { text-decoration:underline; }
+.native-confirmation input:focus-visible,.native-confirmation textarea:focus-visible,.native-terms a:focus-visible { outline:3px solid #8b7aff; outline-offset:3px; }
+@media(max-width:700px) { .native-confirmation { padding:0; } .native-confirmation h2 { font-size:29px; } .native-slot { padding:16px; gap:12px; } .native-slot strong { font-size:16px; } .native-slot-icon { width:32px; height:32px; } .native-contact { grid-template-columns:1fr; gap:16px; } .native-contact div:nth-child(2) { grid-row:auto; } .native-back { margin-bottom:18px; } }
