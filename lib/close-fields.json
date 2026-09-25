@@ -38,5 +38,7 @@
   "canceledStatusId": "stat_rLJFxq2pZzSisWKVDtW41xYzPi9U43oVm0PVX7v6Gg8",
   "bookedOpportunityStatusId": "stat_EjTduP3gtHYbp94TyQQzidqmsKoCUBSXAML34mNW9WY",
   "tfdqStatusId": "stat_WzMDyir894slPw5WHK8mrsKdm5TqqNLgxbtpe5advll",
-  "tfnsStatusId": "stat_bmPa0jISJvTQgFp5iwrLiDP3U4LqOF30mfJOVzUH7l6"
+  "tfnsStatusId": "stat_bmPa0jISJvTQgFp5iwrLiDP3U4LqOF30mfJOVzUH7l6",
+  "tfsStatusId": "stat_ij55sAYbHpHkUY2BFOxWq2iBCgjimScspGB3gCAYmak",
+  "tfnbStatusId": "stat_B2v4QecIUQ8wQYfXpd1OwYeB7rc0pX3Rtv6e95MlsyD"
 }

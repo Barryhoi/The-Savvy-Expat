@@ -1,6 +1,7 @@
 import "server-only";
 import config from "./close-fields.json";
 import { qualification, questions, type Answers } from "./intake";
+import { intakeStatus } from "./intake-status";
 import { digest, readRecord, withLock, writeRecord } from "./receipt-store";
 
 export async function closeApi(path: string, method = "GET", body?: unknown) {
@@ -80,26 +81,31 @@ export async function syncApplication(
     let lead = record?.value.leadId
       ? ((await closeApi(`lead/${record.value.leadId}/`)) as Lead)
       : await exactLead(email);
-    if (lead && lead.organization_id !== config.organizationId)
-      throw new Error("WRONG_ORGANIZATION");
-    // A partial repeat visit cannot replace a completed application or booking.
-    if (mode === "draft" && lead && (
-      ![config.potentialStatusId, config.tfnsStatusId].includes(lead.status_id) ||
-      ["Qualified", "Disqualified"].includes(String(lead[`custom.${config.fields.qualification}`] || "")) ||
-      ["Booked", "Rescheduled"].includes(String(lead[`custom.${config.fields.bookingStatus}`] || ""))
-    )) return { leadId: lead.id, created: false, protected: true };
-    const reason = mode === "submitted" ? qualification(answers) : null;
-    const values: Record<string, unknown> = {
-      ...answers,
-      services: Array.isArray(answers.services)
-        ? answers.services.join("; ")
-        : answers.services,
-      qualification: mode === "draft" ? "In progress" : reason ? "Disqualified" : "Qualified",
-      reason: reason || "None",
-      applicationId: id,
-      submittedAt: mode === "submitted" ? submittedAt : undefined,
-      environment:
-        process.env.VERCEL_ENV === "production" ? "Production" : "Preview",
+    const update = async () => {
+      // Re-read while sharing the booking lock so a concurrent booking wins over
+      // a repeat submission instead of being overwritten by TFS.
+      if (lead) lead = await closeApi(`lead/${lead.id}/`) as Lead;
+      if (lead && lead.organization_id !== config.organizationId)
+        throw new Error("WRONG_ORGANIZATION");
+      // A partial repeat visit cannot replace a completed application or booking.
+      if (mode === "draft" && lead && (
+        lead.status_id !== config.potentialStatusId ||
+        ["Qualified", "Disqualified"].includes(String(lead[`custom.${config.fields.qualification}`] || "")) ||
+        ["Booked", "Rescheduled"].includes(String(lead[`custom.${config.fields.bookingStatus}`] || ""))
+      )) return { leadId: lead.id, created: false, protected: true };
+      const reason = mode === "submitted" ? qualification(answers) : null;
+      const status = intakeStatus(mode, !!reason, lead);
+      const values: Record<string, unknown> = {
+        ...answers,
+        services: Array.isArray(answers.services)
+          ? answers.services.join("; ")
+          : answers.services,
+        qualification: mode === "draft" ? "In progress" : reason ? "Disqualified" : "Qualified",
+        reason: reason || "None",
+        applicationId: id,
+        submittedAt: mode === "submitted" ? submittedAt : undefined,
+        environment:
+          process.env.VERCEL_ENV === "production" ? "Production" : "Preview",
     };
     const blankAnswers = Object.fromEntries(
       questions
@@ -122,7 +128,7 @@ export async function syncApplication(
           name:
             [answers.firstName, answers.lastName].filter(Boolean).join(" ") ||
             email,
-          status_id: reason ? config.tfdqStatusId : config.potentialStatusId,
+          status_id: status,
           contacts: [
             {
               name:
@@ -152,8 +158,7 @@ export async function syncApplication(
     } else {
       await closeApi(`lead/${lead.id}/`, "PUT", {
         ...custom,
-        ...(reason ? { status_id: config.tfdqStatusId }
-          : (lead.status_id === config.tfnsStatusId || (mode === "submitted" && lead.status_id === config.tfdqStatusId)) ? { status_id: config.potentialStatusId } : {}),
+        ...(status ? { status_id: status } : {}),
       });
       const contact = lead.contacts.find((c) =>
         c.emails.some((e) => e.email.trim().toLowerCase() === email),
@@ -179,5 +184,7 @@ export async function syncApplication(
     }
     await writeRecord(key, { leadId: lead!.id, creating: false, createdByApplication: created ? id : record?.value.createdByApplication }, record?.etag);
     return { leadId: lead!.id, created: created || record?.value.createdByApplication === id };
+    };
+    return lead ? withLock(`lead-booking:${lead.id}`, update) : update();
   });
 }

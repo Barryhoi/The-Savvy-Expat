@@ -9,8 +9,8 @@ export async function GET(request: Request) {
   const expected = Buffer.from(`Bearer ${secret}`);
   if (!secret || received.length !== expected.length || !timingSafeEqual(received, expected)) return new Response(null, { status: 401 });
   try {
-    const result = await withLock("tfns-sweep", async () => {
-      const state = await readRecord<{ cursor?: string }>("tfns-sweep-cursor");
+    const result = await withLock("tfnb-sweep", async () => {
+      const state = await readRecord<{ cursor?: string }>("tfnb-sweep-cursor");
       const page = await listPendingDrafts(state?.value.cursor);
       const counts = { marked: 0, waiting: 0, excluded: 0, errors: 0 };
       for (const blob of page.blobs) {
@@ -18,7 +18,7 @@ export async function GET(request: Request) {
         try { counts[await checkAbandonment(id)]++; }
         catch { counts.errors++; }
       }
-      await writeRecord("tfns-sweep-cursor", { cursor: page.hasMore ? page.cursor : undefined }, state?.etag);
+      await writeRecord("tfnb-sweep-cursor", { cursor: page.hasMore ? page.cursor : undefined }, state?.etag);
       return counts;
     });
     return Response.json(result, { status: result.errors ? 503 : 200 });

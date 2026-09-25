@@ -33,7 +33,7 @@ export async function checkAbandonment(id: string, now = Date.now()) {
   return withLock(`application:${id}`, async () => {
     const receipt = await getApplication(id);
     const application = receipt?.value;
-    // TFNS means a qualified, submitted application without a booked call.
+    // TFNB means a qualified, submitted application without a booked call.
     // Old partial-form queue entries are discarded without changing CRM status.
     if (!application || !application.qualified) {
       await removePendingDraft(id);
@@ -42,15 +42,15 @@ export async function checkAbandonment(id: string, now = Date.now()) {
     if (!application.synced || !application.leadId) return "waiting";
     if (!abandonmentDue(application.submittedAt, now)) return "waiting";
     const email = String(application.answers.email).trim().toLowerCase();
-    return withLock(`lead-booking:${application.leadId}`, () => withLock(`identity:${email}`, async () => {
+    return withLock(`identity:${email}`, () => withLock(`lead-booking:${application.leadId}`, async () => {
       const lead = await closeApi(`lead/${application.leadId}/`) as Lead;
       if (lead.organization_id !== config.organizationId) throw new Error("WRONG_ORGANIZATION");
       const eligible = lead[`custom.${config.fields.applicationId}`] === id &&
         lead[`custom.${config.fields.qualification}`] === "Qualified" &&
         !["Booked", "Rescheduled"].includes(String(lead[`custom.${config.fields.bookingStatus}`])) &&
-        [config.potentialStatusId, config.tfnsStatusId].includes(lead.status_id);
-      if (eligible && lead.status_id !== config.tfnsStatusId)
-        await closeApi(`lead/${lead.id}/`, "PUT", { status_id: config.tfnsStatusId });
+        [config.tfsStatusId, config.tfnbStatusId].includes(lead.status_id);
+      if (eligible && lead.status_id !== config.tfnbStatusId)
+        await closeApi(`lead/${lead.id}/`, "PUT", { status_id: config.tfnbStatusId });
       await removePendingDraft(id);
       return eligible ? "marked" : "excluded";
     }));

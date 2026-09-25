@@ -17,7 +17,7 @@ Module._load = function(id, ...args) {
   if (id === './close') return {
     syncApplication: async (id, answers, at, mode) => { assert.equal(mode, 'draft'); syncCount++; return { leadId: 'lead_test' }; },
     closeApi: async (url, method, body) => {
-      assert.match(url, /^lead\//, 'TFNS must never create tasks or outreach');
+      assert.match(url, /^lead\//, 'TFNB must never create tasks or outreach');
       if (method === 'PUT') { patches.push(body); Object.assign(lead, body); }
       return lead;
     },
@@ -29,7 +29,7 @@ const { validateProgress, abandonmentDue, ABANDONMENT_MS } = require(path.join(o
 const { saveProgress, checkAbandonment } = require(path.join(output, 'intake-abandonment.js'));
 const answers = { firstName: 'QA', lastName: 'Test', email: 'qa@example.com', phone: '+12025550148' };
 const at = Date.parse('2026-09-25T00:00:00.000Z');
-function eligible(id) { return { id: 'lead_test', organization_id: config.organizationId, status_id: config.potentialStatusId, ['custom.'+config.fields.applicationId]: id, ['custom.'+config.fields.qualification]: 'Qualified' }; }
+function eligible(id) { return { id: 'lead_test', organization_id: config.organizationId, status_id: config.tfsStatusId, ['custom.'+config.fields.applicationId]: id, ['custom.'+config.fields.qualification]: 'Qualified' }; }
 function seed(id, extra={}) { records.set('drafts/'+id, { value: { id, answers, revision: 1, updatedAt: new Date(at).toISOString(), leadId: 'lead_test', ...extra }, etag: 'v1' }); lead = eligible(id); }
 (async () => {
   assert.deepEqual(validateProgress(answers), answers);
@@ -41,13 +41,13 @@ function seed(id, extra={}) { records.set('drafts/'+id, { value: { id, answers, 
   assert.equal(abandonmentDue('invalid'), false);
   seed('unfinished');
   assert.equal(await checkAbandonment('unfinished', at+ABANDONMENT_MS), 'excluded');
-  assert.equal(patches.length, 0, 'unfinished forms must never become TFNS');
+  assert.equal(patches.length, 0, 'unfinished forms must never become TFNB');
   const submitted = id => ({ id, answers, qualified: true, synced: true, leadId: 'lead_test', submittedAt: new Date(at).toISOString() });
   seed('idle'); applications.set('idle', submitted('idle'));
   assert.equal(await checkAbandonment('idle', at+ABANDONMENT_MS-1), 'waiting');
   assert.equal(patches.length, 0);
   assert.equal(await checkAbandonment('idle', at+ABANDONMENT_MS), 'marked');
-  assert.deepEqual(patches[0], { status_id: config.tfnsStatusId });
+  assert.deepEqual(patches[0], { status_id: config.tfnbStatusId });
   await checkAbandonment('idle', at+ABANDONMENT_MS);
   assert.equal(patches.length, 1);
   for (const kind of ['dq', 'booked', 'rescheduled', 'newer', 'manual']) {
@@ -73,6 +73,6 @@ function seed(id, extra={}) { records.set('drafts/'+id, { value: { id, answers, 
   applications.set('resume', submitted('resume'));
   await saveProgress('resume', 12, answers);
   assert.equal(syncCount, 2);
-  assert.equal(records.has('abandonment-pending/resume'), false, 'partial saves do not queue TFNS');
-  console.log('PASS: TFNS only for qualified submitted applications without bookings, 30-minute cutoff, no tasks, partial/DQ/booked/rescheduled/newer/manual-stage exclusions');
+  assert.equal(records.has('abandonment-pending/resume'), false, 'partial saves do not queue TFNB');
+  console.log('PASS: TFNB only for qualified submitted applications without bookings, 30-minute cutoff, no tasks, partial/DQ/booked/rescheduled/newer/manual-stage exclusions');
 })().catch(error => { console.error(error); process.exitCode = 1; });

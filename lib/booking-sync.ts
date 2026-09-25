@@ -133,7 +133,7 @@ export async function syncBooking(
         },
         latest?.etag,
       );
-      // A verified booking always advances the production lead from TFNS to
+      // A verified booking always advances the production lead from TFNB to
       // Booked. This status transition does not depend on newsletter/opportunity
       // automation activation. Preview keeps existing downstream outreach quiet.
       if (process.env.VERCEL_ENV === "production" && invitee.status === "active") {

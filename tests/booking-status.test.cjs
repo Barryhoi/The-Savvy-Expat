@@ -6,7 +6,7 @@ const id = 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee';
 const records = new Map();
 const writes = [];
 const locks = [];
-let status = config.tfnsStatusId;
+let status = config.tfnbStatusId;
 const original = Module._load;
 Module._load = function(name, ...args) {
   if (name === 'server-only') return {};
@@ -43,10 +43,10 @@ const { syncBooking } = require(path.join(process.env.SAVVY_TEST_OUTPUT, 'bookin
   const count = writes.length;
   await syncBooking('invitee_test', id);
   assert.equal(writes.length, count, 'duplicate webhook must not repeat status updates');
-  records.clear(); writes.length = 0; status = config.tfnsStatusId;
+  records.clear(); writes.length = 0; status = config.tfnbStatusId;
   process.env.VERCEL_ENV = 'preview';
   await syncBooking('invitee_preview', id);
-  assert.equal(status, config.tfnsStatusId, 'preview must not activate existing production status automations');
+  assert.equal(status, config.tfnbStatusId, 'preview must not activate existing production status automations');
   assert.equal(writes[0].bookingStatus, 'Booked');
-  console.log('PASS: verified production booking changes TFNS to Booked with optional automations off; duplicate and preview guards');
+  console.log('PASS: verified production booking changes TFNB to Booked with optional automations off; duplicate and preview guards');
 })().catch(e => { console.error(e); process.exitCode = 1; });
