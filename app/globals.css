@@ -766,3 +766,4 @@ details[open] .accordion-body {
   .application-final .application-actions { flex-direction:column-reverse; align-items:stretch; gap:8px; }
   .application-final .application-actions button { white-space:nowrap; }
 }
+.booking-overview>.booking-brand-label { color:#4934fb; font-size:12px; line-height:1.5; margin-top:0; }
