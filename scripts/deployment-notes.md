@@ -163,6 +163,7 @@ One intentionally retained lead: PREVIEW QA Migration Test, savvy-migration-qa-2
 - Typecheck, existing regression suite, diff check and cloud build pass. Authenticated deployed booking page200 and compact-layout markup verified. No new appointment or notification generated. Production and Make unchanged. Active audited webhook remains m0d111epa.
 
 ## 2026-09-25 — Direct form-to-calendar handoff
+- READY preview: https://the-savvy-expat-f030wpas9-barry-operations.vercel.app/form; deployment dpl_G28hzDggV1z1oAH1tccWrEM2HfA1; code a769f23; cloud build9s.
 - Removed the redundant final statement screen. The last real intake question now submits the same answers and takes qualified applicants directly to `/booking`; disqualified answers still go to their existing disqualification ending and CRM handling.
-- Progress now reports 13 actual questions. Old saved sessions whose cursor pointed at the former statement clamp to the final real question.
-- Qualification rules and submitted CRM fields are unchanged. Intake regression suite, typecheck, and whitespace checks pass. Preview redeploy pending.
+- Progress reports 13 actual questions. Old saved sessions whose cursor pointed at the former statement clamp to the final real question.
+- Qualification rules and submitted CRM fields are unchanged. Intake regression suite, typecheck, diff check and cloud build pass. Preview form loaded in Chrome and displayed the 13-question state. Production and Make unchanged.
