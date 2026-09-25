@@ -167,3 +167,7 @@ One intentionally retained lead: PREVIEW QA Migration Test, savvy-migration-qa-2
 - Removed the redundant final statement screen. The last real intake question now submits the same answers and takes qualified applicants directly to `/booking`; disqualified answers still go to their existing disqualification ending and CRM handling.
 - Progress reports 13 actual questions. Old saved sessions whose cursor pointed at the former statement clamp to the final real question.
 - Qualification rules and submitted CRM fields are unchanged. Intake regression suite, typecheck, diff check and cloud build pass. Preview form loaded in Chrome and displayed the 13-question state. Production and Make unchanged.
+
+## 2026-09-25 — Mobile time selection polish
+- Mobile availability list now expands in the page flow instead of creating a nested scroll region. The continue button names the selected local time so the visitor can confirm their choice before moving on.
+- No calendar/API or automation behavior changed. Regression suite and typecheck pass; preview redeploy pending.

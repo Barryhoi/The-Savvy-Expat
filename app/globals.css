@@ -849,3 +849,7 @@ details[open] .accordion-body {
   .booking-simple .native-slot strong { font-size:16px; }
   .native-recipient>p>span { display:block; }
 }
+
+@media(max-width:700px) {
+  .booking-simple .time-list { height:auto; overflow:visible; overscroll-behavior:auto; }
+}
