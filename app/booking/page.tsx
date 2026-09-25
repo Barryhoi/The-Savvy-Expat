@@ -29,7 +29,7 @@ export default async function BookingPage() {
     <div className="min-h-screen funnel-page">
       <FunnelHeader current={2} />
       <main className="booking-main">
-        <div className="booking-intro"><p className="funnel-eyebrow">Your discovery call</p><h1>Let’s plan your <span>next chapter.</span></h1><p>Choose a time to talk about your move to the Philippines.</p></div>
+        <div className="booking-intro"><p className="funnel-eyebrow">Your discovery call</p><h1>Book your <span>discovery call.</span></h1><p>Choose a time to talk about your move to the Philippines.</p></div>
         <DiscoveryCalendar
           application={{
             id,

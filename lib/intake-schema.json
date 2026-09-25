@@ -2,7 +2,7 @@
   "questions": [
     {
       "key": "name",
-      "title": "Before we get started, what\u2019s your full name?",
+      "title": "Before we get started, what’s your full name?",
       "description": "",
       "type": "contact_info",
       "required": false,
@@ -12,7 +12,7 @@
     {
       "key": "email",
       "title": "And your email, {{field:7acc7644-998b-4603-9271-cc89960f6e01}}?",
-      "description": "We\u2019ll use this to follow up.",
+      "description": "We’ll use this to follow up.",
       "type": "email",
       "required": false,
       "choices": [],
@@ -113,7 +113,7 @@
     },
     {
       "key": "funds",
-      "title": "Do you currently have liquid funds available to invest in relocation support \u2014 separate from savings tied to property, retirement accounts, or pending sales?",
+      "title": "Do you currently have liquid funds available to invest in relocation support — separate from savings tied to property, retirement accounts, or pending sales?",
       "description": "",
       "type": "multiple_choice",
       "required": true,
@@ -156,8 +156,8 @@
     },
     {
       "key": "final",
-      "title": "Last Step! Please click \"Continue\" and book in a 30-minute diagnostic call one of our Senior Relocation Strategists",
-      "description": "If you click away without reserving a time slot, your spot is automatically released and the form you just completed won't count.",
+      "title": "Next, choose a time for your discovery call.",
+      "description": "We’ll talk through your plans for the Philippines and how our team can help. Choose an available time on the next page, then confirm your booking.",
       "type": "statement",
       "required": false,
       "choices": [],
@@ -165,7 +165,7 @@
     }
   ],
   "endings": {
-    "timeline": "Our services are tailored for those planning to make the move in less than 6 months. If your timeline is still further out, we encourage you to reach back out when you're closer to making the transition\u2014we\u2019ll be here to support you when the time is right.",
+    "timeline": "Our services are tailored for those planning to make the move in less than 6 months. If your timeline is still further out, we encourage you to reach back out when you're closer to making the transition—we’ll be here to support you when the time is right.",
     "commitment": "Our services are tailored to those who committed coming to the Philippines. If now is not yet the quite the right time, we encourage you to reach out when you're ready.",
     "situation": "Our services are tailored to those who are ready to make the move with a set timeline in mind. As you're plans progress, please reach out when you're ready. We hope to connect when the time is right. See our YouTube channel for more advice.",
     "logistics": "Thank you for your interest in The Savvy Expat.\nWe only work with expats who are fully ready to commit to our assistance without waiting on outside logistics. Reach back out when you're ready."

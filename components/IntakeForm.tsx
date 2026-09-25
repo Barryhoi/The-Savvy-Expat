@@ -157,9 +157,9 @@ export default function IntakeForm() {
     String(answers.firstName || ""),
   ).replace(/,\s*\?$/, "?");
   return (
-    <section className="intake-card application-card" aria-busy={busy}>
+    <section className={`intake-card application-card ${q.type === "statement" ? "application-final" : ""}`} aria-busy={busy}>
       <div className="mb-8 flex items-center justify-between text-xs font-bold uppercase tracking-widest text-ink/50">
-        <span>{step < 13 ? `Question ${step + 1} of 13` : "Last step"}</span>
+        <span>{step < 13 ? `Question ${step + 1} of 13` : "Your next step"}</span>
         <span>
           {q.required ? "Required" : q.type === "statement" ? "" : "Optional"}
         </span>
@@ -200,9 +200,10 @@ export default function IntakeForm() {
             {q.description}
           </p>
         )}
+        {q.type === "statement" && <div className="call-summary"><span>30-minute discovery call</span><span>Online via Google Meet</span></div>}
         <fieldset
           disabled={busy}
-          className="mt-7"
+          className={q.type === "statement" ? "hidden" : "mt-7"}
           aria-labelledby="question-title"
           aria-describedby={q.description ? "question-description" : undefined}
         >
@@ -308,7 +309,7 @@ export default function IntakeForm() {
             type="submit"
             className="min-h-12 rounded-xl bg-primary px-7 py-3 font-bold text-white shadow-glow disabled:opacity-60"
           >
-            {busy ? "Saving…" : "Continue →"}
+            {busy ? "Saving…" : q.type === "statement" ? "Choose a time →" : "Continue →"}
           </button>
         </div>
       </form>

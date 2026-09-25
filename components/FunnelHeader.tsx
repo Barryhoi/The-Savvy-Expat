@@ -1,3 +1,4 @@
+import Image from "next/image";
 const STEPS = [
   { n: 1, label: "Your details" },
   { n: 2, label: "Pick a time" },
@@ -25,7 +26,7 @@ export default function FunnelHeader({ current }: { current: 1 | 2 | 3 }) {
   return (
     <header className="funnel-header">
       <div className="funnel-header-inner">
-        <div className="funnel-brand"><span aria-hidden="true">✦</span> The Savvy Expat</div>
+        <div className="funnel-brand"><Image src="/logo.png" alt="The Savvy Expat" width={105} height={80} priority className="funnel-logo" /></div>
         <ol className="mx-auto flex max-w-md items-center justify-center gap-2 sm:gap-3">
           {STEPS.map((step, i) => {
             const done = step.n < current;

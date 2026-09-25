@@ -14,11 +14,11 @@ export default function FormPage() {
             Your move starts here
           </p>
           <h1 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">
-            A new chapter. A clear plan.
+            Let’s plan your move.
           </h1>
           <p className="mt-3 text-ink/60">
-            If we’re a fit, you’ll choose a time for your 30-minute discovery
-            call.
+            Tell us a little about your plans. If we’re a fit, you can book a
+            30-minute call with our team.
           </p>
         </div>
         <IntakeForm />

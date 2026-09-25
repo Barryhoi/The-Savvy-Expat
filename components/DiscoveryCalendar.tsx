@@ -170,11 +170,11 @@ export default function DiscoveryCalendar({
   return (
     <div className="savvy-booking">
       <aside className="booking-overview">
-        <div className="booking-host"><span className="host-monogram" aria-hidden="true">S</span><div><strong>Sam</strong><span>Senior Relocation Strategist</span></div></div>
-        <h2>Expat Relocation<br /><span>Discovery Call</span></h2>
-        <div className="booking-meta"><span>◷ 30 minutes</span><span>▣ Google Meet</span></div>
-        <p>We’ll dive into your goals, timeline, and biggest concerns — and see if we’re a good fit to work together for your Philippine transition.</p>
-        <div className="booking-note">Your next chapter starts<br />with a conversation.</div>
+        <p className="booking-brand-label">THE SAVVY EXPAT</p>
+        <h2>Your relocation<br /><span>discovery call.</span></h2>
+        <div className="booking-meta"><span>30 minutes</span><span>Google Meet</span></div>
+        <p>Let’s talk about your goals, your timeline, and what you need for a smooth move to the Philippines.</p>
+        <div className="booking-note"><strong>What we’ll cover</strong><ul><li>Your plans for the Philippines</li><li>Your questions and concerns</li><li>How our team can help</li></ul></div>
       </aside>
       <section className="booking-scheduler">
         <ol className="calendar-steps" aria-label="Booking progress"><li aria-current={!selected && !fallback ? "step" : undefined}><span>{selected || fallback ? "✓" : "1"}</span>Choose a time</li><li aria-current={selected || fallback ? "step" : undefined}><span>2</span>Your details</li></ol>
@@ -201,7 +201,7 @@ export default function DiscoveryCalendar({
                 <div className="times-panel">
                   <h3 ref={times} tabIndex={-1}>{activeDate ? formatDay(activeDate, {weekday: "long", month: "short", day: "numeric"}) : "Available times"}</h3>
                   <div className="time-list" ref={timeList} role="group" aria-label="Available times">
-                    {loading ? <p role="status">Finding available times…</p> : chosen.map(slot => <button key={slot.start} aria-pressed={choice?.start === slot.start} className={choice?.start === slot.start ? "time-choice selected" : "time-choice"} onClick={() => setChoice(slot)}>{new Intl.DateTimeFormat("en", {timeZone: zone, hour: "numeric", minute: "2-digit", timeZoneName: "short"}).format(new Date(slot.start))}</button>)}
+                    {loading ? <p role="status">Finding available times…</p> : chosen.map(slot => <button key={slot.start} aria-pressed={choice?.start === slot.start} className={choice?.start === slot.start ? "time-choice selected" : "time-choice"} onClick={() => setChoice(slot)}>{new Intl.DateTimeFormat("en", {timeZone: zone, hour: "numeric", minute: "2-digit"}).format(new Date(slot.start))}</button>)}
                     {!loading && !error && !chosen.length && <p>No times available in the current booking window. Please check again later.</p>}
                   </div>
                   <button className="calendar-continue" disabled={!choice || loading} onClick={() => setSelected(choice)}>Continue <span aria-hidden="true">→</span></button>
