@@ -1,5 +1,5 @@
 import "server-only";
-import { get, put } from "@vercel/blob";
+import { get, put, list, del } from "@vercel/blob";
 import { createHash, randomUUID } from "node:crypto";
 
 export const digest = (value: string) =>
@@ -55,4 +55,11 @@ export async function withLock<T>(
       () => {},
     );
   }
+}
+
+export async function listPendingDrafts(cursor?: string) {
+  return list({ prefix: prefix() + "abandonment-pending/", limit: 10, cursor });
+}
+export async function removePendingDraft(id: string) {
+  await del(prefix() + "abandonment-pending/" + id + ".json");
 }

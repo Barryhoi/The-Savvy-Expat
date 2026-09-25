@@ -13,6 +13,7 @@ import {
   type Rejection,
 } from "@/lib/intake";
 
+import { validateProgress } from "@/lib/intake-progress";
 import { readAttribution } from "@/lib/attribution";
 
 const STORAGE = "savvy-application-v1";
@@ -28,6 +29,9 @@ export default function IntakeForm() {
   const attempted = useRef(false);
   const advanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const submitting = useRef(false);
+  const progressRequest = useRef<Promise<void>>(Promise.resolve());
+  const revision = useRef(0);
+  const [saveWarning, setSaveWarning] = useState(false);
   const [advancing, setAdvancing] = useState(false);
   useEffect(() => () => {
     if (advanceTimer.current) clearTimeout(advanceTimer.current);
@@ -79,6 +83,38 @@ export default function IntakeForm() {
     heading.current?.scrollIntoView({ block: "start", behavior: "instant" });
   }, [step, rejected]);
 
+  useEffect(() => {
+    if (!ready || busy || rejected || contactStep(answers) !== null) return;
+    let partial: Answers;
+    const visited = new Set(["firstName", "lastName", "email", "phone", ...questions.slice(0, step + 1).map(q => q.key)]);
+    try { partial = validateProgress(Object.fromEntries(Object.entries(answers).filter(([key]) => visited.has(key)))); } catch { return; }
+    revision.current = Math.max(Date.now(), revision.current + 1);
+    const payload = JSON.stringify({ id: submissionId, revision: revision.current, answers: partial });
+    let active = true;
+    let retry: ReturnType<typeof setTimeout> | undefined;
+    const save = () => {
+      progressRequest.current = progressRequest.current.catch(() => {}).then(async () => {
+        if (!active || submitting.current) return;
+        try {
+          const response = await fetch("/api/application/progress", {
+            method: "POST", headers: { "Content-Type": "application/json" }, body: payload, keepalive: true,
+          });
+          if (!response.ok) throw new Error("SAVE_FAILED");
+          if (active) setSaveWarning(false);
+        } catch {
+          if (active) { setSaveWarning(true); retry = setTimeout(save, 5000); }
+        }
+      });
+    };
+    const timer = setTimeout(save, 750);
+    const flush = () => {
+      if (document.visibilityState === "hidden" && !submitting.current)
+        navigator.sendBeacon("/api/application/progress", new Blob([payload], { type: "application/json" }));
+    };
+    document.addEventListener("visibilitychange", flush);
+    return () => { active = false; clearTimeout(timer); if (retry) clearTimeout(retry); document.removeEventListener("visibilitychange", flush); };
+  }, [answers, step, ready, busy, rejected, submissionId]);
+
   const change = (key: string, value: string | string[]) => {
     let id = submissionId;
     if (attempted.current) {
@@ -111,6 +147,7 @@ export default function IntakeForm() {
     setBusy(true);
     setError("");
     try {
+      await progressRequest.current;
       const response = await fetch("/api/application", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -324,6 +361,7 @@ export default function IntakeForm() {
             />
           ) : null}
         </fieldset>
+        {saveWarning && !error && <p role="status" className="mt-4 text-sm text-ink/65">Reconnecting to save your progress. Your answers are still here.</p>}
         {error && (
           <p
             id="form-error"

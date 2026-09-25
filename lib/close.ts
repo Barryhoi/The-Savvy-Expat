@@ -37,6 +37,7 @@ type Contact = {
   phones: { phone: string; type: string }[];
 };
 export type Lead = {
+  [key: string]: unknown;
   id: string;
   organization_id: string;
   contacts: Contact[];
@@ -60,12 +61,13 @@ export async function exactLead(email: string): Promise<Lead | null> {
   if (matches.length > 1) throw new Error("AMBIGUOUS_EMAIL");
   if (matches[0] && matches[0].organization_id !== config.organizationId)
     throw new Error("WRONG_ORGANIZATION");
-  return matches[0] || null;
+  return matches[0] ? await closeApi(`lead/${matches[0].id}/`) as Lead : null;
 }
 export async function syncApplication(
   id: string,
   answers: Answers,
   submittedAt: string,
+  mode: "submitted" | "draft" = "submitted",
 ) {
   const email = String(answers.email || "")
     .trim()
@@ -74,22 +76,28 @@ export async function syncApplication(
   if (!email) return { leadId: null, created: false };
   return withLock(`identity:${email}`, async () => {
     const key = `identities/${digest(email)}`;
-    let record = await readRecord<{ leadId?: string; creating?: boolean }>(key);
+    let record = await readRecord<{ leadId?: string; creating?: boolean; createdByApplication?: string }>(key);
     let lead = record?.value.leadId
       ? ((await closeApi(`lead/${record.value.leadId}/`)) as Lead)
       : await exactLead(email);
     if (lead && lead.organization_id !== config.organizationId)
       throw new Error("WRONG_ORGANIZATION");
-    const reason = qualification(answers);
+    // A partial repeat visit cannot replace a completed application or booking.
+    if (mode === "draft" && lead && (
+      ![config.potentialStatusId, config.tfnsStatusId].includes(lead.status_id) ||
+      ["Qualified", "Disqualified"].includes(String(lead[`custom.${config.fields.qualification}`] || "")) ||
+      ["Booked", "Rescheduled"].includes(String(lead[`custom.${config.fields.bookingStatus}`] || ""))
+    )) return { leadId: lead.id, created: false, protected: true };
+    const reason = mode === "submitted" ? qualification(answers) : null;
     const values: Record<string, unknown> = {
       ...answers,
       services: Array.isArray(answers.services)
         ? answers.services.join("; ")
         : answers.services,
-      qualification: reason ? "Disqualified" : "Qualified",
+      qualification: mode === "draft" ? "In progress" : reason ? "Disqualified" : "Qualified",
       reason: reason || "None",
       applicationId: id,
-      submittedAt,
+      submittedAt: mode === "submitted" ? submittedAt : undefined,
       environment:
         process.env.VERCEL_ENV === "production" ? "Production" : "Preview",
     };
@@ -145,7 +153,7 @@ export async function syncApplication(
       await closeApi(`lead/${lead.id}/`, "PUT", {
         ...custom,
         ...(reason ? { status_id: config.tfdqStatusId }
-          : lead.status_id === config.tfdqStatusId ? { status_id: config.potentialStatusId } : {}),
+          : (lead.status_id === config.tfnsStatusId || (mode === "submitted" && lead.status_id === config.tfdqStatusId)) ? { status_id: config.potentialStatusId } : {}),
       });
       const contact = lead.contacts.find((c) =>
         c.emails.some((e) => e.email.trim().toLowerCase() === email),
@@ -169,7 +177,7 @@ export async function syncApplication(
           await closeApi(`contact/${contact.id}/`, "PUT", patch);
       }
     }
-    await writeRecord(key, { leadId: lead!.id, creating: false }, record?.etag);
-    return { leadId: lead!.id, created };
+    await writeRecord(key, { leadId: lead!.id, creating: false, createdByApplication: created ? id : record?.value.createdByApplication }, record?.etag);
+    return { leadId: lead!.id, created: created || record?.value.createdByApplication === id };
   });
 }
