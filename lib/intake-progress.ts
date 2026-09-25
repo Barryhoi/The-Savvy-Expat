@@ -9,7 +9,7 @@ export function validateProgress(input: unknown): Answers {
   for (const q of questions.filter(q => !["name", "final"].includes(q.key))) {
     const value = source[q.key];
     if (value === undefined || value === "" || (Array.isArray(value) && !value.length)) {
-      if (["email", "phone"].includes(q.key)) throw new Error("MISSING_CONTACT");
+      if (q.key === "email") throw new Error("MISSING_CONTACT");
       continue;
     }
     const error = validateAnswer(q.key, value);

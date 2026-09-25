@@ -33,7 +33,8 @@ function eligible(id) { return { id: 'lead_test', organization_id: config.organi
 function seed(id, extra={}) { records.set('drafts/'+id, { value: { id, answers, revision: 1, updatedAt: new Date(at).toISOString(), leadId: 'lead_test', ...extra }, etag: 'v1' }); lead = eligible(id); }
 (async () => {
   assert.deepEqual(validateProgress(answers), answers);
-  assert.throws(() => validateProgress({ ...answers, phone: '' }));
+  assert.equal(validateProgress({ ...answers, phone: '' }).email, answers.email);
+  assert.throws(() => validateProgress({ ...answers, email: '' }));
   assert.throws(() => validateProgress({ ...answers, situation: 'invalid' }));
   assert.equal(abandonmentDue(new Date(at).toISOString(), at+ABANDONMENT_MS-1), false);
   assert.equal(abandonmentDue(new Date(at).toISOString(), at+ABANDONMENT_MS), true);

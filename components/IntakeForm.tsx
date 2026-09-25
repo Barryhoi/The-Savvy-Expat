@@ -84,10 +84,13 @@ export default function IntakeForm() {
   }, [step, rejected]);
 
   useEffect(() => {
-    if (!ready || busy || rejected || contactStep(answers) !== null) return;
+    if (!ready || busy || rejected || step < 2 || validateName(answers) || validateAnswer("email", answers.email)) return;
     let partial: Answers;
     const visited = new Set(["firstName", "lastName", "email", "phone", ...questions.slice(0, step + 1).map(q => q.key)]);
-    try { partial = validateProgress(Object.fromEntries(Object.entries(answers).filter(([key]) => visited.has(key)))); } catch { return; }
+    const draftAnswers = Object.fromEntries(Object.entries(answers).filter(([key]) => visited.has(key)));
+    // Capture the committed email even if the phone is still being typed.
+    if (validateAnswer("phone", draftAnswers.phone)) delete draftAnswers.phone;
+    try { partial = validateProgress(draftAnswers); } catch { return; }
     revision.current = Math.max(Date.now(), revision.current + 1);
     const payload = JSON.stringify({ id: submissionId, revision: revision.current, answers: partial });
     let active = true;
