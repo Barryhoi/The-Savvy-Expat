@@ -20,8 +20,12 @@ export async function syncBooking(
   const { resource: event } = await calendlyApi(
     providerPath(invitee.event, "event"),
   );
-  if (event.event_type !== (await resolveEventType()))
-    throw new Error("WRONG_EVENT");
+  if (event.event_type !== (await resolveEventType())) {
+    if (expectedApplicationId) throw new Error("WRONG_EVENT");
+    // Calendly subscriptions can include unrelated event types. Acknowledge
+    // those without touching Close or causing repeated webhook deliveries.
+    return { confirmed: false, ignored: true };
+  }
   const tracking = String(invitee.tracking?.utm_content || "");
   const match = tracking.match(/^se_([a-f0-9-]{36})$/);
   const previous =
