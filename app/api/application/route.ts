@@ -10,6 +10,7 @@ import {
 import { syncApplication } from "@/lib/close";
 import { limitApplication } from "@/lib/rate-limit";
 import { syncApplicationFollowups } from "@/lib/application-followups";
+import { queueUnbookedApplication } from "@/lib/intake-abandonment";
 import { syncTfdqFollowup } from "@/lib/tfdq-followup";
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -81,6 +82,7 @@ export async function POST(request: NextRequest) {
         saved.value = { ...saved.value, ...synced, synced: true };
         await writeRecord(applicationKey(body.id), saved.value, saved.etag);
       }
+      if (saved.value.qualified) await queueUnbookedApplication(saved.value.id);
       await syncTfdqFollowup(saved.value);
       await syncApplicationFollowups(saved.value);
       return saved.value;

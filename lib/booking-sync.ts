@@ -133,6 +133,14 @@ export async function syncBooking(
         },
         latest?.etag,
       );
+      // A verified booking always advances the production lead from TFNS to
+      // Booked. This status transition does not depend on newsletter/opportunity
+      // automation activation. Preview keeps existing downstream outreach quiet.
+      if (process.env.VERCEL_ENV === "production" && invitee.status === "active") {
+        await closeApi(`lead/${application.leadId}/`, "PUT", {
+          status_id: config.bookedStatusId,
+        });
+      }
       // Preview writes fields only: existing Make/Close follow-ups must not be
       // triggered by test data. Production automation activation is explicit.
       if (
@@ -168,9 +176,7 @@ export async function syncBooking(
             marker.etag,
           );
         }
-        await closeApi(`lead/${application.leadId}/`, "PUT", {
-          status_id: config.bookedStatusId,
-        });
+
       }
       if (
         process.env.VERCEL_ENV === "production" &&

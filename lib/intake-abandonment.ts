@@ -11,14 +11,7 @@ export async function saveProgress(id: string, revision: number, answers: Answer
     if (await getApplication(id)) return;
     const key = `drafts/${id}`;
     const saved = await readRecord<Draft>(key);
-    if (saved && saved.value.revision >= revision) {
-      // Repair a missing queue entry if the previous response failed after the
-      // draft write. Replays never move the inactivity deadline forward.
-      const pendingKey = `abandonment-pending/${id}`;
-      if (!saved.value.marked && !await readRecord(pendingKey))
-        await writeRecord(pendingKey, { id });
-      return;
-    }
+    if (saved && saved.value.revision >= revision) return;
     // Disqualification is submitted through the final application endpoint and
     // must never be classified as abandonment, even if that submit needs retry.
     const draft: Draft = { id, revision, answers, updatedAt: new Date().toISOString() };
@@ -28,35 +21,38 @@ export async function saveProgress(id: string, revision: number, answers: Answer
       draft.protected = "protected" in synced && synced.protected;
     }
     await writeRecord(key, draft, saved?.etag);
-    const pendingKey = `abandonment-pending/${id}`;
-    const pending = await readRecord(pendingKey);
-    await writeRecord(pendingKey, { id }, pending?.etag);
+
   });
+}
+export async function queueUnbookedApplication(id: string) {
+  const key = `abandonment-pending/${id}`;
+  const pending = await readRecord(key);
+  if (!pending) await writeRecord(key, { id });
 }
 export async function checkAbandonment(id: string, now = Date.now()) {
   return withLock(`application:${id}`, async () => {
-    const saved = await readRecord<Draft>(`drafts/${id}`);
-    const draft = saved?.value;
-    if (!draft || draft.marked || draft.protected || qualification(draft.answers) || await getApplication(id)) {
+    const receipt = await getApplication(id);
+    const application = receipt?.value;
+    // TFNS means a qualified, submitted application without a booked call.
+    // Old partial-form queue entries are discarded without changing CRM status.
+    if (!application || !application.qualified) {
       await removePendingDraft(id);
       return "excluded";
     }
-    if (!abandonmentDue(draft.updatedAt, now)) return "waiting";
-    if (!draft.leadId) throw new Error("DRAFT_MISSING_LEAD");
-    const email = String(draft.answers.email).trim().toLowerCase();
-    return withLock(`identity:${email}`, async () => {
-      const lead = await closeApi(`lead/${draft.leadId}/`) as Lead & Record<string, unknown>;
+    if (!application.synced || !application.leadId) return "waiting";
+    if (!abandonmentDue(application.submittedAt, now)) return "waiting";
+    const email = String(application.answers.email).trim().toLowerCase();
+    return withLock(`lead-booking:${application.leadId}`, () => withLock(`identity:${email}`, async () => {
+      const lead = await closeApi(`lead/${application.leadId}/`) as Lead;
       if (lead.organization_id !== config.organizationId) throw new Error("WRONG_ORGANIZATION");
-      // Protect other applications, bookings, and any manual pipeline movement.
       const eligible = lead[`custom.${config.fields.applicationId}`] === id &&
-        lead[`custom.${config.fields.qualification}`] === "In progress" &&
+        lead[`custom.${config.fields.qualification}`] === "Qualified" &&
         !["Booked", "Rescheduled"].includes(String(lead[`custom.${config.fields.bookingStatus}`])) &&
         [config.potentialStatusId, config.tfnsStatusId].includes(lead.status_id);
       if (eligible && lead.status_id !== config.tfnsStatusId)
         await closeApi(`lead/${lead.id}/`, "PUT", { status_id: config.tfnsStatusId });
-      await writeRecord(`drafts/${id}`, { ...draft, marked: true }, saved!.etag);
       await removePendingDraft(id);
       return eligible ? "marked" : "excluded";
-    });
+    }));
   });
 }

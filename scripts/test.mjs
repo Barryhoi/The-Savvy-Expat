@@ -13,6 +13,7 @@ try {
       "lib/booking-confirmation.ts",
       "lib/tfdq-followup.ts",
       "lib/intake-abandonment.ts",
+      "lib/booking-sync.ts",
       "--outDir",
       output,
       "--module",
@@ -25,7 +26,7 @@ try {
     ],
     { stdio: "inherit" },
   );
-  for (const file of ["intake", "webhook-signature", "booking-confirmation", "tfdq-followup", "intake-abandonment"])
+  for (const file of ["intake", "webhook-signature", "booking-confirmation", "tfdq-followup", "intake-abandonment", "booking-status"])
     execFileSync(process.execPath, [`tests/${file}.test.cjs`], {
       stdio: "inherit",
       env: { ...process.env, SAVVY_TEST_OUTPUT: output },
