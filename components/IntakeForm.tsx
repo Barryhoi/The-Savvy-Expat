@@ -155,7 +155,7 @@ export default function IntakeForm() {
   const title = q.title.replace(
     /\{\{field:[^}]+\}\}/g,
     String(answers.firstName || ""),
-  );
+  ).replace(/,\s*\?$/, "?");
   return (
     <section className="intake-card application-card" aria-busy={busy}>
       <div className="mb-8 flex items-center justify-between text-xs font-bold uppercase tracking-widest text-ink/50">

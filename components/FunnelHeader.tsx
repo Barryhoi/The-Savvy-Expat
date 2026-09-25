@@ -31,7 +31,7 @@ export default function FunnelHeader({ current }: { current: 1 | 2 | 3 }) {
             const done = step.n < current;
             const active = step.n === current;
             return (
-              <li key={step.n} className="flex items-center gap-2 sm:gap-3">
+              <li key={step.n} aria-label={step.label} aria-current={active ? "step" : undefined} className="flex items-center gap-2 sm:gap-3">
                 <span className="flex items-center gap-2">
                   <span
                     className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[0.7rem] font-black transition-colors ${

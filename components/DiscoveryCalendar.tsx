@@ -216,6 +216,7 @@ export default function DiscoveryCalendar({
               <button
                 onClick={() => {
                   setSelected(null);
+                  setChoice(null);
                   setFallback(false);
                   setError("");
                   setRetry((n) => n + 1);
