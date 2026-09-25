@@ -10,6 +10,7 @@ try {
       "node_modules/typescript/bin/tsc",
       "lib/intake.ts",
       "lib/webhook-signature.ts",
+      "lib/booking-confirmation.ts",
       "--outDir",
       output,
       "--module",
@@ -22,7 +23,7 @@ try {
     ],
     { stdio: "inherit" },
   );
-  for (const file of ["intake", "webhook-signature"])
+  for (const file of ["intake", "webhook-signature", "booking-confirmation"])
     execFileSync(process.execPath, [`tests/${file}.test.cjs`], {
       stdio: "inherit",
       env: { ...process.env, SAVVY_TEST_OUTPUT: output },

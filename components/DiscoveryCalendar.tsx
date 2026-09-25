@@ -1,5 +1,6 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { confirmBookingRequest } from "@/lib/booking-confirmation";
 type Slot = { start: string; url: string };
 const eventUrl =
   "https://calendly.com/sam-thesavvyexpat/expat-relocation-discovery-call";
@@ -113,12 +114,7 @@ export default function DiscoveryCalendar({
     setConfirming(true);
     setError("");
     try {
-      const response = await fetch("/api/booking/confirm", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ inviteeUri: uri }),
-      });
-      if (!response.ok) throw Error();
+      await confirmBookingRequest(uri);
       try {
         sessionStorage.removeItem("savvy-application-v1");
       } catch {}
