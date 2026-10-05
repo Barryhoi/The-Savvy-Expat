@@ -1,9 +1,11 @@
 "use client";
 import { useRef, useState } from "react";
 import { confirmBookingRequest } from "@/lib/booking-confirmation";
-export default function NativeBookingDetails({ application, start, zone, onBack }: {
-  application: { name: string; email: string; phone: string }; start: string; zone: string; onBack: () => void;
+import { timeZoneLabel } from "@/lib/timezones";
+export default function NativeBookingDetails({ application, start, zone, setterToken, onBack }: {
+  application: { id?: string; name: string; email: string; phone: string }; start: string; zone: string; setterToken?: string; onBack: () => void;
 }) {
+  const isSetterBooking = Boolean(setterToken);
   const [whatsapp, setWhatsapp] = useState("");
   const [notes, setNotes] = useState("");
   const [busy, setBusy] = useState(false);
@@ -19,7 +21,7 @@ export default function NativeBookingDetails({ application, start, zone, onBack 
       if (!invitee.current) {
         let response: Response;
         try {
-          response = await fetch("/api/booking/create", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ start, timezone: zone, whatsapp, notes }) });
+          response = await fetch("/api/booking/create", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ start, timezone: zone, whatsapp, notes, ...(setterToken ? { setterToken } : {}) }) });
         } catch { setPending(true); throw Error("We’re checking whether your booking went through. Wait a moment, then check again—please don’t book another appointment."); }
         let result;
         try { result = await response.json(); } catch { setPending(true); throw Error("We couldn’t read the booking response. Please check again before making another booking."); }
@@ -28,20 +30,20 @@ export default function NativeBookingDetails({ application, start, zone, onBack 
         invitee.current = result.inviteeUri;
       }
       setPending(true);
-      try { await confirmBookingRequest(invitee.current!); }
+      try { await confirmBookingRequest(invitee.current!, fetch, undefined, setterToken); }
       catch { throw Error("Your appointment is booked. We’re still saving the confirmation—please check again instead of booking twice."); }
       try { sessionStorage.removeItem("savvy-application-v1"); } catch {}
-      window.location.assign("/thank-you");
+      window.location.assign(setterToken ? "/setting/confirmed" : "/thank-you");
     } catch (e) { setError(e instanceof Error ? e.message : "Please try again shortly."); }
     finally { lock.current = false; setBusy(false); }
   }
   return <div className="native-confirmation">
     <h1>Confirm your call.</h1>
-    <div className="native-slot"><div><strong>{new Intl.DateTimeFormat("en", { timeZone: zone, weekday: "short", month: "short", day: "numeric" }).format(new Date(start))}</strong><p>{new Intl.DateTimeFormat("en", { timeZone: zone, hour: "numeric", minute: "2-digit" }).format(new Date(start))}<span className="native-zone">{zone.replaceAll("_", " ")}</span></p><span>30 min · Google Meet</span></div><button type="button" className="native-change" onClick={onBack} disabled={busy || pending} aria-label="Change date or time">Change</button></div>
+    <div className="native-slot"><div><strong>{new Intl.DateTimeFormat("en", { timeZone: zone, weekday: "short", month: "short", day: "numeric" }).format(new Date(start))}</strong><p>{new Intl.DateTimeFormat("en", { timeZone: zone, hour: "numeric", minute: "2-digit" }).format(new Date(start))}<span className="native-zone">{timeZoneLabel(zone)}</span></p><span>30 min · Google Meet</span></div><button type="button" className="native-change" onClick={onBack} disabled={busy || pending} aria-label="Change date or time">Change</button></div>
     <div className="native-recipient"><strong>{application.name}</strong><p>Confirmation to <span>{application.email}</span></p><div className="native-contact-summary"><span>Contact details</span><p>{application.phone}</p></div></div>
     <form onSubmit={submit}>
       <fieldset disabled={busy || pending} className="native-whatsapp"><legend>Do you have WhatsApp?</legend><div>{["Yes", "No"].map(value => <label key={value} className={whatsapp === value ? "chosen" : ""}><input required type="radio" name="whatsapp" value={value} checked={whatsapp === value} onChange={() => setWhatsapp(value)} />{value}</label>)}</div></fieldset>
-      <label className="native-notes"><span className="native-note-label"><span aria-hidden="true">▾</span> Add a note <span className="native-optional-label">(optional)</span></span><textarea aria-label="Anything else you’d like us to know?" maxLength={2000} rows={3} value={notes} onChange={e => setNotes(e.target.value)} disabled={busy || pending} placeholder="Anything helpful for our call?" /></label>
+      <label className="native-notes"><span className="native-note-label"><span aria-hidden="true">▾</span> {isSetterBooking ? "Add a note for Sam" : "Add a note"} <span className="native-optional-label">(optional)</span></span><textarea aria-label="What would be helpful for us to know before the call?" maxLength={2000} rows={3} value={notes} onChange={e => setNotes(e.target.value)} disabled={busy || pending} placeholder="What would be helpful for us to know before the call?" /></label>
       {error && <p className="calendar-error" role="alert">{error}</p>}
       <button className="native-confirm-button" disabled={busy || (!pending && !whatsapp)} type="submit">{busy ? "Confirming your booking…" : pending ? "Check booking status" : "Confirm booking"}<span aria-hidden="true">→</span></button>
       <p className="native-terms">By booking, you agree to Calendly’s <a href="https://calendly.com/legal/participant-terms-conditions" target="_blank" rel="noopener noreferrer">Participant Terms</a> and <a href="https://calendly.com/privacy" target="_blank" rel="noopener noreferrer">Privacy Notice</a>.</p>

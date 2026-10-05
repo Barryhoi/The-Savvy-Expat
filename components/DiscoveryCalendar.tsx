@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import NativeBookingDetails from "./NativeBookingDetails";
+import { getTimeZones, timeZoneLabel } from "@/lib/timezones";
 type Slot = { start: string; url: string };
 const eventUrl =
   "https://calendly.com/sam-thesavvyexpat/expat-relocation-discovery-call";
@@ -14,11 +15,13 @@ function dateKey(value: string, zone: string) {
 }
 export default function DiscoveryCalendar({
   application,
+  setterToken,
 }: {
   application: { id: string; name: string; email: string; phone: string };
+  setterToken?: string;
 }) {
   const [zone, setZone] = useState("UTC"),
-    [zones, setZones] = useState<string[]>(["UTC"]);
+    [zones, setZones] = useState(() => getTimeZones("UTC"));
   const [slots, setSlots] = useState<Slot[]>([]),
     [date, setDate] = useState(""),
     [selected, setSelected] = useState<Slot | null>(null);
@@ -33,25 +36,15 @@ export default function DiscoveryCalendar({
   useEffect(() => {
     const local = Intl.DateTimeFormat().resolvedOptions().timeZone;
     setZone(local);
-    const supported = (
-      Intl as unknown as { supportedValuesOf?: (key: string) => string[] }
-    ).supportedValuesOf?.("timeZone") || [
-      local,
-      "UTC",
-      "America/New_York",
-      "America/Los_Angeles",
-      "Europe/London",
-      "Asia/Manila",
-      "Asia/Bangkok",
-      "Australia/Sydney",
-    ];
-    setZones(Array.from(new Set([local, "UTC", ...supported])));
+    const supported = (Intl as unknown as { supportedValuesOf?: (key: string) => string[] })
+      .supportedValuesOf?.("timeZone");
+    setZones(getTimeZones(local, supported));
   }, []);
   useEffect(() => {
     const controller = new AbortController();
     setLoading(true);
     setError("");
-    fetch("/api/booking/availability", { signal: controller.signal })
+    fetch(`/api/booking/availability${setterToken ? `?setter=${encodeURIComponent(setterToken)}` : ""}`, { signal: controller.signal })
       .then(async (r) => {
         const j = await r.json();
         if (!r.ok) throw Error(j.error);
@@ -64,7 +57,7 @@ export default function DiscoveryCalendar({
         if (!controller.signal.aborted) setLoading(false);
       });
     return () => controller.abort();
-  }, [retry]);
+  }, [retry, setterToken]);
   useEffect(() => {
     if (date) {
       times.current?.focus({ preventScroll: true });
@@ -81,7 +74,7 @@ export default function DiscoveryCalendar({
     const url = new URL(base);
     url.searchParams.set("primary_color", "4934fb");
     url.searchParams.set("timezone", zone);
-    url.searchParams.set("utm_content", `se_${application.id}`);
+    url.searchParams.set("utm_content", setterToken ? `setter_${application.id}` : `se_${application.id}`);
     if (application.name) url.searchParams.set("name", application.name);
     if (application.email) url.searchParams.set("email", application.email);
     if (application.phone) url.searchParams.set("a2", application.phone);
@@ -118,7 +111,7 @@ export default function DiscoveryCalendar({
                       return <button key={day} disabled={!available || loading} aria-label={`${formatDay(day, {weekday: "long", month: "long", day: "numeric"})}, ${available ? "times available" : "no times available"}`} aria-pressed={day === activeDate} className={day === activeDate ? "calendar-day selected" : "calendar-day"} onClick={() => {setDate(day);setChoice(null);}}>{i + 1}</button>;
                     })}
                   </div>
-                  <label className="calendar-zone"><span>Time zone</span><select value={zone} onChange={e => {setZone(e.target.value);setDate("");setMonth("");setChoice(null);}}>{zones.map(z => <option key={z} value={z}>{z.replaceAll("_", " ")}</option>)}</select></label>
+                  <label className="calendar-zone"><span>Time zone</span><select value={zone} onChange={e => {setZone(e.target.value);setDate("");setMonth("");setChoice(null);}}><optgroup label="Common U.S. time zones">{zones.common.map(z => <option key={z} value={z}>{timeZoneLabel(z)}</option>)}</optgroup><optgroup label="Other time zones">{zones.additional.map(z => <option key={z} value={z}>{timeZoneLabel(z)}</option>)}</optgroup></select></label>
                   <p className="calendar-caption">All times are shown in your time zone.</p>
                 </div>
                 <div className="times-panel">
@@ -136,7 +129,7 @@ export default function DiscoveryCalendar({
             </>
           ) : (
             <div className="booking-details outline-none" tabIndex={-1} ref={details}>
-              <NativeBookingDetails application={application} start={selected.start} zone={zone} onBack={() => { setSelected(null); setChoice(null); setError(""); setRetry(n => n + 1); }} />
+              <NativeBookingDetails application={application} start={selected.start} zone={zone} setterToken={setterToken} onBack={() => { setSelected(null); setChoice(null); setError(""); setRetry(n => n + 1); }} />
             </div>
           )}
       </section>

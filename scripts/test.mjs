@@ -14,6 +14,8 @@ try {
       "lib/intake-abandonment.ts",
       "lib/booking-sync.ts",
       "lib/native-booking.ts",
+      "lib/setting-validation.ts",
+      "lib/timezones.ts",
       "--outDir",
       output,
       "--module",
@@ -26,7 +28,7 @@ try {
     ],
     { stdio: "inherit" },
   );
-  for (const file of ["intake", "webhook-signature", "booking-confirmation", "intake-abandonment", "booking-status", "intake-status", "native-booking"])
+  for (const file of ["intake", "webhook-signature", "booking-confirmation", "intake-abandonment", "booking-status", "intake-status", "native-booking", "setting-validation", "timezones"])
     execFileSync(process.execPath, [`tests/${file}.test.cjs`], {
       stdio: "inherit",
       env: { ...process.env, SAVVY_TEST_OUTPUT: output },

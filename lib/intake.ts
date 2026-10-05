@@ -28,6 +28,7 @@ export const rejectionRules = {
   situation: "I'm at an early stage and mainly looking for advice",
   commitment: "Unsure - still weighing options",
   timeline: "12+ months from now",
+  funds: "No",
   logistics: "I'm not ready to move forward, still finalizing logistics",
 } as const;
 export type Rejection = keyof typeof rejectionRules;

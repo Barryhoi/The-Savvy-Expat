@@ -860,3 +860,45 @@ details[open] .accordion-body {
 @media(max-width:700px) {
   .booking-simple .time-list { height:auto; overflow:visible; overscroll-behavior:auto; }
 }
+
+/* Setter desk: a focused, responsive internal workflow using the public-site brand. */
+.setter-main { min-height:100vh; padding:clamp(32px,8vh,88px) 20px 56px; background:radial-gradient(850px 520px at 50% 0%,#f8f6ff 0%,transparent 70%),#e9e7f4; }
+.setter-shell { width:min(100%,620px); margin:0 auto; }
+.setter-heading { text-align:center; margin-bottom:30px; }
+.setter-kicker { color:#4934fb; font-size:11px; font-weight:800; letter-spacing:1.8px; }
+.setter-heading h1,.setter-confirmed h1 { margin-top:12px; color:#041630; font-size:clamp(30px,5vw,42px); line-height:1.12; letter-spacing:-1.3px; font-weight:850; }
+.setter-heading>p { max-width:460px; margin:12px auto 0; color:#59657b; font-size:16px; line-height:1.65; }
+.setter-card,.setter-confirmed { border:1px solid #e2deef; border-radius:20px; background:#fff; padding:clamp(22px,5vw,36px); box-shadow:0 24px 65px #24194a0d; }
+.setter-card-heading { display:flex; align-items:flex-start; gap:15px; margin-bottom:28px; }
+.setter-card-heading>span { display:grid; place-items:center; flex:none; width:36px; height:36px; border-radius:50%; background:#f0edff; color:#4934fb; font-weight:800; }
+.setter-card-heading h2 { color:#041630; font-size:21px; font-weight:750; letter-spacing:-.35px; }
+.setter-card-heading p { color:#647087; font-size:14px; line-height:1.55; margin-top:5px; }
+.setter-form { display:grid; gap:20px; }
+.setter-form>label { display:grid; gap:8px; color:#07172f; font-size:14px; font-weight:700; }
+.setter-form input { box-sizing:border-box; width:100%; min-height:52px; border:1px solid #d8d7e5; border-radius:10px; background:#fff; padding:13px 15px; color:#07172f; font:inherit; font-size:16px; font-weight:450; outline:none; }
+.setter-form input:focus { border-color:#4934fb; box-shadow:0 0 0 3px #4934fb1a; }
+.setter-form input::placeholder { color:#9299a8; }
+.setter-phone { display:flex; align-items:center; border:1px solid #d8d7e5; border-radius:10px; padding-left:13px; }
+.setter-phone:focus-within { border-color:#4934fb; box-shadow:0 0 0 3px #4934fb1a; }
+.setter-phone>span { flex:none; color:#59657b; font-size:14px; font-weight:600; }
+.setter-phone input { border:0; box-shadow:none!important; }
+.setter-form small { margin-top:-4px; color:#70798b; font-size:12px; font-weight:450; }
+.setter-primary,.setter-secondary { display:flex; align-items:center; justify-content:space-between; gap:16px; width:100%; min-height:54px; padding:14px 18px; border-radius:11px; font-size:16px; font-weight:750; cursor:pointer; transition:background .15s,transform .15s; }
+.setter-primary { margin-top:4px; background:#4934fb; color:#fff; box-shadow:0 6px 18px #4934fb20; }
+.setter-primary:hover:not(:disabled) { background:#3924df; transform:translateY(-1px); }
+.setter-primary:disabled { opacity:.65; cursor:wait; }
+.setter-secondary { border:1px solid #ded8ff; background:#f5f2ff; color:#4934fb; }
+.setter-secondary:hover { background:#eeeaff; }
+.setter-actions { display:grid; gap:12px; }
+.setter-error,.setter-success { border-radius:10px; padding:13px 15px; font-size:14px; line-height:1.5; }
+.setter-error { background:#fff1f1; color:#9f2525; }
+.setter-success { margin-top:15px; background:#effaf3; color:#27633c; }
+.setter-reset { display:block; margin:22px auto 0; min-height:42px; color:#59657b; font-size:14px; text-decoration:underline; text-underline-offset:3px; }
+.setter-back { display:block; min-height:44px; margin:0 0 12px; color:#4934fb; font-size:14px; font-weight:700; }
+.setter-footnote { max-width:460px; margin:20px auto 0; color:#70798b; text-align:center; font-size:12px; line-height:1.6; }
+.setter-confirmed { width:min(100%,560px); margin:8vh auto; text-align:center; padding:42px 32px; }
+.setter-confirmed>span { display:grid; place-items:center; width:52px; height:52px; margin:0 auto 22px; border-radius:50%; background:#4934fb; color:#fff; font-size:28px; font-weight:700; }
+.setter-confirmed>p:not(.setter-kicker) { max-width:400px; margin:16px auto 22px; color:#59657b; font-size:16px; line-height:1.7; }
+.setter-confirmed>a { color:#4934fb; font-weight:700; text-decoration:underline; text-underline-offset:3px; }
+.setter-main button:focus-visible,.setter-main a:focus-visible { outline:3px solid #8b7aff; outline-offset:3px; }
+@media(max-width:500px) { .setter-main { padding:32px 14px 40px; } .setter-heading { margin-bottom:22px; } .setter-heading>p { font-size:15px; } .setter-card { border-radius:16px; padding:22px 18px; } .setter-card-heading { gap:12px; margin-bottom:22px; } .setter-card-heading h2 { font-size:19px; } .setter-confirmed { margin:3vh auto; padding:34px 22px; } }

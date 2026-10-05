@@ -36,7 +36,6 @@ for (const [key, value] of Object.entries(rejectionRules)) {
 }
 for (const patch of [
   { budget: "Under $1,000" },
-  { funds: "No" },
   { funds: "I have the funds but they're tied up right now" },
   { timeline: "6 months - 1 year from now" },
   { motivation: "To visit" },
@@ -45,6 +44,7 @@ for (const patch of [
 
 ])
   assert.equal(qualification(validateSubmission({ ...base, ...patch })), null);
+assert.equal(qualification(validateSubmission({ ...base, funds: "No" })), "funds");
 for (const key of [
   "firstName",
   "lastName",

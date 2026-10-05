@@ -5,6 +5,7 @@ export async function confirmBookingRequest(
   request: typeof fetch = fetch,
   pause: (ms: number) => Promise<void> = (ms) =>
     new Promise((resolve) => setTimeout(resolve, ms)),
+  setterToken?: string,
 ) {
   for (let attempt = 0; attempt < 5; attempt++) {
     let response: Response | undefined;
@@ -12,7 +13,7 @@ export async function confirmBookingRequest(
       response = await request("/api/booking/confirm", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ inviteeUri }),
+        body: JSON.stringify({ inviteeUri, ...(setterToken ? { setterToken } : {}) }),
       });
     } catch {
       // A dropped response is safe to retry with the same invitee identity.
