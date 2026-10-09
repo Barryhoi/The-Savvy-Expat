@@ -44,7 +44,18 @@ export async function checkAbandonment(id: string, now = Date.now()) {
     if (!abandonmentDue(application.submittedAt, now)) return "waiting";
     const email = String(application.answers.email).trim().toLowerCase();
     return withLock(`identity:${email}`, () => withLock(`lead-booking:${application.leadId}`, async () => {
-      const lead = await closeApi(`lead/${application.leadId}/`) as Lead;
+      let lead: Lead;
+      try {
+        lead = await closeApi(`lead/${application.leadId}/`) as Lead;
+      } catch (error) {
+        // A lead deleted in Close (e.g. test cleanup) can never become TFNB.
+        // Drop it from the queue instead of failing every sweep from now on.
+        if (error instanceof Error && error.message === "CLOSE_404") {
+          await removePendingDraft(id);
+          return "excluded";
+        }
+        throw error;
+      }
       if (lead.organization_id !== config.organizationId) throw new Error("WRONG_ORGANIZATION");
       const identity = await readRecord<{ applicationId?: string }>(`identities/${digest(email)}`);
       const legacyApplicationField = config.legacyFields?.applicationId;

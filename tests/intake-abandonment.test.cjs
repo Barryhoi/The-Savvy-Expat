@@ -19,6 +19,7 @@ Module._load = function(id, ...args) {
     syncApplication: async (id, answers, at, mode) => { assert.equal(mode, 'draft'); syncCount++; return { leadId: 'lead_test' }; },
     closeApi: async (url, method, body) => {
       assert.match(url, /^lead\//, 'TFNB must never create tasks or outreach');
+      if (lead === 'deleted') throw new Error('CLOSE_404');
       if (method === 'PUT') { patches.push(body); Object.assign(lead, body); }
       return lead;
     },
@@ -65,6 +66,12 @@ function seed(id, extra={}) { records.set('drafts/'+id, { value: { id, answers, 
   records.set('lead-bookings/lead_test', { value: { applicationId: 'older-form', status: 'active' } });
   assert.equal(await checkAbandonment('new-after-old-booking', at+ABANDONMENT_MS), 'marked');
   assert.equal(lead.status_id, config.tfnbStatusId, 'old booking cannot suppress TFNB');
+  seed('deleted-lead'); applications.set('deleted-lead', submitted('deleted-lead'));
+  records.set('abandonment-pending/deleted-lead', { value: { id: 'deleted-lead' } });
+  lead = 'deleted';
+  assert.equal(await checkAbandonment('deleted-lead', at+ABANDONMENT_MS), 'excluded', 'lead deleted in Close is dropped, not retried forever');
+  assert.ok(removed.includes('deleted-lead'));
+  lead = eligible('resume');
   await saveProgress('resume', 10, answers);
   const first = records.get('drafts/resume').value;
   await saveProgress('resume', 9, { ...answers, firstName: 'stale' });
