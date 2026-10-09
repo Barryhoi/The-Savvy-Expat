@@ -10,6 +10,19 @@ import config from "./close-fields.json";
 import { syncApplicationFollowups } from "./application-followups";
 import { digest, readRecord, withLock, writeRecord } from "./receipt-store";
 
+// Statuses a verified booking may move to Booked. Newsletter-survey leads
+// (BHS HOT/Warm/Cold, NO ANSWER - BHS) count as pre-call; any later sales
+// stage set by hand is preserved.
+const BOOKABLE_STATUS_IDS: string[] = [
+  config.potentialStatusId,
+  config.tfsStatusId,
+  config.tfnbStatusId,
+  config.tfdqStatusId,
+  config.bookedStatusId,
+  config.canceledStatusId,
+  ...config.bhsStatusIds,
+];
+
 export async function syncBooking(
   inviteeUri: string,
   expectedApplicationId?: string,
@@ -107,7 +120,7 @@ export async function syncBooking(
       )
         return;
       const stagePatch: Record<string, string> = {};
-      if (invitee.status === "active" && [config.potentialStatusId, config.tfsStatusId, config.tfnbStatusId, config.tfdqStatusId, config.bookedStatusId, config.canceledStatusId].includes(current.status_id))
+      if (invitee.status === "active" && BOOKABLE_STATUS_IDS.includes(current.status_id))
         stagePatch.status_id = config.bookedStatusId;
       if (invitee.status === "canceled" && !invitee.rescheduled && current.status_id === config.bookedStatusId)
         stagePatch.status_id = config.canceledStatusId;
@@ -201,7 +214,7 @@ async function syncSetterBooking(invitee: any, inviteeUri: string, id: string) {
       const older = latest && Date.parse(invitee.created_at) < Date.parse(latest.value.createdAt);
       if (older || (invitee.status !== "active" && latest && latest.value.inviteeUri !== inviteeUri)) return;
       const stagePatch: Record<string, string> = {};
-      if (invitee.status === "active" && [config.potentialStatusId, config.tfsStatusId, config.tfnbStatusId, config.tfdqStatusId, config.bookedStatusId, config.canceledStatusId].includes(current.status_id))
+      if (invitee.status === "active" && BOOKABLE_STATUS_IDS.includes(current.status_id))
         stagePatch.status_id = config.bookedStatusId;
       if (invitee.status === "canceled" && !invitee.rescheduled && current.status_id === config.bookedStatusId)
         stagePatch.status_id = config.canceledStatusId;

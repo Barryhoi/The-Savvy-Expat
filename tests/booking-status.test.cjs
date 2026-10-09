@@ -52,6 +52,11 @@ const { syncBooking } = require(path.join(process.env.SAVVY_TEST_OUTPUT, 'bookin
   records.set('bookings/invitee_previously_synced', { value: { updatedAt: '2026-09-25T00:00:00Z', synced: true } });
   await syncBooking('invitee_previously_synced', id);
   assert.equal(status, config.bookedStatusId, 'legacy successful preview booking replays once to repair the missing stage transition');
+  for (const bhs of config.bhsStatusIds) {
+    records.clear(); writes.length = 0; status = bhs;
+    await syncBooking('invitee_bhs_'+bhs, id);
+    assert.equal(status, config.bookedStatusId, 'newsletter-survey lead that books moves to Booked');
+  }
   records.clear(); writes.length = 0; currentApplication = 'newer-application';
   process.env.VERCEL_ENV = 'production';
   await syncBooking('invitee_old_late', id);

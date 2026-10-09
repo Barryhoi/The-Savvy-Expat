@@ -23,5 +23,11 @@
   "tfdqStatusId": "stat_WzMDyir894slPw5WHK8mrsKdm5TqqNLgxbtpe5advll",
   "tfnsStatusId": "stat_bmPa0jISJvTQgFp5iwrLiDP3U4LqOF30mfJOVzUH7l6",
   "tfsStatusId": "stat_ij55sAYbHpHkUY2BFOxWq2iBCgjimScspGB3gCAYmak",
-  "tfnbStatusId": "stat_B2v4QecIUQ8wQYfXpd1OwYeB7rc0pX3Rtv6e95MlsyD"
+  "tfnbStatusId": "stat_B2v4QecIUQ8wQYfXpd1OwYeB7rc0pX3Rtv6e95MlsyD",
+  "bhsStatusIds": [
+    "stat_2GzbZXyyUUBlYLy5dTQGjUXidDIAYDL3adSInjCbDWm",
+    "stat_giPt4N0ya910Owwjsb3ct9ngv9c9PcWIzs1ica4E6TO",
+    "stat_09bKuP35aM9jR4euZF3nynnfjTdcgTIzdzux0Nxk8Vn",
+    "stat_EBu8ns7BuwSsfzEZULwVLRwygLCDvCEghQb3710M3gh"
+  ]
 }
