@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     const code = error instanceof Error ? error.message : "UNKNOWN";
     const messages: Record<string, string> = {
-      INVALID_CONTACT: "Check the name, email, and 10-digit US phone number, then try again.",
+      INVALID_CONTACT: "Check the name, email, and phone number (start non-US numbers with + and the country code), then try again.",
       ALREADY_BOOKED: "This person already has an active discovery call booked in Close.",
       AMBIGUOUS_EMAIL: "Close has more than one lead with this email. Please resolve the duplicate before booking.",
       WRONG_ORGANIZATION: "That lead belongs to a different Close organization.",

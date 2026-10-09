@@ -55,13 +55,22 @@ export function contactStep(answers: Answers): number | null {
   return null;
 }
 // US is the default: accept local formatting and an optional leading 1.
+// Numbers starting with + or 00 are international and keep their country code.
 export function normalizePhone(value: unknown): string | null {
   if (typeof value !== "string" || !/^\+?[\d\s().-]+$/.test(value.trim())) return null;
+  const trimmed = value.trim();
   const digits = value.replace(/\D/g, "");
+  if (trimmed.startsWith("+") || trimmed.startsWith("00")) {
+    const international = trimmed.startsWith("+") ? digits : digits.slice(2);
+    if (international.startsWith("1")) return international.length === 11 ? `+${international}` : null;
+    return /^[2-9]\d{7,14}$/.test(international) ? `+${international}` : null;
+  }
   if (digits.length === 10) return `+1${digits}`;
   if (digits.length === 11 && digits.startsWith("1")) return `+${digits}`;
   return null;
 }
+export const PHONE_ERROR =
+  "Please enter a valid phone number. Outside the US? Start with + and your country code.";
 export function validateAnswer(key: string, value: unknown): string | null {
   const q = questions.find((q) => q.key === key);
   if (!q || key === "final" || key === "name") return null;
@@ -71,7 +80,7 @@ export function validateAnswer(key: string, value: unknown): string | null {
     (Array.isArray(value) && !value.length);
   if (empty) return q.required
     ? key === "email" ? "Please enter your email address."
-      : key === "phone" ? "Please enter your 10-digit US phone number."
+      : key === "phone" ? PHONE_ERROR
       : "Please choose an answer to continue."
     : null;
   if (q.multiple) {
@@ -88,7 +97,7 @@ export function validateAnswer(key: string, value: unknown): string | null {
     if (key === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim()))
       return "Please enter a valid email address.";
     if (key === "phone" && !normalizePhone(value))
-      return "Please enter your 10-digit US phone number.";
+      return PHONE_ERROR;
   }
   return null;
 }

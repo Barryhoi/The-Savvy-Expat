@@ -82,8 +82,11 @@ for (const key of ["firstName", "lastName", "email", "phone"]) {
     }
   }
 }
-for (const phone of ["+++++++", "+( )....", "202555014", "+1234567890123456"]) {
+for (const phone of ["+++++++", "+( )....", "202555014", "+1234567890123456", "+44 12345", "+1 720 810 989", "+0 1234 5678", "972502260229"]) {
   assert.throws(() => validateSubmission({ ...base, phone }));
+}
+for (const [phone, expected] of [["+44 7700 900123", "+447700900123"], ["+972 50-226-0229", "+972502260229"], ["0061 412 345 678", "+61412345678"], ["+63 917 123 4567", "+639171234567"]]) {
+  assert.equal(validateSubmission({ ...base, phone }).phone, expected);
 }
 for (const phone of ["7208109892", "17208109892", "+17208109892", "(720) 810-9892", "1 (720) 810-9892"]) {
   assert.equal(validateSubmission({ ...base, phone }).phone, "+17208109892");
