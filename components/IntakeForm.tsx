@@ -15,9 +15,11 @@ import {
 
 import { validateProgress } from "@/lib/intake-progress";
 import { readAttribution } from "@/lib/attribution";
+import PhoneInput from "@/components/PhoneInput";
+import type { CountryCode } from "@/lib/phone";
 
 const STORAGE = "savvy-application-v1";
-export default function IntakeForm() {
+export default function IntakeForm({ defaultCountry = "US" }: { defaultCountry?: CountryCode }) {
   const [answers, setAnswers] = useState<Answers>({});
   const [step, setStep] = useState(0);
   const [ready, setReady] = useState(false);
@@ -339,6 +341,20 @@ export default function IntakeForm() {
                 <p className="text-sm text-ink/55">Choose all that apply.</p>
               )}
             </div>
+          ) : q.key === "phone" ? (
+            <PhoneInput
+              value={String(answers.phone || "")}
+              onChange={(v) => change("phone", v)}
+              defaultCountry={defaultCountry}
+              inputProps={{
+                "aria-labelledby": "question-title",
+                "aria-invalid": !!error,
+                "aria-describedby": error ? "form-error" : undefined,
+                required: q.required,
+                className: "intake-input",
+                placeholder: "Phone number",
+              }}
+            />
           ) : (
             <input
               aria-labelledby="question-title"

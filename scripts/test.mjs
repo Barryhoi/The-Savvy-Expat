@@ -31,7 +31,8 @@ try {
   for (const file of ["intake", "webhook-signature", "booking-confirmation", "intake-abandonment", "booking-status", "intake-status", "native-booking", "setting-validation", "timezones"])
     execFileSync(process.execPath, [`tests/${file}.test.cjs`], {
       stdio: "inherit",
-      env: { ...process.env, SAVVY_TEST_OUTPUT: output },
+      // Compiled tests live in a temp dir; let them resolve the app's packages.
+      env: { ...process.env, SAVVY_TEST_OUTPUT: output, NODE_PATH: join(process.cwd(), "node_modules") },
     });
 } finally {
   rmSync(output, { recursive: true, force: true });

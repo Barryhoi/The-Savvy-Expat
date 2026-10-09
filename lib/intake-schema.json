@@ -21,7 +21,7 @@
     {
       "key": "phone",
       "title": "What’s your phone number?",
-      "description": "US numbers get +1 automatically. Outside the US? Start with + and your country code.",
+      "description": "Pick your country, then enter your number.",
       "type": "phone_number",
       "required": true,
       "choices": [],

@@ -902,3 +902,22 @@ details[open] .accordion-body {
 .setter-confirmed>a { color:#4934fb; font-weight:700; text-decoration:underline; text-underline-offset:3px; }
 .setter-main button:focus-visible,.setter-main a:focus-visible { outline:3px solid #8b7aff; outline-offset:3px; }
 @media(max-width:500px) { .setter-main { padding:32px 14px 40px; } .setter-heading { margin-bottom:22px; } .setter-heading>p { font-size:15px; } .setter-card { border-radius:16px; padding:22px 18px; } .setter-card-heading { gap:12px; margin-bottom:22px; } .setter-card-heading h2 { font-size:19px; } .setter-confirmed { margin:3vh auto; padding:34px 22px; } }
+
+/* Phone: country picker + number. The native <select> sits invisibly over the
+   flag/code face so phones get their own picker wheel/sheet. */
+.phone-row { display:flex; gap:8px; align-items:stretch; }
+.phone-country { position:relative; flex:none; display:flex; }
+.phone-country-face { display:flex; align-items:center; gap:7px; min-height:56px; padding:0 12px; border:1px solid #d9d9e5; border-radius:12px; background:#fff; color:#041630; font-size:16px; font-weight:600; white-space:nowrap; }
+.phone-country-face svg { color:#7a8296; }
+.phone-flag { font-size:20px; line-height:1; }
+.phone-country select { position:absolute; inset:0; width:100%; height:100%; opacity:0; cursor:pointer; font-size:16px; }
+.phone-country:focus-within .phone-country-face { outline:3px solid #4934fb; outline-offset:3px; }
+.phone-number { flex:1; min-width:0; }
+.phone-preview { min-height:1.45em; margin-top:10px; color:#526078; font-size:14px; line-height:1.45; }
+.phone-preview strong { color:#041630; font-weight:700; }
+.application-card .phone-country-face { border:0; border-bottom:2px solid #dcd9ec; border-radius:5px 5px 0 0; background:#faf9fe; transition:border-color .15s; }
+.application-card .phone-country:focus-within .phone-country-face { outline:none; border-color:#4934fb; }
+.setter-field { display:grid; gap:8px; color:#07172f; font-size:14px; font-weight:700; }
+.setter-form .phone-country-face { min-height:52px; border-color:#d8d7e5; border-radius:10px; }
+.setter-form .phone-country:focus-within .phone-country-face { outline:none; border-color:#4934fb; box-shadow:0 0 0 3px #4934fb1a; }
+.setter-form .phone-preview { margin-top:0; font-size:13px; font-weight:450; }

@@ -1,4 +1,5 @@
 import schema from "./intake-schema.json";
+import { normalizePhone, PHONE_ERROR } from "./phone";
 
 export const questions = schema.questions;
 // Display copy is separate from the original answer values used by qualification,
@@ -54,23 +55,7 @@ export function contactStep(answers: Answers): number | null {
   if (validateAnswer("phone", answers.phone)) return 2;
   return null;
 }
-// US is the default: accept local formatting and an optional leading 1.
-// Numbers starting with + or 00 are international and keep their country code.
-export function normalizePhone(value: unknown): string | null {
-  if (typeof value !== "string" || !/^\+?[\d\s().-]+$/.test(value.trim())) return null;
-  const trimmed = value.trim();
-  const digits = value.replace(/\D/g, "");
-  if (trimmed.startsWith("+") || trimmed.startsWith("00")) {
-    const international = trimmed.startsWith("+") ? digits : digits.slice(2);
-    if (international.startsWith("1")) return international.length === 11 ? `+${international}` : null;
-    return /^[2-9]\d{7,14}$/.test(international) ? `+${international}` : null;
-  }
-  if (digits.length === 10) return `+1${digits}`;
-  if (digits.length === 11 && digits.startsWith("1")) return `+${digits}`;
-  return null;
-}
-export const PHONE_ERROR =
-  "Please enter a valid phone number. Outside the US? Start with + and your country code.";
+export { normalizePhone, PHONE_ERROR } from "./phone";
 export function validateAnswer(key: string, value: unknown): string | null {
   const q = questions.find((q) => q.key === key);
   if (!q || key === "final" || key === "name") return null;

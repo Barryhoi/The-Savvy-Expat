@@ -1,3 +1,5 @@
+import { normalizePhone } from "./phone";
+
 export type SetterContactInput = {
   name: string;
   email: string;
@@ -14,18 +16,7 @@ export function validateSetterContact(input: unknown): SetterContactInput {
     throw new Error("INVALID_CONTACT");
   if (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
     throw new Error("INVALID_CONTACT");
-  if (!/^\+?[\d\s().-]+$/.test(rawPhone)) throw new Error("INVALID_CONTACT");
-  const digits = rawPhone.replace(/\D/g, "");
-  // + or 00 marks an international number that keeps its own country code.
-  if (rawPhone.startsWith("+") || rawPhone.startsWith("00")) {
-    const international = rawPhone.startsWith("+") ? digits : digits.slice(2);
-    if (!international.startsWith("1")) {
-      if (!/^[2-9]\d{7,14}$/.test(international)) throw new Error("INVALID_CONTACT");
-      return { name, email, phone: `+${international}` };
-    }
-  }
-  const national = digits.length === 11 && digits.startsWith("1") ? digits.slice(1) : digits;
-  if (national.length !== 10 || !/^[2-9]\d{2}[2-9]\d{6}$/.test(national))
-    throw new Error("INVALID_CONTACT");
-  return { name, email, phone: `+1${national}` };
+  const phone = normalizePhone(rawPhone);
+  if (!phone) throw new Error("INVALID_CONTACT");
+  return { name, email, phone };
 }
