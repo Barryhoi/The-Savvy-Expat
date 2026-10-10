@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, type FormEvent, type ReactNode } from "react";
+import PhoneInput from "@/components/PhoneInput";
+import { normalizePhone, PHONE_ERROR, type CountryCode } from "@/lib/phone";
 
 const TIMELINE_OPTIONS = [
   "Within the next 6 months",
@@ -26,9 +28,11 @@ type Status = "idle" | "loading" | "error";
  * page-level heading and copy for this step live in SubscribeFlow. */
 export default function SubscribeSurvey({
   email,
+  defaultCountry,
   onComplete,
 }: {
   email: string;
+  defaultCountry: CountryCode;
   onComplete: () => void;
 }) {
   const [firstName, setFirstName] = useState("");
@@ -44,6 +48,13 @@ export default function SubscribeSurvey({
     // Close the keyboard now (e.g. submitting straight from the phone
     // field) so it collapses during the request, not after the step swap.
     (document.activeElement as HTMLElement | null)?.blur?.();
+    // The picker hands back a full international number once it's valid for
+    // the chosen country; anything else would be saved with the wrong code.
+    if (!normalizePhone(phone)) {
+      setStatus("error");
+      setMessage(PHONE_ERROR);
+      return;
+    }
     setStatus("loading");
     setMessage("");
 
@@ -102,14 +113,19 @@ export default function SubscribeSurvey({
 
       <div className="mt-4">
         <Field label="Phone number">
-          <input
-            type="tel"
-            required
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            placeholder="Your phone number"
-            className={INPUT_CLASS}
-          />
+          <div className="survey-phone">
+            <PhoneInput
+              value={phone}
+              onChange={setPhone}
+              defaultCountry={defaultCountry}
+              inputProps={{
+                required: true,
+                placeholder: "Your phone number",
+                "aria-label": "Phone number",
+                className: INPUT_CLASS,
+              }}
+            />
+          </div>
         </Field>
       </div>
 

@@ -921,3 +921,7 @@ details[open] .accordion-body {
 .setter-form .phone-country-face { min-height:52px; border-color:#d8d7e5; border-radius:10px; }
 .setter-form .phone-country:focus-within .phone-country-face { outline:none; border-color:#4934fb; box-shadow:0 0 0 3px #4934fb1a; }
 .setter-form .phone-preview { margin-top:0; font-size:13px; font-weight:450; }
+.survey-phone .phone-country-face { min-height:48px; border:1.5px solid #D1D5DB; border-radius:10px; }
+.survey-phone .phone-country:focus-within .phone-country-face { outline:none; border-color:#4934fb; box-shadow:0 0 0 3px rgba(73,52,251,.1); }
+.survey-phone .phone-preview { margin-top:6px; font-size:13px; }
+@media (min-width:768px) { .survey-phone .phone-country-face { min-height:56px; } }

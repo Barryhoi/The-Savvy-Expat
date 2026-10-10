@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { normalizePhone } from "@/lib/phone";
 
 const REQUIRED_FIELDS = [
   "email",
@@ -21,14 +22,6 @@ const STATUS_ID = {
   COLD: "stat_09bKuP35aM9jR4euZF3nynnfjTdcgTIzdzux0Nxk8Vn",
   WARM: "stat_giPt4N0ya910Owwjsb3ct9ngv9c9PcWIzs1ica4E6TO",
 } as const;
-
-/** Strips everything but digits, then adds a country code if it wasn't
- * already there — mirrors the n8n workflow's cleanup exactly. */
-function cleanPhone(raw: string): string {
-  const digits = raw.replace(/[^0-9]/g, "");
-  if (digits.length < 7) return "";
-  return (raw.trim().startsWith("+") ? "+" : "+1") + digits;
-}
 
 function scoreLead(timeline: string, helpIntent: string): keyof typeof STATUS_ID {
   if (timeline === "Within the next 6 months" && helpIntent === "Yes, I want professional help") {
@@ -80,10 +73,11 @@ export async function POST(request: Request) {
   }
 
   const fullName = `${firstName} ${lastName}`;
-  const phoneClean = cleanPhone(phone);
-  const digitCount = phone.replace(/[^0-9]/g, "").length;
-  const isRepeatedDigit = /^(\d)\1*$/.test(phone.replace(/[^0-9]/g, ""));
-  const phoneValid = digitCount >= 7 && digitCount <= 15 && !isRepeatedDigit;
+  // The survey's country picker sends a full international number. A bare
+  // number (an older cached page) is read as US; one that doesn't validate is
+  // left off the contact rather than saved with a made-up country code.
+  const phoneClean = normalizePhone(phone);
+  const phoneValid = phoneClean !== null;
 
   const bucket = scoreLead(timeline, helpIntent);
   const description = `Timeline: ${timeline} | Help: ${helpIntent} | Phone: ${phone}`;

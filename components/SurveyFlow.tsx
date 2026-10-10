@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Reveal from "@/components/Reveal";
 import SubscribeSurvey from "@/components/SubscribeSurvey";
+import type { CountryCode } from "@/lib/phone";
 
 const REDIRECT_DELAY_MS = 2800;
 
@@ -16,7 +17,7 @@ export const SUBSCRIBE_EMAIL_KEY = "savvy-subscribe-email";
  * navigation from /subscribe — because swapping the survey into the same
  * document the iOS keyboard was just open on left Safari's viewport stuck
  * panned, unfixably. A fresh page load resets all of that by definition. */
-export default function SurveyFlow() {
+export default function SurveyFlow({ defaultCountry }: { defaultCountry: CountryCode }) {
   const [step, setStep] = useState<"survey" | "redirecting">("survey");
   const [email, setEmail] = useState("");
 
@@ -92,6 +93,7 @@ export default function SurveyFlow() {
 
         <div className="mt-4 md:mt-10">
           <SubscribeSurvey
+            defaultCountry={defaultCountry}
             email={email}
             onComplete={() => {
               // One-shot: completing the survey uses the stored email up,

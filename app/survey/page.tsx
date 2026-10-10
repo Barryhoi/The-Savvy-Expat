@@ -1,5 +1,7 @@
 import { Plus_Jakarta_Sans } from "next/font/google";
+import { headers } from "next/headers";
 import SurveyFlow from "@/components/SurveyFlow";
+import { isCountryCode } from "@/lib/phone";
 
 export const metadata = {
   title: "Subscriber Survey — The Savvy Expat",
@@ -21,7 +23,10 @@ const jakarta = Plus_Jakarta_Sans({
 const PAGE_GRADIENT =
   "linear-gradient(180deg, #EEEAFD 0%, #F5F3FF 30%, #FAFAFE 65%, #FFFFFF 100%)";
 
-export default function SurveyPage() {
+export default async function SurveyPage() {
+  // Preselects the phone country from the visitor's location, so a number
+  // typed without a country code is never assumed to be American.
+  const country = (await headers()).get("x-vercel-ip-country");
   return (
     <main
       className={`${jakarta.className} grain relative flex min-h-screen flex-col overflow-hidden`}
@@ -31,7 +36,7 @@ export default function SurveyPage() {
         <div className="absolute -left-[10%] -top-[26%] h-[760px] w-[760px] rounded-full bg-[radial-gradient(circle,rgba(73,52,251,0.07),transparent_70%)]" />
       </div>
 
-      <SurveyFlow />
+      <SurveyFlow defaultCountry={isCountryCode(country) ? country : "US"} />
 
       <p className="relative z-10 px-4 pb-4 text-[12px] font-light text-[#000101]">
         &copy; 2026 Savvy Expat.
