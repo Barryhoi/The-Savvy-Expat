@@ -8,7 +8,7 @@ export const metadata = {
 
 const VARIANTS = [
   { href: "/book", label: "Current (live)" },
-  { href: "/book/preview", label: "New: calmer light" },
+  { href: "/book/preview", label: "New: lavender-tinted card" },
 ];
 
 export default function ComparePage() {

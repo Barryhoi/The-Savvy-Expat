@@ -285,3 +285,13 @@
 .bk-embed-grid h2 { font-size:15px; font-weight:800; }
 .bk-embed-frame { height:1000px; border-radius:12px; overflow:hidden; border:1px solid #d6d3e2; background:#fff; }
 .bk-embed-frame iframe { width:100%; height:100%; border:0; }
+
+/* ---------- Preview: lavender-tinted card ("tint"), matches Calendly bg f7f5ff ---------- */
+.bk-theme-tint.bk-panel-card { background:#f7f5ff; }
+.bk-theme-tint .bk-calendar, .bk-theme-tint .bk-loading { background:#f7f5ff; }
+.bk-theme-tint .bk-avatar { background:#f7f5ff; }
+.bk-theme-tint .bkn-time { border:1.5px solid rgb(73 52 251 / 55%); background:#fff; color:#2f1fd6; font-size:14px; }
+.bk-theme-tint .bkn-time:hover { border-color:#4934fb; background:#efecff; }
+.bk-theme-tint .bkn-time.is-selected { background:#4934fb; border-color:#4934fb; color:#fff; }
+.bk-theme-tint .bkn-continue:disabled { background:#e6e2f6; color:#8f8aa8; }
+.bk-theme-tint .bkn-timezone select option { background:#fff; }
