@@ -295,3 +295,7 @@
 .bk-theme-tint .bkn-time.is-selected { background:#4934fb; border-color:#4934fb; color:#fff; }
 .bk-theme-tint .bkn-continue:disabled { background:#e6e2f6; color:#8f8aa8; }
 .bk-theme-tint .bkn-timezone select option { background:#fff; }
+
+/* Step 2: keep Calendly's form in its compact layout (620px or narrower).
+   That layout leaves out the host name ("Sam Indus") above the call title. */
+.bk-calendar[data-stage="details"] .bk-widget { max-width:620px; margin:0 auto; }
