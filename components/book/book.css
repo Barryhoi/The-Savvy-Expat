@@ -164,7 +164,7 @@
 .bk-avatar { border:2px solid #4934fb; padding:3px; background:#fff; }
 .bk-title { margin-top:28px; font-size:30px; font-weight:900; line-height:1.05; letter-spacing:-.5px; text-transform:uppercase; color:#041630; }
 .bk-title span { display:block; margin-top:6px; font-size:25px; font-weight:700; font-style:italic; text-transform:none; letter-spacing:-.4px; color:#4934fb; }
-.bk-panel-card { border-color:#d9d2ff; box-shadow:0 30px 80px -40px #2a1a8a55; }
+.bk-panel-card { border:1px solid #4934fb; box-shadow:0 30px 80px -40px #2a1a8a55; }
 .bkn-days button.is-selected,.bkn-days button.is-selected:hover { background:#fff; color:#4934fb; box-shadow:0 0 0 2px #4934fb; }
 .bkn-time.is-selected { background:#4934fb; border-color:#4934fb; }
 .bk-steps .is-complete > span { color:#4934fb; }
