@@ -32,7 +32,11 @@ export default function NativeBookingCalendar({ nextHref, colors }: { nextHref: 
     // On phones the Continue button sits below the calendar. Bring the new
     // step into view before paint, instead of leaving visitors at the footer.
     const top = stepPanel.current?.getBoundingClientRect().top;
-    if (top !== undefined && top < 0) window.scrollTo({ top: window.scrollY + top - 16, behavior: "instant" });
+    // On touch screens step 2 is sized to fit the screen, so line it up with
+    // the top of the screen to keep the whole form in view.
+    const touch = window.matchMedia("(pointer: coarse)").matches;
+    if (top !== undefined && (top < 0 || (touch && booking && top > 16)))
+      window.scrollTo({ top: window.scrollY + top - 16, behavior: "instant" });
   }, [booking]);
 
   useEffect(() => {

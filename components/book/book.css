@@ -300,6 +300,15 @@
    That layout leaves out the host name ("Sam Indus") above the call title. */
 .bk-calendar[data-stage="details"] .bk-widget { max-width:620px; margin:0 auto; }
 
+/* Touch screens: Calendly opens the phone country list as an overlay as tall
+   as the embed. At full form height (~1700px) half the list hangs off the
+   screen and touch scrolling can't reach United States (top) or the end.
+   Keeping step 2 no taller than the screen makes the overlay fit; the form
+   scrolls inside the embed instead. Desktop keeps the full-height form. */
+@media (pointer:coarse) {
+  .bk-calendar[data-stage="details"] .bk-widget { height:calc(100vh - 130px) !important; height:calc(100svh - 130px) !important; min-height:480px; }
+}
+
 /* Phones: let the time list shrink when a day has only a few times, so
    Continue sits right under them instead of after a blank gap. */
 @media(max-width:640px) { .bkn-time-list { height:auto; min-height:110px; max-height:234px; } }
