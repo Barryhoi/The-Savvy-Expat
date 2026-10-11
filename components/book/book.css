@@ -311,5 +311,7 @@
 @media(max-width:1023px) { .bk-eyebrow { margin-top:0; } .bk-panel .bk-title { font-size:30px; } }
 @media(max-width:480px) { .bk-panel .bk-title { font-size:28px; } }
 
-/* Calendly's form, loading off screen while the visitor is still on step 1. */
-.bkn-preload { position:absolute; left:-10000px; top:0; width:620px; height:900px; overflow:hidden; pointer-events:none; }
+/* Calendly's form, loading invisibly while the visitor is still on step 1.
+   It stays inside the viewport (transparent, behind the page): browsers
+   throttle cross-origin frames that sit off screen, which stalls the load. */
+.bkn-preload { position:fixed; left:0; top:0; width:620px; max-width:100vw; height:900px; overflow:hidden; opacity:0; pointer-events:none; z-index:-1; }
