@@ -299,3 +299,7 @@
 /* Step 2: keep Calendly's form in its compact layout (620px or narrower).
    That layout leaves out the host name ("Sam Indus") above the call title. */
 .bk-calendar[data-stage="details"] .bk-widget { max-width:620px; margin:0 auto; }
+
+/* Phones: let the time list shrink when a day has only a few times, so
+   Continue sits right under them instead of after a blank gap. */
+@media(max-width:640px) { .bkn-time-list { height:auto; min-height:110px; max-height:234px; } }
