@@ -5,9 +5,9 @@ import BookingPanel, { type BookTheme } from "./BookingPanel";
 
 // The /book page. /book uses the dark navy theme (Barry, Oct 11 2026);
 // "current" is the original light version.
-export default function BookPageView({ theme = "current" }: { theme?: BookTheme }) {
+export default function BookPageView({ theme = "current", pageTheme = theme }: { theme?: BookTheme; pageTheme?: BookTheme }) {
   return (
-    <div className={`funnel-page bk-page bk-page-${theme} flex min-h-screen flex-col overflow-x-clip`}>
+    <div className={`funnel-page bk-page bk-page-${pageTheme} flex min-h-screen flex-col overflow-x-clip`}>
       <header className="flex justify-center px-6 pt-5 sm:pt-8">
         <Link href="/"><Image src="/logo.png" alt="The Savvy Expat" width={105} height={80} priority className="funnel-logo" /></Link>
       </header>
