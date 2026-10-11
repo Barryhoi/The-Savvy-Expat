@@ -94,7 +94,9 @@ export async function syncFormBooking(invitee: any, inviteeUri: string, startTim
       try {
         lead = await closeApi("lead/", "POST", {
           name,
-          status_id: config.bookedStatusId,
+          // Created as Potential, then moved to Booked below: Make's
+          // "Lead Status → Update Opportunity" only fires on a status change.
+          status_id: config.potentialStatusId,
           contacts: [{
             name,
             emails: [{ email, type: "office" }],
@@ -108,6 +110,7 @@ export async function syncFormBooking(invitee: any, inviteeUri: string, startTim
         throw error;
       }
       await writeRecord(`form-leads/${digest(email)}`, { creating: false, leadId: lead.id }, pending.etag);
+      await closeApi(`lead/${lead.id}/`, "PUT", { status_id: config.bookedStatusId });
     } else {
       await withLock(`lead-booking:${lead.id}`, async () => {
         const current = await closeApi(`lead/${lead!.id}/`) as Lead;
