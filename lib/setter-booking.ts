@@ -5,6 +5,7 @@ import { closeApi, exactLead, type Lead } from "./close";
 import { calendlyApi, providerPath, resolveEventType } from "./calendly";
 import { digest, readRecord, withLock, writeRecord } from "./receipt-store";
 import { validateBookingDetails, type BookingDetails } from "./native-booking";
+import { bookQuestionValues } from "./book-questions";
 import { validateSetterContact, type SetterContactInput } from "./setting-validation";
 
 export type SetterBooking = SetterContactInput & {
@@ -91,6 +92,7 @@ export async function createSetterInvitee(token: string, input: BookingDetails) 
       "Additional notes": details.notes,
       "Phone number": booking.phone,
       "Do you have WhatsApp?": details.whatsapp,
+      ...bookQuestionValues(details.answers ?? null),
     };
     const questions = (event.custom_questions || []).filter((question: { enabled: boolean }) => question.enabled);
     if (questions.some((question: { required: boolean; name: string }) => question.required && !values[question.name]))

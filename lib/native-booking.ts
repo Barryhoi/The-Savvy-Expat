@@ -4,14 +4,18 @@ import { calendlyApi, providerPath, resolveEventType } from "./calendly";
 import { closeApi } from "./close";
 import config from "./close-fields.json";
 import { digest, readRecord, withLock, writeRecord } from "./receipt-store";
+import { applicationBookAnswers, bookQuestionValues, validBookAnswers, type BookAnswers } from "./book-questions";
 
-export type BookingDetails = { start: string; timezone: string; whatsapp: string; notes: string };
+export type BookingDetails = { start: string; timezone: string; whatsapp: string; notes: string; answers?: BookAnswers | null };
 export function validateBookingDetails(input: BookingDetails): BookingDetails {
   if (!input || typeof input.start !== "string" || !Number.isFinite(Date.parse(input.start)) || Date.parse(input.start) <= Date.now()) throw Error("INVALID_DETAILS");
   if (typeof input.timezone !== "string" || input.timezone.length > 100) throw Error("INVALID_DETAILS");
   try { new Intl.DateTimeFormat("en", { timeZone: input.timezone }); } catch { throw Error("INVALID_DETAILS"); }
   if (!["Yes", "No"].includes(input.whatsapp) || typeof input.notes !== "string" || input.notes.length > 2000) throw Error("INVALID_DETAILS");
-  return { start: new Date(input.start).toISOString(), timezone: input.timezone, whatsapp: input.whatsapp, notes: input.notes.trim() };
+  // The setter page sends the lead's answers to the Calendly form questions.
+  const answers = input.answers === undefined ? null : validBookAnswers(input.answers);
+  if (input.answers !== undefined && !answers) throw Error("INVALID_DETAILS");
+  return { start: new Date(input.start).toISOString(), timezone: input.timezone, whatsapp: input.whatsapp, notes: input.notes.trim(), answers };
 }
 type Attempt = { hash: string; state: "pending" | "rejected" | "created"; inviteeUri?: string };
 export async function createNativeBooking(application: Application, input: BookingDetails) {
@@ -37,7 +41,7 @@ export async function createNativeBooking(application: Application, input: Booki
     const eventType = await resolveEventType();
     const { resource: event } = await calendlyApi(new URL(eventType).pathname);
     if (event.duration !== 30 || event.locations?.[0]?.kind !== "google_conference") throw Error("EVENT_CONFIGURATION_CHANGED");
-    const values: Record<string, string> = { "Additional notes": details.notes, "Phone number": String(application.answers.phone || ""), "Do you have WhatsApp?": details.whatsapp };
+    const values: Record<string, string> = { "Additional notes": details.notes, "Phone number": String(application.answers.phone || ""), "Do you have WhatsApp?": details.whatsapp, ...bookQuestionValues(applicationBookAnswers(application.answers)) };
     const questions = (event.custom_questions || []).filter((q: { enabled: boolean }) => q.enabled);
     if (questions.some((q: { required: boolean; name: string }) => q.required && !values[q.name])) throw Error("EVENT_CONFIGURATION_CHANGED");
     const query = new URLSearchParams({ event_type: eventType, start_time: details.start, end_time: new Date(Date.parse(details.start) + 60000).toISOString() });

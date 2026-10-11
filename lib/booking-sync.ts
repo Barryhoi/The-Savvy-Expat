@@ -9,6 +9,7 @@ import { closeApi, syncApplication } from "./close";
 import config from "./close-fields.json";
 import { syncApplicationFollowups } from "./application-followups";
 import { digest, readRecord, withLock, writeRecord } from "./receipt-store";
+import { formAnswers, syncFormBooking } from "./book-event";
 
 // Statuses a verified booking may move to Booked. Newsletter-survey leads
 // (BHS HOT/Warm/Cold, NO ANSWER - BHS) count as pre-call; any later sales
@@ -51,7 +52,12 @@ export async function syncBooking(
   const setterId = setterMatch?.[1] || previous?.value.setterId;
   const id = match?.[1] || previous?.value.applicationId;
   if (setterId && !id) return syncSetterBooking(invitee, inviteeUri, setterId);
-  if (!id) return { confirmed: false, ignored: true }; // Other bookings in the organization are not ours.
+  // No website application or setter link: booked on Calendly's own form
+  // (/book, or Sam's Calendly link). Find or create the lead and mark Booked.
+  if (!id) {
+    if (expectedApplicationId) throw new Error("WRONG_APPLICATION");
+    return syncFormBooking(invitee, inviteeUri, event.start_time);
+  }
   if (expectedApplicationId && expectedApplicationId !== id)
     throw new Error("WRONG_APPLICATION");
   return withLock(`booking:${id}`, async () => {
@@ -119,7 +125,7 @@ export async function syncBooking(
           latest.value.inviteeUri !== inviteeUri)
       )
         return;
-      const stagePatch: Record<string, string> = {};
+      const stagePatch: Record<string, unknown> = {};
       if (invitee.status === "active" && BOOKABLE_STATUS_IDS.includes(current.status_id))
         stagePatch.status_id = config.bookedStatusId;
       if (invitee.status === "canceled" && !invitee.rescheduled && current.status_id === config.bookedStatusId)
@@ -213,11 +219,19 @@ async function syncSetterBooking(invitee: any, inviteeUri: string, id: string) {
       const latest = await readRecord<{ createdAt: string; inviteeUri: string; status: string }>(latestKey);
       const older = latest && Date.parse(invitee.created_at) < Date.parse(latest.value.createdAt);
       if (older || (invitee.status !== "active" && latest && latest.value.inviteeUri !== inviteeUri)) return;
-      const stagePatch: Record<string, string> = {};
+      const stagePatch: Record<string, unknown> = {};
       if (invitee.status === "active" && BOOKABLE_STATUS_IDS.includes(current.status_id))
         stagePatch.status_id = config.bookedStatusId;
       if (invitee.status === "canceled" && !invitee.rescheduled && current.status_id === config.bookedStatusId)
         stagePatch.status_id = config.canceledStatusId;
+      // The setter answers the same questions as Calendly's form; keep them on the lead.
+      const answers = formAnswers(invitee.questions_and_answers || []);
+      const answerFields = invitee.status === "active"
+        ? Object.fromEntries((["timeline", "services", "funds", "logistics"] as const)
+            .filter((key) => answers[key])
+            .map((key) => [`custom.${config.fields[key]}`, answers[key]]))
+        : {};
+      Object.assign(stagePatch, answerFields);
       if (Object.keys(stagePatch).length) await closeApi(`lead/${booking.leadId}/`, "PUT", stagePatch);
       await writeRecord(latestKey, { createdAt: invitee.created_at, inviteeUri, status: invitee.status, setterId: id }, latest?.etag);
       if (process.env.VERCEL_ENV === "production" && process.env.BOOKING_LIVE_AUTOMATIONS === "true" && invitee.status === "active") {

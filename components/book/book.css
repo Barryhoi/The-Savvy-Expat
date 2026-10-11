@@ -1,0 +1,171 @@
+.bk-panel { display:grid; grid-template-columns:260px minmax(0,1fr); gap:28px; max-width:1020px; margin:0 auto; text-align:left; }
+.bk-overview { align-self:start; display:flex; flex-direction:column; padding:24px 0; }
+.bk-host { display:flex; align-items:center; gap:14px; }
+.bk-avatar { width:72px; height:72px; flex-shrink:0; border:3px solid #fff; box-shadow:0 3px 12px rgba(0,0,0,.06); border-radius:50%; object-fit:cover; object-position:50% 19%; }
+.bk-host p { font-size:15px; font-weight:700; margin-top:3px; }
+.bk-title { font-size:36px; margin-top:28px; }
+.bk-description { font-size:15px; line-height:1.7; color:#526078; margin-top:16px; }
+.bk-summary { display:flex; flex-wrap:wrap; gap:8px; margin-top:24px; color:#526078; font-size:13px; }
+.bk-summary > span { color:#526078; }
+.bk-reassurance { margin-top:8px; color:#526078; font-size:13px; }
+.bk-calendar { container-type:inline-size; min-width:0; scroll-margin-top:20px; background:#fff; }
+.bk-steps { display:flex; gap:28px; margin:0 24px; padding:18px 0; border-bottom:1px solid rgba(0,0,0,.08); list-style:none; }
+.bk-steps li { display:flex; align-items:center; gap:9px; color:#526078; font-size:13px; font-weight:700; }
+.bk-steps li > span { width:28px; height:28px; display:grid; place-items:center; border:1px solid #e3defa; border-radius:50%; font-size:11px; }
+.bk-steps .is-current { color:#000; }
+.bk-steps .is-current > span { background:#4934fb; border-color:#4934fb; color:#fff; }
+.bk-steps .is-complete > span { background:#f1eeff; border-color:#f1eeff; color:#4934fb; }
+.bk-calendar-body { position:relative; overflow:hidden; }
+.bk-widget { min-width:320px; width:100%; max-width:640px; margin:0 auto; height:660px; }
+.bk-widget iframe { display:block; width:100%; height:100%; }
+.bk-widget.is-unavailable { height:0 !important; overflow:hidden; }
+.bk-loading { position:absolute; inset:0; z-index:1; display:flex; flex-direction:column; align-items:center; gap:18px; padding-top:100px; background:#fff; color:#526078; font-size:14px; pointer-events:none; }
+.bk-spinner { height:28px; width:28px; border:2px solid #f1eeff; border-top-color:#4934fb; border-radius:50%; animation:bk-spin .8s linear infinite; }
+@keyframes bk-spin { to { transform:rotate(360deg); } }
+.bk-error { padding:36px 24px; text-align:center; background:#fbfaff; border-bottom:1px solid #e3defa; }
+.bk-error p { margin-top:12px; color:#526078; }
+.bk-error button { display:block; background:#4934fb; color:#fff; border-radius:10px; padding:10px 24px; margin:20px auto 12px; font-weight:700; }
+.bk-error a { color:#4934fb; text-decoration:underline; font-size:13px; }
+.bk-help { display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; padding:10px 24px 18px; font-size:12px; color:#526078; }
+.bk-help a { color:#4934fb; text-underline-offset:3px; }
+.bk-help a:hover { text-decoration:underline; }
+@media(max-width:1023px) {
+  .bk-panel { grid-template-columns:1fr; gap:8px; max-width:780px; }
+  .bk-overview { display:block; padding:24px; border-bottom:1px solid rgba(0,0,0,.08); }
+  .bk-host { float:right; margin-left:24px; }
+  .bk-host > div { display:none; }
+  .bk-title { margin-top:0; font-size:34px; }
+  .bk-description { max-width:520px; margin-top:12px; }
+}
+@media(max-width:480px) {
+  .bk-panel { margin-left:-24px; margin-right:-24px; }
+  .bk-overview { padding:24px; }
+  .bk-avatar { width:52px; height:52px; }
+  .bk-title { font-size:32px; }
+  .bk-description { font-size:14px; }
+  .bk-steps { margin:0 24px; gap:24px; padding:20px 0; }
+  .bk-help { padding:16px 24px 24px; }
+  .bk-calendar { scroll-margin-top:0; }
+}
+@media(prefers-reduced-motion:reduce) { .bk-spinner { animation:none; } }
+
+/* Calendly's desktop time picker is 680px wide inside a 1100px viewport.
+   Center that viewport and trim only its empty side gutters. Keep the details
+   step at its natural compact width so all form controls remain in view. */
+@container (min-width:700px) {
+  .bk-calendar[data-stage="time"] .bk-widget {
+    position:relative; left:50%; width:1100px; min-width:1100px; max-width:none;
+    margin:0; transform:translateX(-50%);
+  }
+}
+
+/* Pull the scheduler up into the card instead of retaining Calendly's large
+   external top/bottom margins. The calendar and time-zone menu stay visible. */
+@container (min-width:700px) {
+  .bk-calendar[data-stage="time"] .bk-calendar-body { height:602px; }
+  .bk-calendar[data-stage="time"] .bk-widget { top:-42px; }
+}
+.bk-calendar[data-stage="details"] .bk-calendar-body { padding-bottom:20px; }
+
+.bk-calendar[data-stage="details"] .bk-widget { max-width:none; }
+
+/* Keep Calendly's responsive reflow out of view during step navigation.
+   Separate names restart the reveal in both directions; the iframe itself
+   stays mounted, preserving the selected slot and any entered form details. */
+.bk-calendar[data-stage="time"] .bk-widget { animation:bk-time-enter 360ms ease-out both; }
+.bk-calendar[data-stage="details"] .bk-widget { animation:bk-details-enter 360ms ease-out both; }
+@keyframes bk-time-enter {
+  0%, 65% { opacity:0; }
+  100% { opacity:1; }
+}
+@keyframes bk-details-enter {
+  0%, 65% { opacity:0; }
+  100% { opacity:1; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .bk-calendar[data-stage] .bk-widget { animation-duration:240ms; animation-timing-function:step-end; }
+}
+
+/* Native availability picker: Calendly still owns final details/submission. */
+.bkn-booking { min-width:0; }
+.bkn-calendar-card { margin-top:28px; overflow:hidden; }
+.bkn-calendar-grid { display:grid; grid-template-columns:minmax(0,1fr) 240px; }
+.bkn-month-panel { padding:0 28px 28px; min-width:0; }
+.bkn-month-bar { display:flex; align-items:center; justify-content:space-between; gap:10px; margin:0 0 20px; }
+.bkn-month-bar h4,.bkn-times-panel h4 { font-size:14px; font-weight:700; }
+.bkn-month-controls { display:flex; gap:4px; }
+.bkn-month-controls button { display:grid; place-items:center; width:32px; height:32px; border:0; border-radius:4px; color:#4934fb; font-size:24px; line-height:1; }
+.bkn-month-controls button:hover:not(:disabled) { background:#f1eeff; border-color:#4934fb; }
+.bkn-month-controls button:disabled { opacity:.3; cursor:default; }
+.bkn-days { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:8px 4px; }
+.bkn-weekday { text-align:center; font-size:10px; font-weight:700; color:#526078; padding:0 0 7px; }
+.bkn-days button { display:grid; place-items:center; justify-self:center; width:38px; height:38px; border-radius:50%; font-size:14px; color:#526078; position:relative; }
+.bkn-days button.is-available { background:#4934fb; color:#fff; font-weight:700; transition:background .15s; }
+.bkn-days button.is-available:hover { background:#3924e8;  }
+.bkn-days button.is-selected,.bkn-days button.is-selected:hover { background:#041630; color:#fff;  }
+.bkn-days .is-today:after { content:""; width:3px; height:3px; border-radius:50%; background:currentColor; position:absolute; bottom:3px; }
+.bkn-timezone { display:flex; align-items:center; gap:10px; margin-top:28px; font-size:12px; font-weight:400; color:#526078; }
+.bkn-timezone select { min-width:0; max-width:calc(100% - 68px); width:220px; font-size:12px; font-weight:400; color:#526078; background:transparent; border:0; border-radius:4px; padding:9px 4px; }
+.bkn-times-panel { padding:0 20px 20px; border-left:1px solid #e3defa; min-width:0; }
+.bkn-times-panel h4 { height:32px; display:flex; align-items:center; margin-bottom:16px; }
+.bkn-time-list { height:322px; overflow-y:auto; overscroll-behavior:contain; scrollbar-width:thin; scrollbar-color:#c9c1ff transparent; padding:2px 7px 2px 2px; display:flex; flex-direction:column; gap:9px; }
+.bkn-time { flex-shrink:0; display:flex; justify-content:center; align-items:center; gap:14px; height:43px; width:100%; border:1px solid #e3defa; border-radius:5px; font-size:13px; color:#4934fb; font-weight:700; background:transparent; }
+.bkn-time:hover { border-color:#4934fb; background:#f1eeff; }
+.bkn-time.is-selected { background:#041630; border-color:#041630; color:white; }
+.bkn-continue { display:flex; justify-content:space-between; align-items:center; width:100%; padding:13px 15px; margin-top:18px; background:#4934fb; color:#fff; font-size:13px; font-weight:700; border-radius:5px; }
+.bkn-continue:hover:not(:disabled) { background:#3924e8; }
+.bkn-continue:disabled { background:#ecebf3; color:#526078; cursor:default; }
+.bkn-status { flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; gap:14px; font-size:12px; line-height:1.6; color:#526078; }
+.bkn-status .bk-spinner { flex-shrink:0; }
+.bkn-retry { background:#4934fb; padding:9px 18px; color:#fff; border-radius:7px; font-weight:700; }
+.bkn-text-button { color:#4934fb; font-size:12px; text-align:left; }
+.bkn-text-button:hover { text-decoration:underline; text-underline-offset:4px; }
+.bkn-details { position:relative; min-width:0; }
+.bkn-change { position:absolute; right:24px; top:25px; z-index:2; color:#4934fb; font-size:12px; }
+.bkn-booking button:focus-visible,.bkn-booking select:focus-visible,.bkn-change:focus-visible { outline:2px solid #4934fb; outline-offset:4px; }
+@media(max-width:640px) {
+ .bkn-calendar-grid { grid-template-columns:1fr; }
+ .bkn-month-panel { padding:0 20px 24px; }
+ .bkn-days { gap:9px 4px; }
+ .bkn-days button { width:38px; height:38px; }
+ .bkn-times-panel { border-left:0; border-top:1px solid #e3defa; padding:20px; }
+ .bkn-time-list { height:234px; display:grid; grid-template-columns:1fr 1fr; align-content:start; gap:9px; }
+ .bkn-status { grid-column:1 / -1; min-height:200px; }
+ .bkn-calendar-card { margin:24px 4px 0; }
+ .bkn-timezone { margin-top:20px; }
+ .bkn-change { position:relative; top:auto; right:auto; display:block; margin:18px 24px 0 auto; }
+}
+@media(prefers-reduced-motion:reduce) { .bkn-days button.is-available { transition:none; } }
+@media(max-width:360px) {
+ .bkn-days button { width:32px; height:34px; font-size:12px; }
+ .bkn-days { gap:9px 3px; }
+}
+
+/* Group the host and scheduler on one white card. */
+.bk-panel-card {
+  max-width: 1080px;
+  padding: 28px;
+  border: 1px solid #e3defa;
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 16px 48px -32px rgb(42 26 138 / 30%);
+}
+.bk-panel-card .bk-calendar,
+.bk-panel-card .bk-loading { background: #fff; }
+@media (max-width: 1023px) {
+  .bk-panel-card { max-width: 780px; padding: 0 0 8px; gap: 8px; }
+}
+@media (max-width: 480px) {
+  .bk-panel-card { margin-left: -12px; margin-right: -12px; border-radius: 20px; }
+}
+
+/* Savvy styling on Ryan's layout. */
+.bk-panel { font-family:Satoshi, system-ui, sans-serif; color:#041630; }
+.bk-avatar { border:2px solid #4934fb; padding:3px; background:#fff; }
+.bk-title { margin-top:28px; font-size:30px; font-weight:900; line-height:1.05; letter-spacing:-.5px; text-transform:uppercase; color:#041630; }
+.bk-title span { display:block; margin-top:6px; font-size:25px; font-weight:700; font-style:italic; text-transform:none; letter-spacing:-.4px; color:#4934fb; }
+.bk-panel-card { border-color:#d9d2ff; box-shadow:0 30px 80px -40px #2a1a8a55; }
+.bkn-days button.is-selected,.bkn-days button.is-selected:hover { background:#fff; color:#4934fb; box-shadow:0 0 0 2px #4934fb; }
+.bkn-time.is-selected { background:#4934fb; border-color:#4934fb; }
+.bk-steps .is-complete > span { color:#4934fb; }
+@media(max-width:1023px) { .bk-title { margin-top:0; font-size:28px; } .bk-title span { font-size:23px; } }
