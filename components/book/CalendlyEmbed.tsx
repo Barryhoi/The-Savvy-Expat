@@ -67,7 +67,8 @@ export default function CalendlyEmbed({ nextHref, bookingUrl, onReturn, colors, 
     window.addEventListener("message", onMessage);
     initialize();
     router.prefetch(nextHref);
-    const timer = window.setTimeout(() => { if (!loaded.current) setFailed(true); }, 15000);
+    // Calendly's form often takes 15+ seconds to load; only call it failed after 30.
+    const timer = window.setTimeout(() => { if (!loaded.current) setFailed(true); }, 30000);
     return () => { window.removeEventListener("message", onMessage); window.clearTimeout(timer); };
   }, [initialize, nextHref, router, bookingUrl, onReturn]);
 
