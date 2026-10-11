@@ -240,3 +240,8 @@
 .bk-booked-navy h1, .bk-booked-navy h2, .bk-booked-navy h3 { color:#fff; }
 .bk-booked-navy .text-ink\/60 { color:#aab4c8; }
 .bk-booked-navy p.inline-flex { background:rgb(139 125 255 / 12%); border-color:rgb(139 125 255 / 40%); color:#fff; }
+
+/* Light theme: time buttons that read as buttons. */
+.bk-theme-current .bkn-time { border:1.5px solid rgb(73 52 251 / 55%); background:#f4f2ff; color:#2f1fd6; font-size:14px; }
+.bk-theme-current .bkn-time:hover { border-color:#4934fb; background:#e9e5ff; }
+.bk-theme-current .bkn-time.is-selected { background:#4934fb; border-color:#4934fb; color:#fff; }
