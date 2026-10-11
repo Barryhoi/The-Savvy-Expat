@@ -162,6 +162,7 @@ export async function syncFormBooking(invitee: any, inviteeUri: string, startTim
           `Arrangements: ${answers.logistics || "-"}`,
           `WhatsApp: ${answers.whatsapp || "-"}`,
           answers.notes ? `Notes: ${answers.notes}` : "",
+          sourceLine(invitee.tracking),
         ].filter(Boolean).join("\n"),
       });
     }
@@ -170,6 +171,12 @@ export async function syncFormBooking(invitee: any, inviteeUri: string, startTim
     }, prior?.etag);
     return { confirmed: active };
   });
+}
+
+// "Source: instagram / video 123" from the Calendly UTM tracking, if any.
+function sourceLine(tracking: { utm_source?: string | null; utm_campaign?: string | null } | undefined) {
+  const parts = [tracking?.utm_source, tracking?.utm_campaign].filter((part): part is string => Boolean(part));
+  return parts.length ? `Source: ${parts.join(" / ").slice(0, 140)}` : "";
 }
 
 // Pre-call statuses a booking may move forward; later sales stages set by

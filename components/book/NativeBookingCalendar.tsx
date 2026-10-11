@@ -22,6 +22,7 @@ export default function NativeBookingCalendar({ nextHref, colors }: { nextHref: 
   const timeList = useRef<HTMLDivElement>(null);
   const stepPanel = useRef<HTMLDivElement>(null);
   const previousBooking = useRef<AvailableSlot | null>(null);
+  const jumpedMonth = useRef(false);
 
   useLayoutEffect(() => {
     // Preserve browser scroll restoration on initial mount. Reposition only
@@ -75,18 +76,37 @@ export default function NativeBookingCalendar({ nextHref, colors }: { nextHref: 
   const dayLabel = selectedDay ? new Intl.DateTimeFormat("en-US", { weekday: "long", month: "short", day: "numeric", timeZone: "UTC" }).format(new Date(`${selectedDay}T12:00:00Z`)) : "Available times";
   const timeLabel = (time: string) => new Intl.DateTimeFormat("en-US", { hour: "numeric", minute: "2-digit", timeZone: zone }).format(new Date(time));
 
+  // Near the end of a month the next open times can all be in the next month.
+  // Open there once instead of showing an empty calendar.
+  useEffect(() => {
+    if (loading || error || jumpedMonth.current || !month || !today) return;
+    if (month !== today.slice(0, 7)) return;
+    if (days.size === 0) {
+      jumpedMonth.current = true;
+      setMonth(moveMonth(month, 1));
+      setDay("");
+    }
+  }, [loading, error, days, month, today]);
+
   function chooseDay(date: string) {
     setDay(date); setChoice(null);
     timeList.current?.scrollTo({ top: 0 });
   }
 
   if (fallback) return <CalendlyEmbed nextHref={nextHref} colors={colors} />;
-  if (booking) return <div ref={stepPanel} className="bkn-details">
-    <button className="bkn-change" onClick={() => { setBooking(null); setChoice(null); setRetry(value => value + 1); }}>← Change time</button>
-    <CalendlyEmbed nextHref={nextHref} colors={colors} bookingUrl={(() => { const url = new URL(booking.schedulingUrl); url.searchParams.set("timezone", zone); return url.toString(); })()} onReturn={() => { setBooking(null); setChoice(null); setRetry(value => value + 1); }} />
+
+  // Calendly's form takes ~15s to load. Start loading it (off screen) as soon
+  // as a time is picked, and keep the same instance when Continue is pressed.
+  const formSlot = booking ?? choice;
+  const formUrl = formSlot && zone ? (() => { const url = new URL(formSlot.schedulingUrl); url.searchParams.set("timezone", zone); return url.toString(); })() : null;
+  const resetToCalendar = () => { setBooking(null); setChoice(null); setRetry(value => value + 1); };
+  const form = formUrl && <div key={formUrl} ref={booking ? stepPanel : undefined} className={booking ? "bkn-details" : "bkn-preload"} aria-hidden={booking ? undefined : true}>
+    {booking && <button className="bkn-change" onClick={resetToCalendar}>← Change time</button>}
+    <CalendlyEmbed nextHref={nextHref} colors={colors} bookingUrl={formUrl} onReturn={resetToCalendar} />
   </div>;
 
-  return <div ref={stepPanel} className="bkn-booking">
+  // Same tree shape before and after Continue, so the loaded form is reused.
+  return <>{form}{!booking && <div key="calendar" ref={stepPanel} className="bkn-booking">
     <ol className="bk-steps" aria-label="Booking progress">
       <li className="is-current" aria-current="step"><span aria-hidden="true">1</span>Choose a time</li>
       <li><span aria-hidden="true">2</span>Your details</li>
@@ -125,5 +145,5 @@ export default function NativeBookingCalendar({ nextHref, colors }: { nextHref: 
       </div>
     </div>
     <div className="bk-help"><span>Times shown in your time zone.</span><button className="bkn-text-button" onClick={() => setFallback(true)}>Trouble booking? ↗</button></div>
-  </div>;
+  </div>}</>;
 }

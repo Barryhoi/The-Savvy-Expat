@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { useRouter } from "next/navigation";
 import { BOOK_EVENT_URL, bookEmbedUrl } from "@/lib/book-site";
+import { readAttribution } from "@/lib/attribution";
 import { isOwnCalendarMessage } from "@/lib/calendly-events";
 
 declare global {
@@ -18,6 +19,12 @@ export default function CalendlyEmbed({ nextHref, bookingUrl, onReturn, colors, 
   const url = useMemo(() => {
     const target = new URL(bookEmbedUrl(bookingUrl ?? eventUrl));
     for (const [key, value] of Object.entries(colors ?? {})) target.searchParams.set(key, value);
+    // Lead source (ManyChat platform + video) rides along as Calendly UTM
+    // tracking; the Close sync adds it to the booking note. utm_content is
+    // left alone: the setter page and old /form use it to match bookings.
+    const source = readAttribution();
+    if (source.platform) target.searchParams.set("utm_source", source.platform);
+    if (source.video) target.searchParams.set("utm_campaign", source.video);
     return target.toString();
   }, [bookingUrl, colors, eventUrl]);
   const container = useRef<HTMLDivElement>(null);
