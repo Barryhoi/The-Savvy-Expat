@@ -15,11 +15,7 @@ export default function BookPageView({ theme = "current", pageTheme = theme }: {
         <section className="px-4 pb-12 pt-4 sm:px-6 sm:pb-16 sm:pt-10">
           <div className="mx-auto max-w-6xl text-center">
             <Reveal>
-              <p className="bk-pill inline-flex items-center gap-2.5 rounded-full border border-primary/30 bg-primary/5 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-primary sm:px-4 sm:py-2 sm:text-xs sm:tracking-[0.18em]">
-                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" aria-hidden="true" />
-                Private discovery call
-              </p>
-              <h1 className="bk-hero-title mx-auto mt-4 max-w-3xl text-[32px] font-black leading-[1.05] tracking-tight text-ink sm:mt-5 sm:text-6xl">
+              <h1 className="bk-hero-title mx-auto mt-2 max-w-3xl text-[32px] font-black leading-[1.05] tracking-tight text-ink sm:mt-3 sm:text-6xl">
                 Book your move with <span className="text-primary">The Savvy Expat</span>
               </h1>
               <p className="bk-hero-sub mx-auto mt-3 max-w-md text-base text-ink/60 sm:mt-5 sm:text-lg">
