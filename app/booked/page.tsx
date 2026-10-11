@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import YouTubeEmbed from "@/components/YouTubeEmbed";
 import ClientVideos from "@/components/ClientVideos";
+import "@/components/book/book.css";
 
 // The explainer to watch before the call.
 const PRE_CALL_VIDEO_ID = "wWbfSZrcMXo";
@@ -30,7 +31,7 @@ function ConfirmedBadge() {
 
 export default function BookedPage() {
   return (
-    <div className="flex min-h-screen flex-col overflow-x-clip">
+    <div className="bk-booked-navy flex min-h-screen flex-col overflow-x-clip">
       <div className="bg-hero">
         <header className="flex justify-center px-6 pt-8">
           <Link href="/"><Image src="/logo.png" alt="The Savvy Expat" width={105} height={80} priority className="funnel-logo" /></Link>

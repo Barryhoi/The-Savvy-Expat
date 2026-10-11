@@ -232,3 +232,11 @@
 .bk-theme-navy .bk-error h3 { color:#fff; }
 .bk-theme-navy .bk-error p { color:#aab4c8; }
 .bk-theme-navy .bk-error a { color:#8b7dff; }
+
+/* /booked (after booking): same dark navy as /book. */
+.bk-booked-navy { background:radial-gradient(ellipse 1100px 700px at 50% 0%,#0d2752 0%,#041630 70%) no-repeat, #041630; color:#fff; }
+.bk-booked-navy .bg-hero, .bk-booked-navy .bg-sheen { background:none; }
+.bk-booked-navy .funnel-logo { filter:brightness(0) invert(1); }
+.bk-booked-navy h1, .bk-booked-navy h2, .bk-booked-navy h3 { color:#fff; }
+.bk-booked-navy .text-ink\/60 { color:#aab4c8; }
+.bk-booked-navy p.inline-flex { background:rgb(139 125 255 / 12%); border-color:rgb(139 125 255 / 40%); color:#fff; }
