@@ -1,5 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // The old application form is replaced by /book (calendar + Calendly form).
+  async redirects() {
+    return [{ source: "/form", destination: "/book", permanent: false }];
+  },
   images: {
     remotePatterns: [
       {
