@@ -529,7 +529,7 @@ function SoftCta({ children }: { children: React.ReactNode }) {
     <p className="mt-10 text-base leading-relaxed text-ink/55">
       {children}{" "}
       <Link
-        href="/form"
+        href="/book"
         prefetch
         className="font-bold text-primary underline underline-offset-4 transition-colors hover:text-[#3d2ae8]"
       >

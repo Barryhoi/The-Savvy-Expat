@@ -1,8 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 
-// Step 1 of the on-site booking funnel: /form → /booking → /thank-you.
-const BOOK_CALL_URL = "/form";
+// The booking funnel: /book (calendar + Calendly form) → /booked.
+const BOOK_CALL_URL = "/book";
 
 export default function Header() {
   // Solid background, not backdrop-blur. A sticky header with backdrop-blur
