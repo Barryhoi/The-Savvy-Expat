@@ -5,13 +5,12 @@ import "./book.css";
 
 // Same structure as ryanunhinged.com/book: host card on the left, our own
 // calendar on the right, then Calendly's form for the details.
-export type BookTheme = "current" | "navy" | "light";
+export type BookTheme = "current" | "navy";
 
 // Calendly's own pages (step 2) take their colors from URL parameters.
 const CALENDLY_COLORS: Record<BookTheme, Record<string, string> | undefined> = {
   current: undefined,
   navy: { background_color: "0b1f3d", text_color: "ffffff", primary_color: "8b7dff" },
-  light: undefined,
 };
 
 export default function BookingPanel({ nextHref, theme = "current" }: { nextHref: string; theme?: BookTheme }) {

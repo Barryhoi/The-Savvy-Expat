@@ -3,8 +3,8 @@ import Link from "next/link";
 import Reveal from "@/components/Reveal";
 import BookingPanel, { type BookTheme } from "./BookingPanel";
 
-// The /book page. "navy" and "light" are color previews (Oct 11 2026) shown
-// at /book/navy, /book/light and side by side at /book/compare.
+// The /book page. /book uses the dark navy theme (Barry, Oct 11 2026);
+// "current" is the original light version.
 export default function BookPageView({ theme = "current" }: { theme?: BookTheme }) {
   return (
     <div className={`funnel-page bk-page bk-page-${theme} flex min-h-screen flex-col overflow-x-clip`}>

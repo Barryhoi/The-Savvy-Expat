@@ -7,5 +7,5 @@ export const metadata = {
 };
 
 export default function BookPage() {
-  return <BookPageView />;
+  return <BookPageView theme="navy" />;
 }
