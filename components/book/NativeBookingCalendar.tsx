@@ -7,7 +7,7 @@ import { dateInZone, monthDays, moveMonth, type AvailableSlot } from "@/lib/book
 
 const weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
-export default function NativeBookingCalendar({ nextHref, backgroundColor }: { nextHref: string; backgroundColor?: string }) {
+export default function NativeBookingCalendar({ nextHref, colors }: { nextHref: string; colors?: Record<string, string> }) {
   const [zone, setZone] = useState("");
   const [zones, setZones] = useState<string[]>([]);
   const [month, setMonth] = useState("");
@@ -80,10 +80,10 @@ export default function NativeBookingCalendar({ nextHref, backgroundColor }: { n
     timeList.current?.scrollTo({ top: 0 });
   }
 
-  if (fallback) return <CalendlyEmbed nextHref={nextHref} backgroundColor={backgroundColor} />;
+  if (fallback) return <CalendlyEmbed nextHref={nextHref} colors={colors} />;
   if (booking) return <div ref={stepPanel} className="bkn-details">
     <button className="bkn-change" onClick={() => { setBooking(null); setChoice(null); setRetry(value => value + 1); }}>← Change time</button>
-    <CalendlyEmbed nextHref={nextHref} backgroundColor={backgroundColor} bookingUrl={(() => { const url = new URL(booking.schedulingUrl); url.searchParams.set("timezone", zone); return url.toString(); })()} onReturn={() => { setBooking(null); setChoice(null); setRetry(value => value + 1); }} />
+    <CalendlyEmbed nextHref={nextHref} colors={colors} bookingUrl={(() => { const url = new URL(booking.schedulingUrl); url.searchParams.set("timezone", zone); return url.toString(); })()} onReturn={() => { setBooking(null); setChoice(null); setRetry(value => value + 1); }} />
   </div>;
 
   return <div ref={stepPanel} className="bkn-booking">

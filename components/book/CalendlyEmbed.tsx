@@ -13,13 +13,13 @@ declare global {
 }
 
 
-export default function CalendlyEmbed({ nextHref, bookingUrl, onReturn, backgroundColor, eventUrl = BOOK_EVENT_URL }: { nextHref: string; bookingUrl?: string; onReturn?: () => void; backgroundColor?: string; eventUrl?: string }) {
+export default function CalendlyEmbed({ nextHref, bookingUrl, onReturn, colors, eventUrl = BOOK_EVENT_URL }: { nextHref: string; bookingUrl?: string; onReturn?: () => void; colors?: Record<string, string>; eventUrl?: string }) {
   const enteredDetails = useRef(false);
   const url = useMemo(() => {
     const target = new URL(bookEmbedUrl(bookingUrl ?? eventUrl));
-    if (backgroundColor) target.searchParams.set("background_color", backgroundColor);
+    for (const [key, value] of Object.entries(colors ?? {})) target.searchParams.set(key, value);
     return target.toString();
-  }, [bookingUrl, backgroundColor, eventUrl]);
+  }, [bookingUrl, colors, eventUrl]);
   const container = useRef<HTMLDivElement>(null);
   const loaded = useRef(false);
   const router = useRouter();
