@@ -169,3 +169,15 @@
 .bkn-time.is-selected { background:#4934fb; border-color:#4934fb; }
 .bk-steps .is-complete > span { color:#4934fb; }
 @media(max-width:1023px) { .bk-title { margin-top:0; font-size:28px; } .bk-title span { font-size:23px; } }
+/* Phones: keep the title to two lines and the calendar close to the top. */
+@media(max-width:480px) {
+  .bk-panel-card { margin-left:0; margin-right:0; }
+  .bk-overview { padding:20px 20px 18px; }
+  .bk-avatar { width:56px; height:56px; padding:2px; }
+  .bk-host { margin-left:12px; }
+  .bk-title { font-size:24px; line-height:1.08; }
+  .bk-title span { font-size:20px; margin-top:4px; }
+  .bk-description { font-size:14px; line-height:1.6; margin-top:10px; }
+  .bk-summary { margin-top:14px; }
+  .bk-steps { margin:0 20px; }
+}
