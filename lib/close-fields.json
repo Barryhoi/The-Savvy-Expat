@@ -1,16 +1,12 @@
 {
   "organizationId": "orga_GNNtkPIRum2rVcOQHDflZjFNuJ9h6M2eNqbigggmHNM",
   "fields": {
-    "situation": "cf_lgtcKopUhk41DKBKJo1tjZcrG8JdfiXIwFgxPcLKPY1",
-    "commitment": "cf_pPU0tZ4Om6no2GWLoD18FzvHt9D5RzC0K0sV5w4VD4a",
     "timeline": "cf_J3aPU66etRBX4Hqwjb8oJj94RW3lj2I5z9EMz72Dy0f",
-    "motivation": "cf_bwGtva6BEc3h3XPP58UtmwGzoEglYnU4RddnrQH6voT",
     "services": "cf_HJp97ABq3ghttOLKOE1ouzmgTsXMZ67pBPgzXRTUaDe",
-    "budget": "cf_b3v5pACaCzJGKwzMRq9OdhmYqlTDmxWmlLgssYF4Mqk",
     "funds": "cf_VixDloX9RuwA2h7PIUdKFIfyBv528kgz6aBljheNPGY",
     "logistics": "cf_10TId7HXHI35bJblHDDTeSYiiVZUkWG31ZfV5uZ7b5a",
-    "obstacle": "cf_UE6YqarXW6F1QUrnpgrB20Ts8OOEwrwMowGQQOZyKuF",
-    "whyUs": "cf_E40dmltVvPkhpqLkLuufJXJucdG7Qfa69mzWaAPnK6L"
+    "whatsapp": "cf_YJ8lNmkF6wUtFI0MVd9xgWrcqbaBYFH1mGlJlAM3ISg",
+    "notes": "cf_2bsaJw0OdHTgCGMJSCiyWEXzQeyW4PdN6nQ4UP3KgHI"
   },
   "legacyFields": {
     "applicationId": "cf_r2LK3E46UuZo0RPjaX3fayvpT1IiMrH1uEcNMyd8kfG"

@@ -42,7 +42,9 @@ const plain = (text: string) => text.replace(/[’‘]/g, "'").trim();
 export function formAnswers(questions: QA[]) {
   const find = (pattern: RegExp) => questions.find((q) => pattern.test(plain(q.question)))?.answer?.trim() || "";
   return {
-    phone: find(/phone|whatsapp/i),
+    phone: find(/phone number/i),
+    whatsapp: find(/whatsapp/i),
+    notes: find(/additional notes/i),
     timeline: find(/arrive/i),
     services: find(/services/i).split("\n").map((s) => s.trim()).filter(Boolean).join("; "),
     funds: find(/liquid funds/i),
@@ -77,6 +79,8 @@ export async function syncFormBooking(invitee: any, inviteeUri: string, startTim
       services: answers.services || undefined,
       funds: answers.funds || undefined,
       logistics: answers.logistics || undefined,
+      whatsapp: answers.whatsapp || undefined,
+      notes: answers.notes || undefined,
     });
 
     let lead = prior?.value.leadId
@@ -156,6 +160,8 @@ export async function syncFormBooking(invitee: any, inviteeUri: string, startTim
           `Services: ${answers.services || "-"}`,
           `Liquid funds: ${answers.funds || "-"}`,
           `Arrangements: ${answers.logistics || "-"}`,
+          `WhatsApp: ${answers.whatsapp || "-"}`,
+          answers.notes ? `Notes: ${answers.notes}` : "",
         ].filter(Boolean).join("\n"),
       });
     }
