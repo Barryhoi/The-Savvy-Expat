@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 
 interface YouTubeEmbedProps {
@@ -19,8 +19,8 @@ interface YouTubeEmbedProps {
  * the iframe when clicked, keeping the page fast.
  *
  * With `autoPlay` the iframe mounts immediately and starts muted, because
- * Chrome and Safari only allow unattended playback without sound. A "Tap for
- * sound" button restarts it from the top with sound on.
+ * Chrome and Safari only allow unattended playback without sound. Viewers
+ * turn sound on with YouTube's own controls.
  */
 export default function YouTubeEmbed({
   videoId,
@@ -30,17 +30,6 @@ export default function YouTubeEmbed({
   autoPlay = false,
 }: YouTubeEmbedProps) {
   const [playing, setPlaying] = useState(autoPlay);
-  const [muted, setMuted] = useState(autoPlay);
-  const frame = useRef<HTMLIFrameElement>(null);
-  const command = (func: string, args: unknown[] = []) =>
-    frame.current?.contentWindow?.postMessage(JSON.stringify({ event: "command", func, args }), "*");
-  const turnOnSound = () => {
-    command("unMute");
-    command("setVolume", [100]);
-    command("seekTo", [0, true]);
-    command("playVideo");
-    setMuted(false);
-  };
   // maxresdefault is the true 16:9 frame at 1280px. hqdefault is only 480x360
   // in 4:3, so it crops and looks soft in a widescreen card. Not every video
   // has a maxres though, so fall back the moment it fails to load.
@@ -53,7 +42,7 @@ export default function YouTubeEmbed({
   const params = new URLSearchParams({
     autoplay: "1",
     rel: "0",
-    ...(autoPlay ? { playsinline: "1", mute: "1", enablejsapi: "1" } : {}),
+    ...(autoPlay ? { playsinline: "1", mute: "1" } : {}),
   });
 
   return (
@@ -65,28 +54,13 @@ export default function YouTubeEmbed({
       }`}
     >
       {playing ? (
-        <>
         <iframe
-          ref={frame}
           src={`https://www.youtube-nocookie.com/embed/${videoId}?${params}`}
           title={title}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           allowFullScreen
           className="absolute inset-0 h-full w-full"
         />
-        {muted && (
-          <button
-            type="button"
-            onClick={turnOnSound}
-            className="absolute inset-0 flex items-end justify-center bg-transparent pb-6"
-            aria-label="Turn on sound and play from the start"
-          >
-            <span className="flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-black text-ink shadow-[0_10px_30px_-8px_rgba(4,22,48,0.55)]">
-              <span aria-hidden="true">🔊</span> Tap for sound
-            </span>
-          </button>
-        )}
-        </>
       ) : (
         <button
           type="button"
