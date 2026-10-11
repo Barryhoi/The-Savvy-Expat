@@ -97,7 +97,10 @@ export default function NativeBookingCalendar({ nextHref, colors }: { nextHref: 
 
   // Calendly's form takes ~15s to load. Start loading it (off screen) as soon
   // as a time is picked, and keep the same instance when Continue is pressed.
-  const formSlot = booking ?? choice;
+  // Before a time is picked, warm up with the first open time of the shown
+  // day: Calendly's scripts and styles are then cached for whichever time
+  // the visitor picks.
+  const formSlot = booking ?? choice ?? (!loading && !error ? times[0] ?? null : null);
   const formUrl = formSlot && zone ? (() => { const url = new URL(formSlot.schedulingUrl); url.searchParams.set("timezone", zone); return url.toString(); })() : null;
   const resetToCalendar = () => { setBooking(null); setChoice(null); setRetry(value => value + 1); };
   const form = formUrl && <div key={formUrl} ref={booking ? stepPanel : undefined} className={booking ? "bkn-details" : "bkn-preload"} aria-hidden={booking ? undefined : true}>
