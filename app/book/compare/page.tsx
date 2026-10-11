@@ -1,3 +1,5 @@
+import "@/components/book/book.css";
+
 // Side-by-side color preview of /book/navy and /book/light.
 export const metadata = {
   title: "Booking Colors | The Savvy Expat",
