@@ -227,7 +227,7 @@ async function syncSetterBooking(invitee: any, inviteeUri: string, id: string) {
       // The setter answers the same questions as Calendly's form; keep them on the lead.
       const answers = formAnswers(invitee.questions_and_answers || []);
       const answerFields = invitee.status === "active"
-        ? Object.fromEntries((["timeline", "services", "funds", "logistics", "whatsapp", "notes"] as const)
+        ? Object.fromEntries((["timeline", "services", "funds", "logistics", "whatsapp", "notes", "why"] as const)
             .filter((key) => answers[key])
             .map((key) => [`custom.${config.fields[key]}`, answers[key]]))
         : {};

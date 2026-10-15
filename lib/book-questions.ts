@@ -34,7 +34,11 @@ export const BOOK_QUESTIONS = {
   },
 } as const;
 
-export type BookAnswers = { timeline: string; services: string[]; funds: string; logistics: string };
+// Free-text question added Oct 15 2026 (Evan). Optional on Calendly's form;
+// saved to the Close field "Why The Savvy Expat".
+export const WHY_QUESTION = "What made you want to look into The Savvy Expat for professional relocation support?";
+
+export type BookAnswers = { timeline: string; services: string[]; funds: string; logistics: string; why?: string };
 
 export function validBookAnswers(input: unknown): BookAnswers | null {
   if (!input || typeof input !== "object") return null;
@@ -46,7 +50,8 @@ export function validBookAnswers(input: unknown): BookAnswers | null {
   const services = Array.isArray(raw.services)
     ? [...new Set(raw.services.filter((s): s is string => (BOOK_QUESTIONS.services.options as readonly string[]).includes(s as string)))]
     : [];
-  const answers = { timeline: pick("timeline"), services, funds: pick("funds"), logistics: pick("logistics") };
+  const why = typeof raw.why === "string" ? raw.why.trim().slice(0, 1000) : "";
+  const answers = { timeline: pick("timeline"), services, funds: pick("funds"), logistics: pick("logistics"), why };
   if (!answers.timeline || !answers.funds) return null;
   return answers;
 }
@@ -59,6 +64,7 @@ export function bookQuestionValues(answers: BookAnswers | null): Record<string, 
     [BOOK_QUESTIONS.services.name]: answers.services.join("\n"),
     [BOOK_QUESTIONS.funds.name]: answers.funds,
     [BOOK_QUESTIONS.logistics.name]: answers.logistics,
+    ...(answers.why ? { [WHY_QUESTION]: answers.why } : {}),
   };
 }
 

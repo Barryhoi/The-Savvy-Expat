@@ -2,7 +2,7 @@
 import { useRef, useState } from "react";
 import { confirmBookingRequest } from "@/lib/booking-confirmation";
 import { timeZoneLabel } from "@/lib/timezones";
-import { BOOK_QUESTIONS } from "@/lib/book-questions";
+import { BOOK_QUESTIONS, WHY_QUESTION } from "@/lib/book-questions";
 export default function NativeBookingDetails({ application, start, zone, setterToken, onBack }: {
   application: { id?: string; name: string; email: string; phone: string }; start: string; zone: string; setterToken?: string; onBack: () => void;
 }) {
@@ -10,7 +10,7 @@ export default function NativeBookingDetails({ application, start, zone, setterT
   const [whatsapp, setWhatsapp] = useState("");
   const [notes, setNotes] = useState("");
   // Setter bookings answer the same questions as Calendly's form on /book.
-  const [answers, setAnswers] = useState({ timeline: "", services: [] as string[], funds: "", logistics: "" });
+  const [answers, setAnswers] = useState({ timeline: "", services: [] as string[], funds: "", logistics: "", why: "" });
   const [busy, setBusy] = useState(false);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
@@ -55,6 +55,7 @@ export default function NativeBookingDetails({ application, start, zone, setterT
             : { ...current, [key]: option })} />{option}</label>;
         })}</div></fieldset>;
       })}
+      {isSetterBooking && <label className="native-notes setter-why"><span className="native-note-label">{WHY_QUESTION} <span className="native-optional-label">(optional)</span></span><textarea aria-label={WHY_QUESTION} maxLength={1000} rows={3} value={answers.why} onChange={e => setAnswers(current => ({ ...current, why: e.target.value }))} disabled={busy || pending} /></label>}
       <fieldset disabled={busy || pending} className="native-whatsapp"><legend>Do you have WhatsApp?</legend><div>{["Yes", "No"].map(value => <label key={value} className={whatsapp === value ? "chosen" : ""}><input required type="radio" name="whatsapp" value={value} checked={whatsapp === value} onChange={() => setWhatsapp(value)} />{value}</label>)}</div></fieldset>
       <label className="native-notes"><span className="native-note-label"><span aria-hidden="true">▾</span> {isSetterBooking ? "Add a note for Sam" : "Add a note"} <span className="native-optional-label">(optional)</span></span><textarea aria-label="What would be helpful for us to know before the call?" maxLength={2000} rows={3} value={notes} onChange={e => setNotes(e.target.value)} disabled={busy || pending} placeholder="What would be helpful for us to know before the call?" /></label>
       {error && <p className="calendar-error" role="alert">{error}</p>}

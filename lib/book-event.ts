@@ -45,6 +45,7 @@ export function formAnswers(questions: QA[]) {
     phone: find(/phone number/i),
     whatsapp: find(/whatsapp/i),
     notes: find(/additional notes/i),
+    why: find(/what made you want/i),
     timeline: find(/arrive/i),
     services: find(/services/i).split("\n").map((s) => s.trim()).filter(Boolean).join("; "),
     funds: find(/liquid funds/i),
@@ -81,6 +82,7 @@ export async function syncFormBooking(invitee: any, inviteeUri: string, startTim
       logistics: answers.logistics || undefined,
       whatsapp: answers.whatsapp || undefined,
       notes: answers.notes || undefined,
+      why: answers.why || undefined,
     });
 
     let lead = prior?.value.leadId
@@ -161,6 +163,7 @@ export async function syncFormBooking(invitee: any, inviteeUri: string, startTim
           `Liquid funds: ${answers.funds || "-"}`,
           `Arrangements: ${answers.logistics || "-"}`,
           `WhatsApp: ${answers.whatsapp || "-"}`,
+          answers.why ? `Why us: ${answers.why}` : "",
           answers.notes ? `Notes: ${answers.notes}` : "",
           sourceLine(invitee.tracking),
         ].filter(Boolean).join("\n"),
