@@ -23,7 +23,7 @@ export default async function FormPage() {
           </h1>
           <p className="mt-3 text-ink/60">
             Tell us a little about your plans. If we’re a fit, you can book a
-            30-minute call with our team.
+            45-minute call with our team.
           </p>
         </div>
         <IntakeForm defaultCountry={isCountryCode(country) ? country : "US"} />

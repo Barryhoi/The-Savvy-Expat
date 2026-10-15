@@ -95,7 +95,7 @@ export default function DiscoveryCalendar({
       <section className="booking-scheduler">
           {!selected ? (
             <>
-              <header className="booking-simple-heading"><h1>Choose a time.</h1><p>30-minute discovery call · Google Meet</p></header>
+              <header className="booking-simple-heading"><h1>Choose a time.</h1><p>45-minute discovery call · Google Meet</p></header>
               <div className="calendar-layout">
                 <div className="month-panel">
                   <div className="month-toolbar"><h2>{formatDay(`${activeMonth}-01`, { month: "long", year: "numeric" })}</h2><div>

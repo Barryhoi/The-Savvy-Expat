@@ -40,7 +40,7 @@ export async function resolveEventType() {
     );
     const event = result.collection.find(
       (e: { scheduling_url: string; duration: number }) =>
-        e.scheduling_url.replace(/\/$/, "") === EVENT_URL && e.duration === 30,
+        e.scheduling_url.replace(/\/$/, "") === EVENT_URL && e.duration === 45,
     );
     if (event) {
       eventUri = event.uri;

@@ -86,7 +86,7 @@ export async function createSetterInvitee(token: string, input: BookingDetails) 
     if (active?.value.status === "active") throw new Error("ALREADY_BOOKED");
     const eventType = await resolveEventType();
     const { resource: event } = await calendlyApi(new URL(eventType).pathname);
-    if (event.duration !== 30 || event.locations?.[0]?.kind !== "google_conference")
+    if (event.duration !== 45 || event.locations?.[0]?.kind !== "google_conference")
       throw new Error("EVENT_CONFIGURATION_CHANGED");
     const values: Record<string, string> = {
       "Additional notes": details.notes,

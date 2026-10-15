@@ -7,7 +7,7 @@ Module._load=function(name,...args){
  if(name==='./calendly')return{resolveEventType:async()=> 'https://api.calendly.com/event_types/test',providerPath:()=>'/valid',calendlyApi:async(p,m,b)=>{
   if(p==='/invitees'){posts++;if(fail)throw Error(fail);assert.equal(b.tracking.utm_content,'se_app');assert.deepEqual(Object.keys(b.tracking).sort(),['salesforce_uuid','utm_campaign','utm_content','utm_medium','utm_source','utm_term']);assert.equal(b.invitee.email,'qa@example.com');assert.equal(b.questions_and_answers[0].answer,'Yes');return{resource:{uri:'https://calendly.com/scheduled_events/test/invitees/test'}};}
   if(p.startsWith('/event_type_available_times'))return{collection:available?[{start_time:details.start,status:'available'}]:[]};
-  return{resource:{duration:30,locations:[{kind:'google_conference'}],custom_questions:[{enabled:true,required:true,name:'Do you have WhatsApp?',position:2}]}};
+  return{resource:{duration:45,locations:[{kind:'google_conference'}],custom_questions:[{enabled:true,required:true,name:'Do you have WhatsApp?',position:2}]}};
  }};
  return old.call(this,name,...args);
 };

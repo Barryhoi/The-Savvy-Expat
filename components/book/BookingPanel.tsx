@@ -24,7 +24,7 @@ export default function BookingPanel({ nextHref, theme = "current" }: { nextHref
           <Image src="/evan-portrait.jpg" alt="Evan Lorezca" width={72} height={72} sizes="72px" className="bk-avatar" />
           <div><p>Evan Lorezca</p></div>
         </div>
-        <p className="bk-eyebrow">Free · 30 minutes</p>
+        <p className="bk-eyebrow">Free · 45 minutes</p>
         <h2 className="bk-title">Discovery call</h2>
         <p className="bk-description">You’ll speak with our Senior Relocation Strategist about your goals, your timeline and your biggest concerns, and we’ll see if we’re the right fit to make your move to the Philippines easy.</p>
       </aside>

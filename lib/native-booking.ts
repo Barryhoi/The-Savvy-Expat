@@ -40,7 +40,7 @@ export async function createNativeBooking(application: Application, input: Booki
     if (lead.organization_id !== config.organizationId || currentApplication !== application.id) throw Error("APPLICATION_CHANGED");
     const eventType = await resolveEventType();
     const { resource: event } = await calendlyApi(new URL(eventType).pathname);
-    if (event.duration !== 30 || event.locations?.[0]?.kind !== "google_conference") throw Error("EVENT_CONFIGURATION_CHANGED");
+    if (event.duration !== 45 || event.locations?.[0]?.kind !== "google_conference") throw Error("EVENT_CONFIGURATION_CHANGED");
     const values: Record<string, string> = { "Additional notes": details.notes, "Phone number": String(application.answers.phone || ""), "Do you have WhatsApp?": details.whatsapp, ...bookQuestionValues(applicationBookAnswers(application.answers)) };
     const questions = (event.custom_questions || []).filter((q: { enabled: boolean }) => q.enabled);
     if (questions.some((q: { required: boolean; name: string }) => q.required && !values[q.name])) throw Error("EVENT_CONFIGURATION_CHANGED");

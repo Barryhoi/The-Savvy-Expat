@@ -42,7 +42,7 @@ export default function NativeBookingDetails({ application, start, zone, setterT
   }
   return <div className="native-confirmation">
     <h1>Confirm your call.</h1>
-    <div className="native-slot"><div><strong>{new Intl.DateTimeFormat("en", { timeZone: zone, weekday: "short", month: "short", day: "numeric" }).format(new Date(start))}</strong><p>{new Intl.DateTimeFormat("en", { timeZone: zone, hour: "numeric", minute: "2-digit" }).format(new Date(start))}<span className="native-zone">{timeZoneLabel(zone)}</span></p><span>30 min · Google Meet</span></div><button type="button" className="native-change" onClick={onBack} disabled={busy || pending} aria-label="Change date or time">Change</button></div>
+    <div className="native-slot"><div><strong>{new Intl.DateTimeFormat("en", { timeZone: zone, weekday: "short", month: "short", day: "numeric" }).format(new Date(start))}</strong><p>{new Intl.DateTimeFormat("en", { timeZone: zone, hour: "numeric", minute: "2-digit" }).format(new Date(start))}<span className="native-zone">{timeZoneLabel(zone)}</span></p><span>45 min · Google Meet</span></div><button type="button" className="native-change" onClick={onBack} disabled={busy || pending} aria-label="Change date or time">Change</button></div>
     <div className="native-recipient"><strong>{application.name}</strong><p>Confirmation to <span>{application.email}</span></p><div className="native-contact-summary"><span>Contact details</span><p>{application.phone}</p></div></div>
     <form onSubmit={submit}>
       {isSetterBooking && (["timeline", "funds", "logistics", "services"] as const).map(key => {
