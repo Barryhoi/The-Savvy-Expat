@@ -48,6 +48,7 @@ export function formAnswers(questions: QA[]) {
     why: find(/what made you want/i),
     timeline: find(/arrive/i),
     services: find(/services/i).split("\n").map((s) => s.trim()).filter(Boolean).join("; "),
+    budget: find(/monthly living expenses/i),
     funds: find(/liquid funds/i),
     logistics: find(/arrangements/i),
   };
@@ -59,6 +60,7 @@ export function formAnswers(questions: QA[]) {
 export function disqualified(answers: ReturnType<typeof formAnswers>) {
   return /^12\+/.test(plain(answers.timeline)) ||
     /^No\b/i.test(plain(answers.funds)) ||
+    /^Under/i.test(plain(answers.budget)) ||
     /not ready/i.test(plain(answers.logistics));
 }
 
@@ -78,6 +80,7 @@ export async function syncFormBooking(invitee: any, inviteeUri: string, startTim
     const custom = customFields({
       timeline: answers.timeline || undefined,
       services: answers.services || undefined,
+      budget: answers.budget || undefined,
       funds: answers.funds || undefined,
       logistics: answers.logistics || undefined,
       whatsapp: answers.whatsapp || undefined,
@@ -160,7 +163,8 @@ export async function syncFormBooking(invitee: any, inviteeUri: string, startTim
           `Phone: ${answers.phone || "-"}`,
           `Arrival: ${answers.timeline || "-"}`,
           `Services: ${answers.services || "-"}`,
-          `Liquid funds: ${answers.funds || "-"}`,
+          `Monthly budget: ${answers.budget || "-"}`,
+          answers.funds ? `Liquid funds: ${answers.funds}` : "",
           `Arrangements: ${answers.logistics || "-"}`,
           `WhatsApp: ${answers.whatsapp || "-"}`,
           answers.why ? `Why us: ${answers.why}` : "",
