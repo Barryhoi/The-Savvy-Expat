@@ -61,7 +61,7 @@ export function disqualified(answers: ReturnType<typeof formAnswers>) {
   return /^12\+/.test(plain(answers.timeline)) ||
     /^No\b/i.test(plain(answers.funds)) ||
     /^Under/i.test(plain(answers.budget)) ||
-    /not ready/i.test(plain(answers.logistics));
+    /^I.m not ready to move forward/i.test(plain(answers.logistics));
 }
 
 export async function syncFormBooking(invitee: any, inviteeUri: string, startTime?: string) {
@@ -165,7 +165,7 @@ export async function syncFormBooking(invitee: any, inviteeUri: string, startTim
           `Services: ${answers.services || "-"}`,
           `Monthly budget: ${answers.budget || "-"}`,
           answers.funds ? `Liquid funds: ${answers.funds}` : "",
-          `Arrangements: ${answers.logistics || "-"}`,
+          `Flights & arrangements: ${answers.logistics || "-"}`,
           `WhatsApp: ${answers.whatsapp || "-"}`,
           answers.why ? `Why us: ${answers.why}` : "",
           answers.notes ? `Notes: ${answers.notes}` : "",

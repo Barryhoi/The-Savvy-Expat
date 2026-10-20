@@ -21,15 +21,12 @@ export const BOOK_QUESTIONS = {
     options: ["Under $1,000", "$1,000–$2,500", "$2,500–$4,000", "$4,000+"],
     required: true,
   },
-  logistics: {
-    name: "What arrangements do you still need to finalize before making the move?",
-    options: [
-      "None, I’m ready to get professional help now",
-      "I’m not ready to move forward, I’m still finalizing arrangements",
-    ],
-    required: false,
-  },
 } as const;
+
+// Short-answer question that replaced the arrangements choice on Oct 20 2026
+// (Evan), so Sam has context before the call. Required on Calendly's form;
+// saved to the Close field "Outstanding logistics".
+export const ARRANGEMENTS_QUESTION = "Have you confirmed your flight dates & what arrangements do you need to finalize before the move?";
 
 // Free-text question added Oct 15 2026 (Evan). Optional on Calendly's form;
 // saved to the Close field "Why The Savvy Expat".
@@ -40,16 +37,16 @@ export type BookAnswers = { timeline: string; services: string[]; budget: string
 export function validBookAnswers(input: unknown): BookAnswers | null {
   if (!input || typeof input !== "object") return null;
   const raw = input as Record<string, unknown>;
-  const pick = (key: "timeline" | "budget" | "logistics") => {
+  const pick = (key: "timeline" | "budget") => {
     const value = typeof raw[key] === "string" ? (raw[key] as string) : "";
     return (BOOK_QUESTIONS[key].options as readonly string[]).includes(value) ? value : "";
   };
   const services = Array.isArray(raw.services)
     ? [...new Set(raw.services.filter((s): s is string => (BOOK_QUESTIONS.services.options as readonly string[]).includes(s as string)))]
     : [];
-  const why = typeof raw.why === "string" ? raw.why.trim().slice(0, 1000) : "";
-  const answers = { timeline: pick("timeline"), services, budget: pick("budget"), logistics: pick("logistics"), why };
-  if (!answers.timeline || !answers.budget) return null;
+  const text = (key: "logistics" | "why") => typeof raw[key] === "string" ? (raw[key] as string).trim().slice(0, 1000) : "";
+  const answers = { timeline: pick("timeline"), services, budget: pick("budget"), logistics: text("logistics"), why: text("why") };
+  if (!answers.timeline || !answers.budget || !answers.logistics) return null;
   return answers;
 }
 
@@ -60,7 +57,7 @@ export function bookQuestionValues(answers: BookAnswers | null): Record<string, 
     [BOOK_QUESTIONS.timeline.name]: answers.timeline,
     [BOOK_QUESTIONS.services.name]: answers.services.join("\n"),
     [BOOK_QUESTIONS.budget.name]: answers.budget,
-    [BOOK_QUESTIONS.logistics.name]: answers.logistics,
+    ...(answers.logistics ? { [ARRANGEMENTS_QUESTION]: answers.logistics } : {}),
     ...(answers.why ? { [WHY_QUESTION]: answers.why } : {}),
   };
 }

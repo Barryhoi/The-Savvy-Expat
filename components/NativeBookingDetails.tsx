@@ -2,7 +2,7 @@
 import { useRef, useState } from "react";
 import { confirmBookingRequest } from "@/lib/booking-confirmation";
 import { timeZoneLabel } from "@/lib/timezones";
-import { BOOK_QUESTIONS, WHY_QUESTION } from "@/lib/book-questions";
+import { ARRANGEMENTS_QUESTION, BOOK_QUESTIONS, WHY_QUESTION } from "@/lib/book-questions";
 export default function NativeBookingDetails({ application, start, zone, setterToken, onBack }: {
   application: { id?: string; name: string; email: string; phone: string }; start: string; zone: string; setterToken?: string; onBack: () => void;
 }) {
@@ -45,7 +45,7 @@ export default function NativeBookingDetails({ application, start, zone, setterT
     <div className="native-slot"><div><strong>{new Intl.DateTimeFormat("en", { timeZone: zone, weekday: "short", month: "short", day: "numeric" }).format(new Date(start))}</strong><p>{new Intl.DateTimeFormat("en", { timeZone: zone, hour: "numeric", minute: "2-digit" }).format(new Date(start))}<span className="native-zone">{timeZoneLabel(zone)}</span></p><span>45 min · Google Meet</span></div><button type="button" className="native-change" onClick={onBack} disabled={busy || pending} aria-label="Change date or time">Change</button></div>
     <div className="native-recipient"><strong>{application.name}</strong><p>Confirmation to <span>{application.email}</span></p><div className="native-contact-summary"><span>Contact details</span><p>{application.phone}</p></div></div>
     <form onSubmit={submit}>
-      {isSetterBooking && (["timeline", "budget", "logistics", "services"] as const).map(key => {
+      {isSetterBooking && (["timeline", "services", "budget"] as const).map(key => {
         const question = BOOK_QUESTIONS[key];
         const multiple = key === "services";
         return <fieldset key={key} disabled={busy || pending} className="native-whatsapp setter-question"><legend>{question.name}{!question.required && <span className="native-optional-label"> (optional)</span>}</legend><div>{question.options.map(option => {
@@ -55,11 +55,12 @@ export default function NativeBookingDetails({ application, start, zone, setterT
             : { ...current, [key]: option })} />{option}</label>;
         })}</div></fieldset>;
       })}
+      {isSetterBooking && <label className="native-notes setter-why"><span className="native-note-label">{ARRANGEMENTS_QUESTION}</span><textarea required aria-label={ARRANGEMENTS_QUESTION} maxLength={1000} rows={3} value={answers.logistics} onChange={e => setAnswers(current => ({ ...current, logistics: e.target.value }))} disabled={busy || pending} /></label>}
       {isSetterBooking && <label className="native-notes setter-why"><span className="native-note-label">{WHY_QUESTION} <span className="native-optional-label">(optional)</span></span><textarea aria-label={WHY_QUESTION} maxLength={1000} rows={3} value={answers.why} onChange={e => setAnswers(current => ({ ...current, why: e.target.value }))} disabled={busy || pending} /></label>}
       <fieldset disabled={busy || pending} className="native-whatsapp"><legend>Do you have WhatsApp?</legend><div>{["Yes", "No"].map(value => <label key={value} className={whatsapp === value ? "chosen" : ""}><input required type="radio" name="whatsapp" value={value} checked={whatsapp === value} onChange={() => setWhatsapp(value)} />{value}</label>)}</div></fieldset>
       <label className="native-notes"><span className="native-note-label"><span aria-hidden="true">▾</span> {isSetterBooking ? "Add a note for Sam" : "Add a note"} <span className="native-optional-label">(optional)</span></span><textarea aria-label="What would be helpful for us to know before the call?" maxLength={2000} rows={3} value={notes} onChange={e => setNotes(e.target.value)} disabled={busy || pending} placeholder="What would be helpful for us to know before the call?" /></label>
       {error && <p className="calendar-error" role="alert">{error}</p>}
-      <button className="native-confirm-button" disabled={busy || (!pending && (!whatsapp || (isSetterBooking && (!answers.timeline || !answers.budget))))} type="submit">{busy ? "Confirming your booking…" : pending ? "Check booking status" : "Confirm booking"}<span aria-hidden="true">→</span></button>
+      <button className="native-confirm-button" disabled={busy || (!pending && (!whatsapp || (isSetterBooking && (!answers.timeline || !answers.budget || !answers.logistics.trim()))))} type="submit">{busy ? "Confirming your booking…" : pending ? "Check booking status" : "Confirm booking"}<span aria-hidden="true">→</span></button>
       <p className="native-terms">By booking, you agree to Calendly’s <a href="https://calendly.com/legal/participant-terms-conditions" target="_blank" rel="noopener noreferrer">Participant Terms</a> and <a href="https://calendly.com/privacy" target="_blank" rel="noopener noreferrer">Privacy Notice</a>.</p>
     </form>
   </div>;
