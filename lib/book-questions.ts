@@ -26,7 +26,7 @@ export const BOOK_QUESTIONS = {
 // Short-answer question that replaced the arrangements choice on Oct 20 2026
 // (Evan), so Sam has context before the call. Required on Calendly's form;
 // saved to the Close field "Outstanding logistics".
-export const ARRANGEMENTS_QUESTION = "Have you confirmed your flight dates & what arrangements do you need to finalize before the move?";
+export const ARRANGEMENTS_QUESTION = "Have you confirmed your flight dates and what arrangements do you need to finalize before the move?";
 
 // Free-text question added Oct 15 2026 (Evan). Optional on Calendly's form;
 // saved to the Close field "Why The Savvy Expat".
