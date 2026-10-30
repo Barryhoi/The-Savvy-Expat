@@ -3,10 +3,19 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import CalendlyEmbed from "./CalendlyEmbed";
 import { dateInZone, monthDays, moveMonth, type AvailableSlot } from "@/lib/booking-time";
-import { timeZoneLabel } from "@/lib/timezones";
 
 
 const weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+// "Eastern Time", "Central European Time" etc. for the time-zone note.
+function zoneName(zone: string) {
+  try {
+    const name = new Intl.DateTimeFormat("en-US", { timeZone: zone, timeZoneName: "longGeneric" })
+      .formatToParts(new Date()).find(part => part.type === "timeZoneName")?.value;
+    if (name && !/^GMT/.test(name)) return name;
+  } catch {}
+  return zone.split("/").pop()?.replace(/_/g, " ") || zone;
+}
 
 export default function NativeBookingCalendar({ nextHref, colors }: { nextHref: string; colors?: Record<string, string> }) {
   const [zone, setZone] = useState("");
@@ -122,7 +131,7 @@ export default function NativeBookingCalendar({ nextHref, colors }: { nextHref: 
     <div className="bkn-calendar-card" aria-busy={loading}>
       <h3 className="sr-only">Select a date &amp; time</h3>
       {/* Leads kept mixing up their time and Manila time (Evan, Oct 30 2026). */}
-      {zone && <p className="bkn-zone-note"><span aria-hidden="true">🌐</span>{zone === "Asia/Manila" ? <span>All times are shown in <strong>Philippine time</strong>.</span> : <span>All times are shown in <strong>your local time ({timeZoneLabel(zone)})</strong>, not Philippine time.</span>}</p>}
+      {zone && <p className="bkn-zone-note"><span aria-hidden="true">🌐</span>{zone === "Asia/Manila" ? <span>All times are shown in <strong>Philippine time</strong>.</span> : <span>All times are shown in <strong>your local time ({zoneName(zone)})</strong>, not Philippine time.</span>}</p>}
       <div className="bkn-calendar-grid">
         <div className="bkn-month-panel">
           <div className="bkn-month-bar">
