@@ -3,6 +3,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import CalendlyEmbed from "./CalendlyEmbed";
 import { dateInZone, monthDays, moveMonth, type AvailableSlot } from "@/lib/booking-time";
+import { timeZoneLabel } from "@/lib/timezones";
 
 
 const weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -120,6 +121,8 @@ export default function NativeBookingCalendar({ nextHref, colors }: { nextHref: 
     </ol>
     <div className="bkn-calendar-card" aria-busy={loading}>
       <h3 className="sr-only">Select a date &amp; time</h3>
+      {/* Leads kept mixing up their time and Manila time (Evan, Oct 30 2026). */}
+      {zone && <p className="bkn-zone-note"><span aria-hidden="true">🌐</span>{zone === "Asia/Manila" ? <span>All times are shown in <strong>Philippine time</strong>.</span> : <span>All times are shown in <strong>your local time ({timeZoneLabel(zone)})</strong>, not Philippine time.</span>}</p>}
       <div className="bkn-calendar-grid">
         <div className="bkn-month-panel">
           <div className="bkn-month-bar">
@@ -151,6 +154,6 @@ export default function NativeBookingCalendar({ nextHref, colors }: { nextHref: 
         </div>
       </div>
     </div>
-    <div className="bk-help"><span>Times shown in your time zone.</span><button className="bkn-text-button" onClick={() => setFallback(true)}>Trouble booking? ↗</button></div>
+    <div className="bk-help"><span /><button className="bkn-text-button" onClick={() => setFallback(true)}>Trouble booking? ↗</button></div>
   </div>}</>;
 }

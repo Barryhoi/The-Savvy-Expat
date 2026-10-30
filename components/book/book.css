@@ -104,6 +104,10 @@
 .bkn-days button.is-available:hover { background:#3924e8;  }
 .bkn-days button.is-selected,.bkn-days button.is-selected:hover { background:#041630; color:#fff;  }
 .bkn-days .is-today:after { content:""; width:3px; height:3px; border-radius:50%; background:currentColor; position:absolute; bottom:3px; }
+.bkn-zone-note { display:flex; align-items:flex-start; gap:10px; margin:0 0 18px; padding:12px 14px; border-radius:12px; background:#efecff; border:1px solid rgb(73 52 251 / 25%); color:#041630; font-size:14px; line-height:1.45; }
+.bkn-zone-note strong { color:#2f1fd6; font-weight:700; }
+.bk-theme-navy .bkn-zone-note { background:rgb(139 125 255 / 14%); border-color:rgb(139 125 255 / 35%); color:#fff; }
+.bk-theme-navy .bkn-zone-note strong { color:#b9b0ff; }
 .bkn-timezone { display:flex; align-items:center; gap:10px; margin-top:28px; font-size:12px; font-weight:400; color:#526078; }
 .bkn-timezone select { min-width:0; max-width:calc(100% - 68px); width:220px; font-size:12px; font-weight:400; color:#526078; background:transparent; border:0; border-radius:4px; padding:9px 4px; }
 .bkn-times-panel { padding:0 20px 20px; border-left:1px solid #e3defa; min-width:0; }
