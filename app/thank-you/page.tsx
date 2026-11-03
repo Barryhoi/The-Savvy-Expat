@@ -53,9 +53,9 @@ export default async function ThankYouPage() {
                 Your discovery call is booked.
               </h1>
               <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-ink/60">
-                Your booking is confirmed and the details are in your email. Please
-                watch these videos to help you prepare for your upcoming chat with
-                The Savvy Expat team.
+                Your booking is confirmed and the details are in your email. To help
+                you prepare for your chat with The Savvy Expat team, take a few minutes
+                to read what our clients say and watch their stories below.
               </p>
             </Reveal>
           </div>
