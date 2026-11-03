@@ -3,10 +3,9 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Reveal from "@/components/Reveal";
 import Eyebrow from "@/components/Eyebrow";
-import QuoteMarquee from "@/components/QuoteMarquee";
 import TrustpilotReviews from "@/components/TrustpilotReviews";
 import YouTubeEmbed from "@/components/YouTubeEmbed";
-import { REVIEW_VIDEOS, WRITTEN_REVIEWS } from "@/lib/reviews";
+import { REVIEW_VIDEOS } from "@/lib/reviews";
 
 export const metadata = {
   title: "Reviews — The Savvy Expat",
@@ -111,14 +110,6 @@ export default function ReviewsPage() {
             </Reveal>
           </div>
         </section>
-
-        {/* ---------- Written reviews ---------- */}
-        <QuoteMarquee
-          heading="Real Reviews From Real Clients"
-          subheading="Real feedback from clients who moved to the Philippines with The Savvy Expat."
-          quotes={WRITTEN_REVIEWS}
-          showTrustBadge={false}
-        />
 
         {/* ---------- Close ---------- */}
         <section className="px-6 py-24">
