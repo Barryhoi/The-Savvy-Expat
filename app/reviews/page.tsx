@@ -4,6 +4,7 @@ import Footer from "@/components/Footer";
 import Reveal from "@/components/Reveal";
 import Eyebrow from "@/components/Eyebrow";
 import TrustpilotReviews from "@/components/TrustpilotReviews";
+import ClientPhotoMarquee from "@/components/ClientPhotoMarquee";
 import { TestimonialClipGrid } from "@/components/TestimonialClips";
 
 export const metadata = {
@@ -85,6 +86,9 @@ export default function ReviewsPage() {
             </Reveal>
           </div>
         </section>
+
+        {/* ---------- Evan with clients ---------- */}
+        <ClientPhotoMarquee />
 
         {/* ---------- Close ---------- */}
         <section className="px-6 py-24">
