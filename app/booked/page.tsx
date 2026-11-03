@@ -4,6 +4,7 @@ import Reveal from "@/components/Reveal";
 import Image from "next/image";
 import Link from "next/link";
 import TestimonialClips from "@/components/TestimonialClips";
+import ClientPhotoMarquee from "@/components/ClientPhotoMarquee";
 import TrustpilotReviews from "@/components/TrustpilotReviews";
 import "@/components/book/book.css";
 
@@ -61,6 +62,7 @@ export default function BookedPage() {
           heading="Watch these before your call"
           subheading="Real clients on what it was like making the move with The Savvy Expat."
         />
+        <ClientPhotoMarquee />
       </main>
     </div>
   );

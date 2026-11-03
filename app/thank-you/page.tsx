@@ -5,6 +5,7 @@ import { readRecord } from "@/lib/receipt-store";
 import Reveal from "@/components/Reveal";
 import FunnelHeader from "@/components/FunnelHeader";
 import TestimonialClips from "@/components/TestimonialClips";
+import ClientPhotoMarquee from "@/components/ClientPhotoMarquee";
 import TrustpilotReviews from "@/components/TrustpilotReviews";
 
 export const metadata = {
@@ -72,6 +73,7 @@ export default async function ThankYouPage() {
           heading="Watch these before your call"
           subheading="Real clients on what it was like making the move with The Savvy Expat."
         />
+        <ClientPhotoMarquee />
       </main>
     </div>
   );

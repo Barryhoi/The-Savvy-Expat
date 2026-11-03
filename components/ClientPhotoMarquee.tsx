@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Reveal from "@/components/Reveal";
-import Eyebrow from "@/components/Eyebrow";
 
 // Real photos of Evan with clients (same set as the Philippine Gameplan deck),
 // all pre-cropped to one 9:8 frame in /public/clients so the strip stays even.
@@ -12,9 +11,8 @@ export default function ClientPhotoMarquee() {
     <section className="pb-8 pt-4">
       <div className="mx-auto max-w-6xl px-6 text-center">
         <Reveal>
-          <Eyebrow icon="users">Real Clients, Real Moves</Eyebrow>
           <h2 className="mx-auto max-w-3xl text-3xl font-black leading-tight tracking-tight sm:text-4xl">
-            Evan With Clients
+            Every face here made the move with us
           </h2>
         </Reveal>
       </div>
