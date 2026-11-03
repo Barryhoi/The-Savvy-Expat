@@ -4,6 +4,7 @@ import Footer from "@/components/Footer";
 import Reveal from "@/components/Reveal";
 import Eyebrow from "@/components/Eyebrow";
 import QuoteMarquee from "@/components/QuoteMarquee";
+import TrustpilotReviews from "@/components/TrustpilotReviews";
 import YouTubeEmbed from "@/components/YouTubeEmbed";
 import { REVIEW_VIDEOS, WRITTEN_REVIEWS } from "@/lib/reviews";
 
@@ -59,8 +60,11 @@ export default function ReviewsPage() {
           </div>
         </section>
 
+        {/* ---------- Trustpilot reviews ---------- */}
+        <TrustpilotReviews />
+
         {/* ---------- Video testimonials ---------- */}
-        <section className="px-6 pb-24">
+        <section className="px-6 pb-24 pt-20">
           <div className="mx-auto max-w-6xl">
             <Reveal>
               <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
