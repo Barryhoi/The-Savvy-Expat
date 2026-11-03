@@ -5,13 +5,13 @@ import HostedVideo from "@/components/HostedVideo";
 // Evan's short testimonial cuts (Nov 2026), straight to the client's story.
 // Files live in /public/testimonials: H.264 MP4 plus a poster frame each.
 export const TESTIMONIAL_CLIPS = [
-  { slug: "todd", name: "Todd" },
-  { slug: "charles", name: "Charles" },
-  { slug: "michael-cherry", name: "Michael Cherry" },
-  { slug: "michael", name: "Michael" },
+  { slug: "todd", name: "Todd", from: "Washington" },
+  { slug: "charles", name: "Charles", from: "Florida" },
+  { slug: "michael-cherry", name: "Michael", from: "North Carolina" },
+  { slug: "michael", name: "Michael", from: "Pennsylvania" },
 ];
 
-/** 2x2 grid of the clips, each with the client's name underneath. */
+/** 2x2 grid of the clips, each with the client's name and home state underneath. */
 export function TestimonialClipGrid() {
   return (
     <div className="grid gap-6 sm:grid-cols-2">
@@ -21,9 +21,12 @@ export function TestimonialClipGrid() {
             <HostedVideo
               src={`/testimonials/${clip.slug}.mp4`}
               poster={`/testimonials/${clip.slug}.jpg`}
-              title={`${clip.name}, client testimonial`}
+              title={`${clip.name} from ${clip.from}, client testimonial`}
             />
-            <p className="px-5 py-4 font-black">{clip.name}</p>
+            <div className="px-5 py-4">
+              <p className="font-black">{clip.name}</p>
+              <p className="text-sm text-ink/50">From {clip.from}</p>
+            </div>
           </div>
         </Reveal>
       ))}
