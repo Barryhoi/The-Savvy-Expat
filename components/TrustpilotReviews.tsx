@@ -85,10 +85,50 @@ function TrustpilotMark() {
   );
 }
 
+// Second marquee row starts halfway through the list so the rows never line up.
+const ROW_TWO = [...REVIEWS.slice(3), ...REVIEWS.slice(0, 3)];
+
+function ReviewCard({ review }: { review: (typeof REVIEWS)[number] }) {
+  return (
+    <a
+      href={TRUSTPILOT_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="mx-3 flex w-[320px] shrink-0 flex-col rounded-2xl bg-white p-6 sm:w-[400px] shadow-[0_18px_45px_-28px_rgba(4,22,48,0.35)] ring-1 ring-ink/5 transition-all duration-300 hover:shadow-[0_26px_55px_-28px_rgba(73,52,251,0.45)]"
+    >
+      <div className="flex items-center justify-between gap-3">
+        <Stars />
+        <span className="text-xs font-medium text-ink/45">{review.date}</span>
+      </div>
+      <p className="mt-4 text-base font-black leading-snug tracking-tight">
+        {review.title}
+      </p>
+      <p className="mt-2 flex-1 text-sm leading-relaxed text-ink/70">
+        “{review.text}”
+      </p>
+      <div className="mt-5 flex items-center gap-3 border-t border-ink/5 pt-4">
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-lavender text-sm font-black text-primary">
+          {initials(review.name)}
+        </span>
+        <div className="min-w-0">
+          <p className="truncate text-sm font-bold">{review.name}</p>
+          <p className="text-xs text-ink/50">{review.country}</p>
+        </div>
+        <span className="ml-auto inline-flex items-center gap-1 text-[11px] font-semibold text-[#00805A]">
+          <svg viewBox="0 0 20 20" fill="currentColor" className="h-3.5 w-3.5" aria-hidden="true">
+            <path d="M9.05 2.93c.3-.92 1.6-.92 1.9 0l1.07 3.29a1 1 0 00.95.69h3.46c.97 0 1.37 1.24.59 1.81l-2.8 2.03a1 1 0 00-.36 1.12l1.07 3.29c.3.92-.76 1.69-1.54 1.12l-2.8-2.03a1 1 0 00-1.18 0l-2.8 2.03c-.78.57-1.84-.2-1.54-1.12l1.07-3.29a1 1 0 00-.36-1.12L2.98 8.72c-.78-.57-.38-1.81.59-1.81h3.46a1 1 0 00.95-.69l1.07-3.29z" />
+          </svg>
+          Trustpilot
+        </span>
+      </div>
+    </a>
+  );
+}
+
 export default function TrustpilotReviews() {
   return (
-    <section className="px-6 pb-4 pt-16">
-      <div className="mx-auto max-w-6xl">
+    <section className="pb-4 pt-16">
+      <div className="mx-auto max-w-6xl px-6">
         <Reveal>
           <div className="text-center">
             <a
@@ -104,61 +144,35 @@ export default function TrustpilotReviews() {
             <h2 className="mx-auto mt-6 max-w-3xl text-3xl font-black leading-tight tracking-tight sm:text-4xl">
               What our clients say
             </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-base text-ink/60">
-              Five-star reviews from expats who made the move with us, posted
-              on Trustpilot.
-            </p>
           </div>
         </Reveal>
+      </div>
 
-        {/* Swipeable row on phones, a 3-column wall on desktop. */}
-        <div
-          className="-mx-6 mt-10 flex snap-x snap-mandatory gap-4 overflow-x-auto px-6 pb-6 [scrollbar-width:none] lg:mx-0 lg:grid lg:grid-cols-3 lg:gap-6 lg:overflow-visible lg:px-0 [&::-webkit-scrollbar]:hidden"
-        >
-          {REVIEWS.map((review, i) => (
-            <Reveal
-              key={review.name}
-              delay={(i % 3) * 100}
-              className="w-[86%] shrink-0 snap-center sm:w-[46%] lg:w-auto"
-            >
-              <a
-                href={TRUSTPILOT_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex h-full flex-col rounded-2xl bg-white p-6 shadow-[0_18px_45px_-28px_rgba(4,22,48,0.35)] ring-1 ring-ink/5 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_26px_55px_-28px_rgba(73,52,251,0.45)] sm:p-7"
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <Stars />
-                  <span className="text-xs font-medium text-ink/45">{review.date}</span>
-                </div>
-                <p className="mt-5 text-lg font-black leading-snug tracking-tight">
-                  {review.title}
-                </p>
-                <p className="mt-3 flex-1 text-[15px] leading-relaxed text-ink/70">
-                  “{review.text}”
-                </p>
-                <div className="mt-6 flex items-center gap-3 border-t border-ink/5 pt-5">
-                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-lavender text-sm font-black text-primary">
-                    {initials(review.name)}
-                  </span>
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-bold">{review.name}</p>
-                    <p className="text-xs text-ink/50">{review.country}</p>
-                  </div>
-                  <span className="ml-auto inline-flex items-center gap-1 text-[11px] font-semibold text-[#00805A]">
-                    <svg viewBox="0 0 20 20" fill="currentColor" className="h-3.5 w-3.5" aria-hidden="true">
-                      <path d="M9.05 2.93c.3-.92 1.6-.92 1.9 0l1.07 3.29a1 1 0 00.95.69h3.46c.97 0 1.37 1.24.59 1.81l-2.8 2.03a1 1 0 00-.36 1.12l1.07 3.29c.3.92-.76 1.69-1.54 1.12l-2.8-2.03a1 1 0 00-1.18 0l-2.8 2.03c-.78.57-1.84-.2-1.54-1.12l1.07-3.29a1 1 0 00-.36-1.12L2.98 8.72c-.78-.57-.38-1.81.59-1.81h3.46a1 1 0 00.95-.69l1.07-3.29z" />
-                    </svg>
-                    Trustpilot
-                  </span>
-                </div>
-              </a>
-            </Reveal>
-          ))}
+      {/* Two counter-scrolling rows, same motion as the /reviews page.
+          Hovering a row pauses it (see .marquee-row in globals.css). */}
+      <Reveal delay={150}>
+        <div className="marquee-row mt-10 overflow-hidden py-3 [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
+          <div className="animate-marquee flex w-max" style={{ animationDuration: "45s" }}>
+            {[...REVIEWS, ...REVIEWS].map((review, i) => (
+              <ReviewCard key={`row1-${i}`} review={review} />
+            ))}
+          </div>
         </div>
+        <div className="marquee-row mt-3 overflow-hidden py-3 [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
+          <div
+            className="animate-marquee-slow flex w-max"
+            style={{ animationDirection: "reverse", animationDuration: "60s" }}
+          >
+            {[...ROW_TWO, ...ROW_TWO].map((review, i) => (
+              <ReviewCard key={`row2-${i}`} review={review} />
+            ))}
+          </div>
+        </div>
+      </Reveal>
 
+      <div className="mx-auto max-w-6xl px-6">
         <Reveal>
-          <p className="mt-4 text-center">
+          <p className="mt-6 text-center">
             <a
               href={TRUSTPILOT_URL}
               target="_blank"
