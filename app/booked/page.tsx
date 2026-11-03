@@ -3,12 +3,9 @@
 import Reveal from "@/components/Reveal";
 import Image from "next/image";
 import Link from "next/link";
-import YouTubeEmbed from "@/components/YouTubeEmbed";
 import ClientVideos from "@/components/ClientVideos";
+import TrustpilotReviews from "@/components/TrustpilotReviews";
 import "@/components/book/book.css";
-
-// The explainer to watch before the call.
-const PRE_CALL_VIDEO_ID = "wWbfSZrcMXo";
 
 export const metadata = {
   title: "You're Booked | The Savvy Expat",
@@ -37,7 +34,7 @@ export default function BookedPage() {
           <Link href="/"><Image src="/logo.png" alt="The Savvy Expat" width={105} height={80} priority className="funnel-logo" /></Link>
         </header>
 
-        <section className="px-6 pb-16 pt-12">
+        <section className="px-6 pb-4 pt-12">
           <div className="mx-auto max-w-3xl text-center">
             <Reveal>
               <ConfirmedBadge />
@@ -45,38 +42,24 @@ export default function BookedPage() {
                 Your discovery call is booked.
               </h1>
               <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-ink/60">
-                Check your email for your booking details, and watch this short video
-                before your call.
+                Your booking is confirmed and the details are in your email. Please
+                watch these videos to help you prepare for your upcoming chat with
+                The Savvy Expat team.
               </p>
             </Reveal>
           </div>
 
-          <Reveal delay={180}>
-            <div className="relative mx-auto mt-12 w-full max-w-[820px]">
-              <div
-                className="absolute -inset-4 rounded-[2rem] bg-gradient-to-br from-primary to-primary-soft opacity-25 blur-xl"
-                aria-hidden="true"
-              />
-              <div className="relative overflow-hidden rounded-2xl shadow-[0_24px_60px_-30px_rgba(4,22,48,0.45)]">
-                <YouTubeEmbed
-                  videoId={PRE_CALL_VIDEO_ID}
-                  title="Watch this before your call with The Savvy Expat"
-                  thumbnail="/thumbnails/thank-you.png"
-                  featured
-                  autoPlay
-                />
-              </div>
-            </div>
-          </Reveal>
         </section>
+
+        <TrustpilotReviews />
       </div>
 
       {/* No site footer on the funnel pages: the visitor has just booked;
           a newsletter box and social links here only dilute the ending. */}
       <main className="flex-1 pb-16">
         <ClientVideos
-          heading="While you wait, meet a few of our clients"
-          subheading="They all started with the same call you just booked."
+          heading="Watch these before your call"
+          subheading="Real clients on what it was like making the move with The Savvy Expat."
         />
       </main>
     </div>
