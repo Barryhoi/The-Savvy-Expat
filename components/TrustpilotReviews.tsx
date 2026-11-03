@@ -85,9 +85,6 @@ function TrustpilotMark() {
   );
 }
 
-// Second marquee row starts halfway through the list so the rows never line up.
-const ROW_TWO = [...REVIEWS.slice(3), ...REVIEWS.slice(0, 3)];
-
 function ReviewCard({ review }: { review: (typeof REVIEWS)[number] }) {
   return (
     <a
@@ -148,23 +145,13 @@ export default function TrustpilotReviews() {
         </Reveal>
       </div>
 
-      {/* Two counter-scrolling rows, same motion as the /reviews page.
-          Hovering a row pauses it (see .marquee-row in globals.css). */}
+      {/* One scrolling row, same motion as the /reviews page.
+          Hovering pauses it (see .marquee-row in globals.css). */}
       <Reveal delay={150}>
         <div className="marquee-row mt-10 overflow-hidden py-3 [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
           <div className="animate-marquee flex w-max" style={{ animationDuration: "45s" }}>
             {[...REVIEWS, ...REVIEWS].map((review, i) => (
               <ReviewCard key={`row1-${i}`} review={review} />
-            ))}
-          </div>
-        </div>
-        <div className="marquee-row mt-3 overflow-hidden py-3 [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
-          <div
-            className="animate-marquee-slow flex w-max"
-            style={{ animationDirection: "reverse", animationDuration: "60s" }}
-          >
-            {[...ROW_TWO, ...ROW_TWO].map((review, i) => (
-              <ReviewCard key={`row2-${i}`} review={review} />
             ))}
           </div>
         </div>
