@@ -3,7 +3,7 @@
 import Reveal from "@/components/Reveal";
 import Image from "next/image";
 import Link from "next/link";
-import ClientVideos from "@/components/ClientVideos";
+import TestimonialClips from "@/components/TestimonialClips";
 import TrustpilotReviews from "@/components/TrustpilotReviews";
 import "@/components/book/book.css";
 
@@ -57,7 +57,7 @@ export default function BookedPage() {
       {/* No site footer on the funnel pages: the visitor has just booked;
           a newsletter box and social links here only dilute the ending. */}
       <main className="flex-1 pb-16">
-        <ClientVideos
+        <TestimonialClips
           heading="Watch these before your call"
           subheading="Real clients on what it was like making the move with The Savvy Expat."
         />

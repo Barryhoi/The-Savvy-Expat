@@ -4,7 +4,7 @@ import { applicationFromToken } from "@/lib/application";
 import { readRecord } from "@/lib/receipt-store";
 import Reveal from "@/components/Reveal";
 import FunnelHeader from "@/components/FunnelHeader";
-import ClientVideos from "@/components/ClientVideos";
+import TestimonialClips from "@/components/TestimonialClips";
 import TrustpilotReviews from "@/components/TrustpilotReviews";
 
 export const metadata = {
@@ -68,7 +68,7 @@ export default async function ThankYouPage() {
       {/* No site footer on the funnel pages: the visitor has just booked;
           a newsletter box and social links here only dilute the ending. */}
       <main className="flex-1 pb-16">
-        <ClientVideos
+        <TestimonialClips
           heading="Watch these before your call"
           subheading="Real clients on what it was like making the move with The Savvy Expat."
         />

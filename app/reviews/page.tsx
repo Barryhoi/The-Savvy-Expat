@@ -4,8 +4,7 @@ import Footer from "@/components/Footer";
 import Reveal from "@/components/Reveal";
 import Eyebrow from "@/components/Eyebrow";
 import TrustpilotReviews from "@/components/TrustpilotReviews";
-import YouTubeEmbed from "@/components/YouTubeEmbed";
-import { REVIEW_VIDEOS } from "@/lib/reviews";
+import { TestimonialClipGrid } from "@/components/TestimonialClips";
 
 export const metadata = {
   title: "Reviews — The Savvy Expat",
@@ -14,26 +13,6 @@ export const metadata = {
 };
 
 const YOUTUBE_CHANNEL_URL = "https://www.youtube.com/@TheSavvyExpat";
-
-function ReviewVideoCard({
-  id,
-  name,
-  location,
-}: {
-  id: string;
-  name: string;
-  location: string;
-}) {
-  return (
-    <div className="overflow-hidden rounded-2xl bg-white shadow-card ring-1 ring-ink/5">
-      <YouTubeEmbed videoId={id} title={`${name}, ${location} — client story`} />
-      <div className="p-5">
-        <p className="font-black">{name}</p>
-        <p className="text-sm text-ink/50">{location}</p>
-      </div>
-    </div>
-  );
-}
 
 export default function ReviewsPage() {
   return (
@@ -53,7 +32,7 @@ export default function ReviewsPage() {
                   className="h-1.5 w-1.5 rounded-full bg-primary"
                   aria-hidden="true"
                 />
-                170+ Clients satisfied
+                200+ Expats Relocated
               </p>
             </Reveal>
           </div>
@@ -88,12 +67,8 @@ export default function ReviewsPage() {
               </div>
             </Reveal>
 
-            <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {REVIEW_VIDEOS.map((video, index) => (
-                <Reveal key={video.id} delay={(index % 3) * 100}>
-                  <ReviewVideoCard {...video} />
-                </Reveal>
-              ))}
+            <div className="mt-10">
+              <TestimonialClipGrid />
             </div>
 
             <Reveal delay={150}>

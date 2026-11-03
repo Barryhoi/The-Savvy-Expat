@@ -24,7 +24,7 @@ const CREDIBILITY: {
   value?: string;
   label: string;
 }[] = [
-  { end: 170, suffix: "+", label: "Expats Relocated" },
+  { end: 200, suffix: "+", label: "Expats Relocated" },
   { end: 64000, suffix: "+", label: "Subscribers On YouTube" },
   { value: "Featured", label: "On Asian Journal News" },
 ];
