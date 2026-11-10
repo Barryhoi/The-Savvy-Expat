@@ -47,6 +47,20 @@ export function readAttribution(): Attribution {
     result.platform = clean(params.get("platform"));
     if (result.video || result.platform) return result;
 
+    // Tracked links (links.thesavvyexpat.com) drop "se_link=<platform>.<slug>"
+    // on the whole domain, so a visitor who lands on the homepage/VSL first
+    // still carries the tag when they reach /book.
+    const cookie = document.cookie.split("; ").find((c) => c.startsWith("se_link="));
+    if (cookie) {
+      const value = decodeURIComponent(cookie.slice("se_link=".length));
+      const dot = value.indexOf(".");
+      if (dot > 0) {
+        result.platform = clean(value.slice(0, dot));
+        result.video = clean(value.slice(dot + 1));
+        if (result.video) return result;
+      }
+    }
+
     const raw = localStorage.getItem(KEY);
     if (!raw) return result;
     const stored = JSON.parse(raw) as Attribution & { ts?: number };
