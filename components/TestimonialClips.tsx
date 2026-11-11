@@ -11,26 +11,19 @@ export const TESTIMONIAL_CLIPS = [
   { slug: "michael", name: "Michael", from: "Pennsylvania" },
 ];
 
-/** 2x2 grid of the clips, each with the client's name and home state underneath. */
+/**
+ * Evan's testimonial montage (Nov 11 2026): one full-width video that replaced
+ * the four separate clips. TESTIMONIAL_CLIPS above is kept for reference only.
+ */
 export function TestimonialClipGrid() {
   return (
-    <div className="grid gap-6 sm:grid-cols-2">
-      {TESTIMONIAL_CLIPS.map((clip, i) => (
-        <Reveal key={clip.slug} delay={(i % 2) * 100}>
-          <div className="overflow-hidden rounded-2xl bg-white shadow-card ring-1 ring-ink/5">
-            <HostedVideo
-              src={`/testimonials/${clip.slug}.mp4`}
-              poster={`/testimonials/${clip.slug}.jpg`}
-              title={`${clip.name} from ${clip.from}, client testimonial`}
-            />
-            <div className="px-5 py-4">
-              <p className="font-black">{clip.name}</p>
-              <p className="text-sm text-ink/50">From {clip.from}</p>
-            </div>
-          </div>
-        </Reveal>
-      ))}
-    </div>
+    <Reveal>
+      <HostedVideo
+        src="/testimonials/montage.mp4"
+        poster="/testimonials/montage.jpg"
+        title="Savvy Expat clients share their experience moving to the Philippines"
+      />
+    </Reveal>
   );
 }
 

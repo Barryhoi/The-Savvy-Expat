@@ -70,7 +70,7 @@ export default async function ThankYouPage() {
           a newsletter box and social links here only dilute the ending. */}
       <main className="flex-1 pb-16">
         <TestimonialClips
-          heading="Watch these before your call"
+          heading="Watch this before your call"
           subheading="Real clients on what it was like making the move with The Savvy Expat."
         />
         <ClientPhotoMarquee />

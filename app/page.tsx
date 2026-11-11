@@ -6,7 +6,7 @@ import YouTubeEmbed from "@/components/YouTubeEmbed";
 import BookCallButton from "@/components/BookCallButton";
 import CountUp from "@/components/CountUp";
 import LottieIcon from "@/components/LottieIcon";
-import ClientVideos from "@/components/ClientVideos";
+import TestimonialClips from "@/components/TestimonialClips";
 import TrustpilotReviews from "@/components/TrustpilotReviews";
 
 const VSL_VIDEO_ID = "gQY2qf-ZXIE";
@@ -393,7 +393,7 @@ export default function VslPage() {
           </div>
         </section>
 
-        <ClientVideos />
+        <TestimonialClips heading="Hear From Those Who've Made The Move With Us…" />
 
         {/* ---------- Options — the one dark section on the page ---------- */}
         <section className="bg-dark-glow">
