@@ -7,7 +7,7 @@ import BookCallButton from "@/components/BookCallButton";
 import CountUp from "@/components/CountUp";
 import LottieIcon from "@/components/LottieIcon";
 import ClientVideos from "@/components/ClientVideos";
-import QuoteMarquee from "@/components/QuoteMarquee";
+import TrustpilotReviews from "@/components/TrustpilotReviews";
 
 const VSL_VIDEO_ID = "gQY2qf-ZXIE";
 
@@ -449,7 +449,10 @@ export default function VslPage() {
           </div>
         </section>
 
-        <QuoteMarquee />
+        {/* ---------- Trustpilot reviews (same as /reviews, Evan Nov 11) ---------- */}
+        <div className="bg-sheen pb-16">
+          <TrustpilotReviews />
+        </div>
 
         {/* ---------- Process ---------- */}
         <section className="mx-auto max-w-6xl px-6 py-20 text-center">
