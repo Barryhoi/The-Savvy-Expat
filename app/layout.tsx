@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import AttributionCapture from "@/components/AttributionCapture";
 
 export const metadata: Metadata = {
   title: "The Savvy Expat | Helping Expats Move To The Philippines",
@@ -23,6 +24,7 @@ export default function RootLayout({
         />
       </head>
       <body className="font-sans antialiased">
+        <AttributionCapture />
         {children}
       </body>
     </html>
